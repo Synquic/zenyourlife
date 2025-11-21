@@ -2,7 +2,7 @@ import s1 from '../../assets/s1.png';
 import s2 from '../../assets/s2.png';
 import s3 from '../../assets/s3.png';
 import s4 from '../../assets/s4.png';
-
+import lock2 from '../../assets/lock2.png'
 const Service = () => {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-16 bg-white">
@@ -10,7 +10,7 @@ const Service = () => {
         {/* Services Badge */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 border border-blue-400 rounded-full text-sm text-blue-600">
-            <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+            <img src={lock2} alt="Lock" className="w-5 h-5" />
             Services
           </div>
         </div>
@@ -44,12 +44,12 @@ const Service = () => {
                 className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-105 z-10 block"
               />
 
-              {/* Stronger bottom fade: shorter height, stronger white */}
+              {/* Top to bottom fade: white at top to transparent */}
               <div
-                className="absolute bottom-0 left-0 right-0 h-28 z-20 pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-50 z-20 pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(255,255,255,1) 15%, rgba(255,255,255,0.9) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0))",
+                    "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0))",
                 }}
               />
             </div>
@@ -69,10 +69,10 @@ const Service = () => {
                 className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-105 z-10 block"
               />
               <div
-                className="absolute bottom-0 left-0 right-0 h-28 z-20 pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-28 z-20 pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(255,255,255,1) 15%, rgba(255,255,255,0.9) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0))",
+                    "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0))",
                 }}
               />
             </div>
@@ -92,10 +92,10 @@ const Service = () => {
                 className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-105 z-10 block"
               />
               <div
-                className="absolute bottom-0 left-0 right-0 h-28 z-20 pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-28 z-20 pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(255,255,255,1) 15%, rgba(255,255,255,0.9) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0))",
+                    "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0))",
                 }}
               />
             </div>
@@ -115,10 +115,10 @@ const Service = () => {
                 className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-105 z-10 block"
               />
               <div
-                className="absolute bottom-0 left-0 right-0 h-28 z-20 pointer-events-none"
+                className="absolute top-0 left-0 right-0 h-28 z-20 pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(255,255,255,1) 15%, rgba(255,255,255,0.9) 40%, rgba(255,255,255,0.6) 65%, rgba(255,255,255,0))",
+                    "linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0.7) 40%, rgba(255,255,255,0))",
                 }}
               />
             </div>

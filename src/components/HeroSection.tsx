@@ -1,4 +1,4 @@
-import React from "react";
+
 import Frame1 from "../assets/Frame1.jpg";
 
 const HeroSection = () => {

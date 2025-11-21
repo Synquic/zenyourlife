@@ -1,4 +1,4 @@
-import React from 'react'
+
 import MasterButton from "../assets/MasterButton.png";
 import MasterButton1 from "../assets/MasterButton (1).png";
 import MasterButton2 from "../assets/MasterButton (2).png";

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import {
   Facebook,
@@ -12,7 +12,7 @@ import {
 import blueArrow from '../assets/bluearrow.png';
 
 const Footer = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   return (
     <footer  className="bg-gray-900 text-white min-h-screen py-16">
       {/* Booking Section */}
@@ -49,9 +49,11 @@ const Footer = () => {
 
               {/* Right Side - Button */}
               <div className="flex-shrink-0">
-                <button onClick={() => navigate('/booking')} className="bg-white/30 backdrop-blur-md border-2 border-[#6F7BF8] hover:bg-white/40 text-white px-6 py-3 rounded-lg transition-all text-base font-medium flex items-center gap-3 shadow-lg cursor-pointer">
-                  <span className="font-semibold">Reserve Now</span>
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center">
+                <button  className="relative bg-white/30 backdrop-blur-md border-2 border-white hover:bg-white/40 text-white px-6 py-3 rounded-lg transition-all text-base font-medium flex items-center gap-3 shadow-lg cursor-pointer overflow-hidden group">
+                  {/* Glass shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
+                  <span className="font-semibold relative z-10">Reserve Now</span>
+                  <div className="w-8 h-8 rounded-md flex items-center justify-center relative z-10">
                     <img src={blueArrow} alt="arrow" className="w-8 h-8" />
                   </div>
                 </button>

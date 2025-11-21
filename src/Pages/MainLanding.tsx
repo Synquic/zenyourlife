@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import znlogo from '../assets/znlogo.png';
-import trustedImage from '../assets/trusted.png';
 import main1 from '../assets/main1.png';
 import main2 from '../assets/main2.png';
+import tp1 from '../assets/tp1.jpg';
+import tp2 from '../assets/tp2.jpg';
+import tp3 from '../assets/tp3.jpg';
+import tp4 from '../assets/tp4.jpg';
+import tp5 from '../assets/tp5.png';
 
 const MainLanding = () => {
   const navigate = useNavigate();
@@ -30,7 +34,7 @@ const MainLanding = () => {
             {/* Right Side - Contact Button and Language Dropdown */}
             <div className="flex items-center gap-3">
               {/* Contact Button */}
-              <button className="bg-[#d4af37] text-gray-900 px-6 py-2 rounded-full font-medium hover:bg-[#b8921f] transition shadow-md">
+              <button className="bg-[#d4af37] text-white px-6 py-2 rounded-full font-medium hover:bg-[#b8921f] transition shadow-md">
                 Contact us
               </button>
 
@@ -55,16 +59,45 @@ const MainLanding = () => {
         <div className="max-w-6xl mx-auto">
           {/* Trusted Partner Badge */}
           <div className="flex justify-center mb-8">
-            <img
-              src={trustedImage}
-              alt="Trusted by 5000+ Partners"
-              className="h-8 object-contain"
-            />
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white shadow-lg">
+              {/* Overlapping Avatar Circles */}
+              <div className="flex items-center -space-x-1.5">
+                {/* Avatar 1 */}
+                <div className="w-7 h-7 rounded-full border-2 border-white shadow-md overflow-hidden">
+                  <img src={tp1} alt="Partner 1" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Avatar 2 */}
+                <div className="w-7 h-7 rounded-full border-2 border-white shadow-md overflow-hidden">
+                  <img src={tp2} alt="Partner 2" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Avatar 3 */}
+                <div className="w-7 h-7 rounded-full border-2 border-white shadow-md overflow-hidden">
+                  <img src={tp3} alt="Partner 3" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Avatar 4 */}
+                <div className="w-7 h-7 rounded-full border-2 border-white shadow-md overflow-hidden">
+                  <img src={tp4} alt="Partner 4" className="w-full h-full object-cover" />
+                </div>
+
+                {/* Avatar 5 */}
+                <div className="w-7 h-7 rounded-full border-2 border-white shadow-md overflow-hidden">
+                  <img src={tp5} alt="Partner 5" className="w-full h-full object-cover" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div className="text-gray-800 font-semibold text-xs">
+                Trusted by 1000+ Partners
+              </div>
+            </div>
           </div>
 
           {/* Heading */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4 leading-tight">
+            <h1 className="text-4xl md:text-5xl  text-gray-900 mb-4 leading-tight">
               Discover Tranquility &<br />Luxury
             </h1>
             <p className="text-gray-600 text-lg">
@@ -85,7 +118,7 @@ const MainLanding = () => {
                 className="w-full h-80 object-cover"
               />
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -93,8 +126,9 @@ const MainLanding = () => {
                 <div className="flex items-center gap-2 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5 stroke-yellow-400"
                     fill="none"
+                   
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
@@ -127,7 +161,7 @@ const MainLanding = () => {
                 className="w-full h-80 object-cover"
               />
               {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
 
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
@@ -135,7 +169,7 @@ const MainLanding = () => {
                 <div className="flex items-center gap-2 text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5 stroke-yellow-400"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"

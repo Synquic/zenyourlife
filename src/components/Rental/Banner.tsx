@@ -1,5 +1,6 @@
-import React from 'react';
+// import React from 'react';
 import blueArrow from '../../assets/bluearrow.png';
+import lock2 from '../../assets/lock2.png';
 
 const Banner = () => {
   return (
@@ -39,7 +40,9 @@ const Banner = () => {
           <div className="flex flex-col items-start gap-5 flex-1">
             {/* Contact Badge */}
             <button className="bg-white/60 backdrop-blur-sm border border-white/80 px-4 py-2 rounded-full text-xs font-medium flex items-center gap-2 hover:bg-white/70 transition-all shadow-sm text-slate-700">
-              <span className="text-base">🔒</span> Contact
+              <span className="text-base">
+                <img src={lock2} alt="" />
+                </span> Contact
             </button>
 
             {/* Heading */}
@@ -53,9 +56,11 @@ const Banner = () => {
 
           {/* Right Side - Book Now Button */}
           <div className="mt-6 md:mt-0 relative z-20">
-            <button className="bg-white/30 backdrop-blur-md border-2 border-white/50 text-slate-800 px-6 py-3 rounded-lg text-sm font-semibold flex items-center gap-3 hover:bg-white/40 transition-all shadow-lg">
-              Book Now
-              <div className="w-6 h-6  rounded-md flex items-center justify-center">
+            <button className="relative bg-white/30 backdrop-blur-md border-2 border-white text-slate-800 px-6 py-3 rounded-lg text-sm font-semibold flex items-center gap-3 hover:bg-white/40 transition-all shadow-lg overflow-hidden group">
+              {/* Glass shine effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
+              <span className="relative z-10">Book Now</span>
+              <div className="w-6 h-6 rounded-md flex items-center justify-center relative z-10">
                 <img src={blueArrow} alt="arrow" className="w-5 h-5" />
               </div>
             </button>

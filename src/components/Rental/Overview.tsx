@@ -1,6 +1,6 @@
-import set1 from '../../assets/set1.png';
-import set2 from '../../assets/set2.png';
-import set3 from '../../assets/set3.png';
+import ov1 from '../../assets/ov1.png';
+import ov2 from '../../assets/ov2.png';
+import ov3 from '../../assets/ov3.png';
 
 const Overview = () => {
   return (
@@ -54,13 +54,6 @@ const Overview = () => {
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* Villas Card */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="relative h-56">
-              <img
-                src={set3}
-                alt="Villas"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div className="p-5 text-center">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Villas
@@ -70,17 +63,19 @@ const Overview = () => {
                 long stays.
               </p>
             </div>
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src={ov1}
+                alt="Villas"
+                className="w-full h-full object-cover"
+              />
+              {/* White to transparent gradient overlay from top */}
+              <div className="absolute top-0 left-0 right-0 h-24 z-20 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+            </div>
           </div>
 
           {/* Countryside Homes Card */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="relative h-56">
-              <img
-                src={set2}
-                alt="Countryside Homes"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div className="p-5 text-center">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Countryside Homes
@@ -89,17 +84,19 @@ const Overview = () => {
                 Slow living surrounded by volcanic landscapes.
               </p>
             </div>
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src={ov2}
+                alt="Countryside Homes"
+                className="w-full h-full object-cover"
+              />
+              {/* White to transparent gradient overlay from top */}
+              <div className="absolute top-0 left-0 right-0 h-24 z-20 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+            </div>
           </div>
 
           {/* Luxury Stays Card */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-            <div className="relative h-56">
-              <img
-                src={set1}
-                alt="Luxury Stays"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div className="p-5 text-center">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Luxury Stays
@@ -108,6 +105,15 @@ const Overview = () => {
                 High-end interiors, premium amenities, and
                 total tranquility.
               </p>
+            </div>
+            <div className="relative h-44 overflow-hidden">
+              <img
+                src={ov3}
+                alt="Luxury Stays"
+                className="w-full h-full object-cover"
+              />
+              {/* White to transparent gradient overlay from top */}
+              <div className="absolute top-0 left-0 right-0 h-28 z-20 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
             </div>
           </div>
         </div>

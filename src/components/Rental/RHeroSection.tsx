@@ -1,4 +1,7 @@
-import trustedImage from '../../assets/trusted.png';
+import tp1 from '../../assets/tp1.jpg';
+import tp2 from '../../assets/tp2.jpg';
+import tp3 from '../../assets/tp3.jpg';
+import tp4 from '../../assets/tp4.jpg';
 import frame7 from '../../assets/frame7.png';
 
 const RHeroSection = () => {
@@ -6,12 +9,34 @@ const RHeroSection = () => {
     <div className="relative px-4 sm:px-6 lg:px-8 py-8 mt-8">
       {/* Trusted Partners Badge - Positioned to overlap with hero section */}
       <div className="absolute top-10 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="bg-white rounded-full px-5 py-4 shadow-lg flex items-center gap-3">
-          <img
-            src={trustedImage}
-            alt="Trusted by 1000+ Partners"
-            className="h-7 object-contain"
-          />
+        <div className="bg-white rounded-full px-6 py-3 shadow-lg flex items-center gap-3">
+          {/* Overlapping Profile Images */}
+          <div className="flex items-center -space-x-2">
+            <img
+              src={tp1}
+              alt="Partner 1"
+              className="w-8 h-8 rounded-full border-2 border-white object-cover"
+            />
+            <img
+              src={tp2}
+              alt="Partner 2"
+              className="w-8 h-8 rounded-full border-2 border-white object-cover"
+            />
+            <img
+              src={tp3}
+              alt="Partner 3"
+              className="w-8 h-8 rounded-full border-2 border-white object-cover"
+            />
+            <img
+              src={tp4}
+              alt="Partner 4"
+              className="w-8 h-8 rounded-full border-2 border-white object-cover"
+            />
+          </div>
+          {/* Text */}
+          <span className="text-sm font-medium text-gray-700">
+            Trusted by 1000+ Partners
+          </span>
         </div>
       </div>
 

@@ -1,8 +1,9 @@
-import React from "react";
+
 import profile1 from "../assets/profile1.png";
 import profile2 from "../assets/profile2.png";
 import profile3 from "../assets/profile3.png";
 import profile4 from "../assets/profile4.png";
+import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 
 const Testimonial = () => {
   const baseCard =
@@ -15,7 +16,7 @@ const Testimonial = () => {
 
   const hoverGradient =
     "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-900 " +
-    "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09]";
+    "bg-gradient-to-b from-[#FFEEC3] via-[#DFB13B] to-[#3D2D06]";
 
   const glossLayer =
     "absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-40 pointer-events-none";
@@ -75,16 +76,16 @@ const Testimonial = () => {
   ];
 
   return (
-    <section className="py-20 bg-white font-inter">
+    <section className="py-20 bg-white font-inter px-8 sm:px-12 lg:px-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
-          <h2 className="text-5xl font-serif text-gray-900 w-[600px] leading-tight">
+          <h2 className="text-5xl  text-gray-900 w-[600px] leading-tight">
             What our clients say about their experience
           </h2>
 
           <button className="bg-white border border-yellow-500 text-gray-900 px-6 py-3 rounded-xl hover:bg-yellow-500 hover:text-white transition flex items-center">
-            Schedule Now →
+            Schedule Now <img src={MasterPrimaryButton} alt=""  className="h-7 w-7 ml-2"/>
           </button>
         </div>
 

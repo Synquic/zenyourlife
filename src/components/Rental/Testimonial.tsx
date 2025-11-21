@@ -1,4 +1,4 @@
-import React from "react";
+
 import profile1 from "../../assets/profile1.png";
 import profile2 from "../../assets/profile2.png";
 import profile3 from "../../assets/profile3.png";
@@ -16,10 +16,10 @@ const Testimonial = () => {
 
   const hoverGradient =
     "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-900 " +
-    "bg-gradient-to-t from-[#1F3A59] via-blue-[#4F82BE] to-[#73B3FF]";
+    "bg-gradient-to-b from-[#6EA8FF29] via-[#73B3FF] via-[#4F82BE] to-[#1F3A59]";
 
   const glossLayer =
-    "absolute inset-0 bg-gradient-to-br from-[#6EA8FF29] to-transparent opacity-40 pointer-events-none";
+    "absolute inset-0 bg-gradient-to-br from-white/30 to-transparent opacity-40 pointer-events-none";
 
   const contentWrapper = "relative z-10";
 

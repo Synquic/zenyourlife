@@ -1,6 +1,6 @@
-import React from 'react'
-import service1 from "../assets/service 1.png";
-import service2 from "../assets/service 2.png";
+// import React from 'react'
+// import service1 from "../assets/service 1.png";
+// import service2 from "../assets/service 2.png";
 const Service = () => {
   return (
     <section className="py-20 bg-gradient-to-b from-white to-yellow-50">

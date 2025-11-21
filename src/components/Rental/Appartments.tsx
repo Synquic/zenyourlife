@@ -1,9 +1,15 @@
-import React from "react";
+
 import apat1 from "../../assets/Apat1.png";
 import apat2 from "../../assets/Apat2.png";
 import blueArrow from "../../assets/bluearrow.png";
 
-const Card = ({ title, price, image }) => (
+interface CardProps {
+  title: string;
+  price: number;
+  image: string;
+}
+
+const Card = ({ title, price, image }: CardProps) => (
   <div className="w-full bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl shadow-lg p-6 flex flex-col md:flex-row gap-6 items-start">
 
     {/* LEFT — Image */}
@@ -80,7 +86,9 @@ const Apartment = () => {
     <div className="p-6 max-w-6xl mx-auto space-y-8">
 
       {/* Apartments Section */}
-      <div className="bg-blue-50 rounded-2xl p-8">
+      <div className="rounded-2xl p-8" style={{
+        background: 'linear-gradient(to bottom, #B9E4FF, #EAF7FF, #FFFFFF)'
+      }}>
         {/* Header Section */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-semibold text-gray-900 mb-3">Apartments</h1>

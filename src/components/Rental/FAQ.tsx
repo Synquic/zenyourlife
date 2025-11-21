@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import blueArrow from '../../assets/bluearrow.png';
+import lock2 from '../../assets/lock2.png';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(1);
@@ -35,7 +36,9 @@ const FAQ = () => {
           <div className="flex flex-col">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 border border-blue-400 rounded-full text-sm text-blue-600 mb-6 -mt-20 w-fit">
-              <span className="text-blue-400">📋</span> FAQs
+              <span className="text-blue-400">
+                <img src={lock2} alt="" />
+                </span> FAQs
             </div>
 
             {/* Heading */}

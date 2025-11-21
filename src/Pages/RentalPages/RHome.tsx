@@ -1,4 +1,4 @@
-import React from 'react'
+
 import RNavbar from '../../components/Rental/RNavbar'
 import RHeroSection from '../../components/Rental/RHeroSection'
 import Overview from '../../components/Rental/Overview'

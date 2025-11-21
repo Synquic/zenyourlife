@@ -1,12 +1,18 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Frame1 from "../assets/Frame1.jpg";
+import  { useState, useEffect } from "react";
+
+
 import frame2 from "../assets/frame2.png";
 import frame3 from "../assets/frame3.png";
 import frame4 from "../assets/Frame 4.png";
 import frame5 from "../assets/frame5.png";
 import frame6 from "../assets/Frame 6.png";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
+import tp1 from "../assets/tp1.jpg";
+import tp2 from "../assets/tp2.jpg";
+import tp3 from "../assets/tp3.jpg";
+import tp4 from "../assets/tp4.jpg";
+import tp5 from "../assets/tp5.png";
+import lock from "../assets/lock.png";
 
 import {
   Facebook,
@@ -16,15 +22,29 @@ import {
   MapPin,
   Phone,
   Mail,
+  X,
 } from "lucide-react";
 import NavbarHome from "../components/NavbarHome";
 import Testimonial from "../components/Testimonial";
 import Expert from "../components/Expert";
+import Booking from "../components/Booking";
 
 
 const Home = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(2);
-  const navigate = useNavigate();
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Disable background scroll when modal is open
+  useEffect(() => {
+    if (isBookingModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isBookingModalOpen]);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -36,7 +56,7 @@ const Home = () => {
       <NavbarHome />
       <section className="px-4 sm:px-6 lg:px-8 py-8 mt-16">
         {/* Card Container */}
-        <div className="relative max-w-7xl mx-auto h-[600px] rounded-3xl overflow-hidden">
+        <div className="relative max-w-7xl mx-auto h-[650px] md:h-[700px] rounded-3xl overflow-hidden">
           {/* Background Image */}
           <img
             src={frame2}
@@ -60,7 +80,7 @@ const Home = () => {
               </p>
 
               <div className="flex gap-4">
-                <button className="bg-white/10 backdrop-blur-md border-2 border-yellow-400 text-white px-8 py-3 rounded-lg hover:bg-white/20 transition flex items-center gap-2">
+                <button className="bg-white/10 backdrop-blur-md border-1 border-yellow-400 text-white px-8 py-3 rounded-lg hover:bg-white/20 transition flex items-center gap-2">
                   Schedule Now
                   <img
                     src={MasterPrimaryButton}
@@ -68,9 +88,46 @@ const Home = () => {
                     className="h-6 w-auto"
                   />
                 </button>
-                <button className="bg-white/10 backdrop-blur-md border-2 border-yellow-400 text-white px-8 py-3 rounded-lg hover:bg-white/20 transition">
+                <button className="bg-white/10 backdrop-blur-md border-1 border-yellow-400 text-white px-8 py-3 rounded-lg hover:bg-white/20 transition">
                   View Services
                 </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Trusted Partners Badge - Bottom Right */}
+          <div className="absolute bottom-5 right-10 z-20">
+            <div className="bg-white/30 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-white/40 max-w-[240px]">
+              {/* Overlapping Avatar Circles */}
+              <div className="flex items-center -space-x-1.5 mb-2">
+                <div className="w-8 h-8 rounded-full border-1 border-white shadow-md overflow-hidden">
+                  <img src={tp1} alt="Partner 1" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-1 border-white shadow-md overflow-hidden">
+                  <img src={tp2} alt="Partner 2" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-1 border-white shadow-md overflow-hidden">
+                  <img src={tp3} alt="Partner 3" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-1 border-white shadow-md overflow-hidden">
+                  <img src={tp4} alt="Partner 4" className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-1 border-white shadow-md overflow-hidden bg-black flex items-center justify-center">
+                  <img src={tp5} alt="Partner 5" className="w-full h-full object-cover" />
+                </div>
+              </div>
+
+              {/* Text */}
+              <div>
+                <h3 className="text-gray-900 font-semibold text-sm">
+                  Trusted by
+                </h3>
+                <h3 className="text-gray-900 font-semibold text-sm">
+                  1000+ Partners
+                </h3>
+                <p className="text-gray-700 text-xs mt-1 leading-relaxed">
+                  The perfect organizer and developer for dream agency
+                </p>
               </div>
             </div>
           </div>
@@ -125,14 +182,21 @@ const Home = () => {
       </section>
 
       {/* Exclusive Services Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-[#FFFBEA]">
+      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-b from-[#F5D88E] via-[#FEFFCF] to-[#FFFFFF]">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <span className="inline-block bg-white text-[#B8860B] px-6 py-2 rounded-full text-sm mb-4">
-              Services
-            </span>
-            <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">
+            <div className="relative inline-block mb-4">
+              {/* Glow effect layers */}
+              <div className="absolute inset-0 bg-[#F5D88E]/30 blur-2xl rounded-full scale-150"></div>
+              <div className="absolute inset-0 bg-[#F5D88E]/20 blur-3xl rounded-full scale-[2]"></div>
+
+              <span className="relative inline-flex items-center gap-2 bg-white text-[#B8860B] px-6 py-2 rounded-full text-sm shadow-lg">
+                <img src={lock} alt="Lock" className="w-3 h-3" />
+                Services
+              </span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-Normal text-gray-900 mb-4">
               Exclusive services for
               <br />
               ultimate relaxation
@@ -221,14 +285,11 @@ const Home = () => {
                     </h3>
                   </div>
                   <div className="flex justify-end items-end mt-4">
-                    <button className="bg-white/15 backdrop-blur-md border border-white/30 text-white rounded-full px-6 py-3 hover:bg-white/25 transition-all flex items-center gap-2 shadow-lg cursor-pointer">
-                      <span className="text-sm font-medium">Book Now</span>
-                      <img
-                        src={MasterPrimaryButton}
-                        alt=""
-                        className="h-4 w-auto"
-                      />
-                    </button>
+                    <img
+                      src={MasterPrimaryButton}
+                      alt="Book Now"
+                      className="h-10 w-auto cursor-pointer"
+                    />
                   </div>
                 </div>
               </div>
@@ -259,7 +320,7 @@ const Home = () => {
             />
             {/* Schedule Now Button Overlay */}
             <div className="absolute top-[5%] right-[3%]">
-              <button className="bg-white/15 backdrop-blur-md border border-white/30 text-white rounded-full pl-6 pr-4 py-3 hover:bg-white/25 transition-all flex items-center gap-3 shadow-xl cursor-pointer">
+              <button className="bg-white/15 backdrop-blur-md border border-[#B8860B] text-black rounded-xl pl-6 pr-4 py-3 hover:bg-white/25 transition-all flex items-center gap-3 shadow-xl cursor-pointer">
                 <span className="text-sm font-medium tracking-wide">
                   Schedule Now
                 </span>
@@ -303,7 +364,7 @@ const Home = () => {
       <Expert />
 
       {/* Features Section */}
-      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-[#FFFBEA]">
+      <section className="px-4 sm:px-6 lg:px-8 py-16 bg-gradient-to-b from-[#F5D88E] via-[#FEFFCF] to-[#FFFFFF]">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
             {/* Customized Treatments */}
@@ -397,7 +458,7 @@ const Home = () => {
             <span className="inline-block bg-[#FFFBEA] text-[#B8860B] px-6 py-2 rounded-full text-sm mb-4">
               Why Choose Us?
             </span>
-            <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl  text-gray-900 mb-4">
               Experience the perfect blend
               <br />
               of luxury & massage
@@ -433,9 +494,9 @@ const Home = () => {
           </div>
 
           {/* Content Grid */}
-          <div className="grid md:grid-cols-2 gap-6 items-center max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 items-stretch max-w-5xl mx-auto">
             {/* Left - Image */}
-            <div className="rounded-3xl overflow-hidden shadow-lg">
+            <div className="rounded-3xl overflow-hidden shadow-lg h-full">
               <img
                 src={frame6}
                 alt="Spa Treatment"
@@ -444,9 +505,9 @@ const Home = () => {
             </div>
 
             {/* Right - Feature Cards */}
-            <div className="space-y-3">
+            <div className="space-y-3 flex flex-col justify-between">
               {/* Premium Products */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition">
                 <div className="flex items-start gap-4">
                   <div className="bg-[#B8860B] rounded-xl w-12 h-12 flex-shrink-0 flex items-center justify-center">
                     <svg
@@ -477,7 +538,7 @@ const Home = () => {
               </div>
 
               {/* Holistic Approach */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition">
                 <div className="flex items-start gap-4">
                   <div className="bg-[#B8860B] rounded-xl w-12 h-12 flex-shrink-0 flex items-center justify-center">
                     <svg
@@ -508,7 +569,7 @@ const Home = () => {
               </div>
 
               {/* Convenient Booking */}
-              <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-lg transition">
                 <div className="flex items-start gap-4">
                   <div className="bg-[#B8860B] rounded-xl w-12 h-12 flex-shrink-0 flex items-center justify-center">
                     <svg
@@ -547,10 +608,11 @@ const Home = () => {
       {/* FAQ Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-16 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto -mt-4">
             {/* Left Side - FAQ Header */}
-            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8">
-              <span className="inline-block bg-[#FFFBEA] text-[#B8860B] px-4 py-1 rounded-full text-xs mb-6">
+            <div className=" rounded-2xl p-8 -mt-8">
+              <span className="relative inline-flex items-center gap-2 bg-[#DFB13B1A] text-[#B8860B] px-5 py-1 rounded-full text-sm shadow-lg">
+                <img src={lock} alt="Lock" className="w-2 h-2" />
                 FAQs
               </span>
               <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-8">
@@ -570,22 +632,13 @@ const Home = () => {
                   need - we'll point you in the right direction without the
                   flaps and-forth.
                 </p>
-                <button className="bg-white border-2 border-[#B8860B] text-gray-900 px-6 py-3 rounded-lg hover:bg-[#FFFBEA] transition flex items-center gap-2">
+                <button className="bg-white/20 backdrop-blur-md border-2 border-[#B8860B] text-gray-900 px-6 py-3 rounded-lg hover:bg-white/30 transition flex items-center gap-2 shadow-lg">
                   <span className="font-medium">Contact Us</span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-[#B8860B]"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
+                  <img
+                    src={MasterPrimaryButton}
+                    alt="Arrow"
+                    className="h-5 w-auto"
+                  />
                 </button>
               </div>
             </div>
@@ -912,7 +965,7 @@ const Home = () => {
                 </div>
 
                 <button
-                  onClick={() => navigate("/booking")}
+                  onClick={() => setIsBookingModalOpen(true)}
                   className="bg-white/20 backdrop-blur-sm border border-white/40 text-white px-8 py-4 rounded-full hover:bg-white/30 transition-all flex items-center gap-3 shadow-lg cursor-pointer whitespace-nowrap"
                 >
                   <span className="font-medium text-black">
@@ -1043,6 +1096,26 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {/* Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto mt-2 shadow-2xl relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsBookingModalOpen(false)}
+              className="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition z-50"
+            >
+              <X className="w-4 h-4 text-gray-600" />
+            </button>
+
+            {/* Booking Component */}
+            <div className="relative">
+              <Booking onClose={() => setIsBookingModalOpen(false)} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

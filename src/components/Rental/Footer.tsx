@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import {
   Facebook,
@@ -49,9 +49,11 @@ const Footer = () => {
 
               {/* Right Side - Button */}
               <div className="flex-shrink-0">
-                <button onClick={() => navigate('/booking')} className="bg-[#F5D76E]/20 backdrop-blur-md border-2 border-[#F5D76E] hover:bg-[#F5D76E]/30 text-white px-8 py-3.5 rounded-full transition-all text-base font-medium flex items-center gap-3 shadow-lg cursor-pointer">
-                  <span className="font-semibold text-black">Submit Your Form</span>
-                  <img src={MasterPrimaryButton} alt="" className="h-5 w-auto" />
+                <button onClick={() => navigate('/booking')} className="relative bg-[#F5D76E]/20 backdrop-blur-md border-2 border-[#F5D76E] hover:bg-[#F5D76E]/30 text-white px-8 py-3.5 rounded-full transition-all text-base font-medium flex items-center gap-3 shadow-lg cursor-pointer overflow-hidden group">
+                  {/* Glass shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
+                  <span className="font-semibold text-black relative z-10">Submit Your Form</span>
+                  <img src={MasterPrimaryButton} alt="" className="h-5 w-auto relative z-10" />
                 </button>
               </div>
             </div>

@@ -1,20 +1,22 @@
-import React from "react";
+
 import Expert1 from "../assets/Expert1.png";
+import lock from "../assets/lock.png";
 
 const Expert = () => {
   return (
     <section className="py-20 bg-white -mt-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-middle items-center flex-col mb-12">
-          <span className="text-yellow-500 text-sm font-semibold mb-2">
-            — Team
-          </span>
+           <span className="relative inline-flex items-center gap-2 bg-[#DFB13B1A] text-[#B8860B] px-6 py-2 rounded-full text-sm shadow-lg">
+                <img src={lock} alt="Lock" className="w-3 h-3" />
+                Teams
+              </span>
         </div>
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <img
             src={Expert1}
             alt="Nadia Deleux"
-            className="rounded-lg shadow-lg w-full"
+            className="rounded-lg  w-full"
           />
           <div>
             <h2 className="text-4xl font-serif text-gray-900 mb-6">
