@@ -1,0 +1,770 @@
+import { useState, useEffect } from 'react'
+import { Search, Bell, Plus, Edit2, Trash2, X, Save, Loader2, Star, Quote, MessageCircle, Filter, Eye, EyeOff, ChevronDown, Sparkles, Home, Menu } from 'lucide-react'
+import Sidebar from '../components/Sidebar'
+
+const API_BASE_URL = 'http://localhost:5000/api'
+
+// Available profile images for selection
+const availablePhotos = [
+  { name: 'profile1.png', label: 'Avatar 1', color: 'from-blue-400 to-blue-600' },
+  { name: 'profile2.png', label: 'Avatar 2', color: 'from-purple-400 to-purple-600' },
+  { name: 'profile3.png', label: 'Avatar 3', color: 'from-emerald-400 to-emerald-600' },
+  { name: 'profile4.png', label: 'Avatar 4', color: 'from-amber-400 to-amber-600' },
+]
+
+interface Testimonial {
+  _id: string
+  name: string
+  role: string
+  text: string
+  photo: string
+  photoUrl?: string
+  rating: number
+  isActive: boolean
+  displayOrder: number
+  createdAt?: string
+}
+
+interface TestimonialFormData {
+  name: string
+  role: string
+  text: string
+  photo: string
+  photoUrl: string
+  rating: number
+  isActive: boolean
+}
+
+const initialFormData: TestimonialFormData = {
+  name: '',
+  role: '',
+  text: '',
+  photo: 'profile1.png',
+  photoUrl: '',
+  rating: 5,
+  isActive: true
+}
+
+type TabType = 'massage' | 'rental'
+
+const Testimonials = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<TabType>('massage')
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null)
+  const [formData, setFormData] = useState<TestimonialFormData>(initialFormData)
+  const [saving, setSaving] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
+
+  // Get API endpoint based on active tab
+  const getApiEndpoint = () => {
+    return activeTab === 'massage' ? 'testimonials' : 'rental-testimonials'
+  }
+
+  // Fetch testimonials
+  useEffect(() => {
+    fetchTestimonials()
+  }, [activeTab])
+
+  const fetchTestimonials = async () => {
+    try {
+      setLoading(true)
+      setError('')
+      const response = await fetch(`${API_BASE_URL}/${getApiEndpoint()}/admin`)
+      const data = await response.json()
+
+      if (data.success) {
+        setTestimonials(data.data)
+      } else {
+        setError('Failed to fetch testimonials')
+      }
+    } catch (err) {
+      setError('Error connecting to server')
+      console.error('Error fetching testimonials:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Open modal for adding new testimonial
+  const handleAddNew = () => {
+    setEditingTestimonial(null)
+    setFormData(initialFormData)
+    setShowModal(true)
+  }
+
+  // Open modal for editing testimonial
+  const handleEdit = (testimonial: Testimonial) => {
+    setEditingTestimonial(testimonial)
+    setFormData({
+      name: testimonial.name,
+      role: testimonial.role,
+      text: testimonial.text,
+      photo: testimonial.photo,
+      photoUrl: testimonial.photoUrl || '',
+      rating: testimonial.rating,
+      isActive: testimonial.isActive
+    })
+    setShowModal(true)
+  }
+
+  // Save testimonial (create or update)
+  const handleSave = async () => {
+    if (!formData.name.trim() || !formData.text.trim()) {
+      alert('Please fill in name and testimonial text')
+      return
+    }
+
+    try {
+      setSaving(true)
+      const url = editingTestimonial
+        ? `${API_BASE_URL}/${getApiEndpoint()}/${editingTestimonial._id}`
+        : `${API_BASE_URL}/${getApiEndpoint()}`
+
+      const method = editingTestimonial ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setShowModal(false)
+        fetchTestimonials()
+        setFormData(initialFormData)
+        setEditingTestimonial(null)
+      } else {
+        alert(data.message || 'Failed to save testimonial')
+      }
+    } catch (err) {
+      console.error('Error saving testimonial:', err)
+      alert('Error saving testimonial')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Delete testimonial
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this testimonial?')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/${getApiEndpoint()}/${id}`, {
+        method: 'DELETE'
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        fetchTestimonials()
+      } else {
+        alert(data.message || 'Failed to delete testimonial')
+      }
+    } catch (err) {
+      console.error('Error deleting testimonial:', err)
+      alert('Error deleting testimonial')
+    }
+  }
+
+  // Toggle active status
+  const handleToggleStatus = async (testimonial: Testimonial) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${getApiEndpoint()}/${testimonial._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...testimonial, isActive: !testimonial.isActive })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        fetchTestimonials()
+      }
+    } catch (err) {
+      console.error('Error toggling status:', err)
+    }
+  }
+
+  // Seed default testimonials
+  const handleSeedTestimonials = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${getApiEndpoint()}/seed`, {
+        method: 'POST'
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        alert(data.message)
+        fetchTestimonials()
+      } else {
+        alert(data.message || 'Failed to seed testimonials')
+      }
+    } catch (err) {
+      console.error('Error seeding testimonials:', err)
+      alert('Error seeding testimonials')
+    }
+  }
+
+  // Filter testimonials
+  const filteredTestimonials = testimonials.filter(testimonial => {
+    const matchesSearch = testimonial.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      testimonial.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      testimonial.role.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesFilter = filterStatus === 'all' ||
+      (filterStatus === 'active' && testimonial.isActive) ||
+      (filterStatus === 'inactive' && !testimonial.isActive)
+
+    return matchesSearch && matchesFilter
+  })
+
+  // Stats
+  const totalTestimonials = testimonials.length
+  const activeTestimonials = testimonials.filter(t => t.isActive).length
+  const avgRating = testimonials.length > 0
+    ? (testimonials.reduce((acc, t) => acc + t.rating, 0) / testimonials.length).toFixed(1)
+    : '0.0'
+
+  // Get avatar color based on photo
+  const getAvatarColor = (photo: string) => {
+    const found = availablePhotos.find(p => p.name === photo)
+    return found?.color || 'from-gray-400 to-gray-600'
+  }
+
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-8 py-4 sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5 text-slate-600" />
+              </button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  Testimonials
+                </h1>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Manage customer reviews and feedback</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search testimonials..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all outline-none"
+                />
+              </div>
+              {/* Notification */}
+              <button className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative">
+                <Bell className="w-5 h-5" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+              </button>
+              {/* Profile */}
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-emerald-500/20">
+                A
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mt-4">
+            <button
+              onClick={() => setActiveTab('massage')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                activeTab === 'massage'
+                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              Massage Testimonials
+            </button>
+            <button
+              onClick={() => setActiveTab('rental')}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                activeTab === 'rental'
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <Home className="w-4 h-4" />
+              Rental Testimonials
+            </button>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-8">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Total Reviews</p>
+                  <p className="text-3xl font-bold text-slate-800 mt-1">{totalTestimonials}</p>
+                </div>
+                <div className={`w-14 h-14 bg-gradient-to-br ${activeTab === 'massage' ? 'from-emerald-400 to-emerald-600' : 'from-blue-400 to-blue-600'} rounded-2xl flex items-center justify-center shadow-lg ${activeTab === 'massage' ? 'shadow-emerald-500/30' : 'shadow-blue-500/30'}`}>
+                  <MessageCircle className="w-7 h-7 text-white" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Active Reviews</p>
+                  <p className="text-3xl font-bold text-slate-800 mt-1">{activeTestimonials}</p>
+                </div>
+                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                  <Eye className="w-7 h-7 text-white" />
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">Average Rating</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-3xl font-bold text-slate-800">{avgRating}</p>
+                    <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+                  </div>
+                </div>
+                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <Star className="w-7 h-7 text-white fill-white" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3">
+              {/* Filter Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition"
+                >
+                  <Filter className="w-4 h-4" />
+                  {filterStatus === 'all' ? 'All Status' : filterStatus === 'active' ? 'Active' : 'Inactive'}
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {showFilterDropdown && (
+                  <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 py-2 min-w-[140px] z-20">
+                    {['all', 'active', 'inactive'].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => { setFilterStatus(status as 'all' | 'active' | 'inactive'); setShowFilterDropdown(false) }}
+                        className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition capitalize ${
+                          filterStatus === status ? 'text-emerald-600 font-medium bg-emerald-50' : 'text-slate-600'
+                        }`}
+                      >
+                        {status === 'all' ? 'All Status' : status}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <span className="text-sm text-slate-500">
+                Showing {filteredTestimonials.length} of {totalTestimonials}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleSeedTestimonials}
+                className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition text-sm font-medium"
+              >
+                Seed Demo Data
+              </button>
+              <button
+                onClick={handleAddNew}
+                className={`flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600 shadow-emerald-500/30' : 'from-blue-500 to-blue-600 shadow-blue-500/30'} text-white rounded-xl hover:opacity-90 transition shadow-lg text-sm font-medium`}
+              >
+                <Plus className="w-4 h-4" />
+                Add Testimonial
+              </button>
+            </div>
+          </div>
+
+          {/* Loading State */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center h-64 bg-white rounded-2xl">
+              <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mb-4" />
+              <span className="text-slate-500">Loading testimonials...</span>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="bg-red-50 border border-red-100 text-red-600 px-6 py-4 rounded-2xl mb-6 flex items-center gap-3">
+              <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <X className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <p className="font-medium">Connection Error</p>
+                <p className="text-sm text-red-500">{error}. Please make sure the backend server is running.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && filteredTestimonials.length === 0 && (
+            <div className="bg-white rounded-2xl p-12 text-center border border-slate-100">
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Quote className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">No {activeTab} testimonials found</h3>
+              <p className="text-slate-500 mb-6">Get started by adding your first customer testimonial or seed demo data</p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  onClick={handleSeedTestimonials}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition"
+                >
+                  Seed Demo Data
+                </button>
+                <button
+                  onClick={handleAddNew}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 ${activeTab === 'massage' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-xl transition`}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Testimonial
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Testimonials Grid */}
+          {!loading && !error && filteredTestimonials.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredTestimonials.map((testimonial, index) => (
+                <div
+                  key={testimonial._id}
+                  className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {/* Card Header */}
+                  <div className="p-5 pb-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${getAvatarColor(testimonial.photo)} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                          {testimonial.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-slate-800">{testimonial.name}</h3>
+                          <p className="text-sm text-slate-500">{testimonial.role || 'Customer'}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleToggleStatus(testimonial)}
+                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                          testimonial.isActive
+                            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                            : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                        }`}
+                      >
+                        {testimonial.isActive ? 'Active' : 'Inactive'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="px-5 py-3">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${
+                            i < testimonial.rating
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-slate-200'
+                          }`}
+                        />
+                      ))}
+                      <span className="text-sm text-slate-500 ml-2">{testimonial.rating}.0</span>
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="px-5 pb-4">
+                    <div className="relative">
+                      <Quote className="w-8 h-8 text-slate-100 absolute -top-1 -left-1" />
+                      <p className="text-sm text-slate-600 leading-relaxed line-clamp-4 relative z-10 pl-4">
+                        {testimonial.text}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center gap-2">
+                    <button
+                      onClick={() => handleEdit(testimonial)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition text-sm font-medium"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Edit
+                    </button>
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <button
+                      onClick={() => handleToggleStatus(testimonial)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition text-sm font-medium"
+                    >
+                      {testimonial.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {testimonial.isActive ? 'Hide' : 'Show'}
+                    </button>
+                    <div className="w-px h-6 bg-slate-200"></div>
+                    <button
+                      onClick={() => handleDelete(testimonial._id)}
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition text-sm font-medium"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* Add/Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div
+            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`relative bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600' : 'from-blue-500 to-blue-600'} px-8 py-6`}>
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                  {editingTestimonial ? <Edit2 className="w-7 h-7 text-white" /> : <Plus className="w-7 h-7 text-white" />}
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    {editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
+                  </h2>
+                  <p className="text-white/80 text-sm mt-0.5">
+                    {activeTab === 'massage' ? 'Massage & Wellness' : 'Rental Properties'} - {editingTestimonial ? 'Update customer feedback' : 'Add a new customer review'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-8 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              {/* Name & Role Row */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Customer Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="John Doe"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Role / Handle
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    placeholder="@johndoe"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Testimonial Text */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Testimonial Text *
+                </label>
+                <textarea
+                  value={formData.text}
+                  onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+                  placeholder="What did the customer say about their experience..."
+                  rows={4}
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none resize-none"
+                />
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                  Rating
+                </label>
+                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, rating: star })}
+                        className="p-1 hover:scale-125 transition-transform"
+                      >
+                        <Star
+                          className={`w-8 h-8 transition ${
+                            star <= formData.rating
+                              ? 'text-amber-400 fill-amber-400'
+                              : 'text-slate-300 hover:text-amber-300'
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="ml-auto bg-white px-4 py-2 rounded-lg border border-slate-200">
+                    <span className="font-bold text-slate-800">{formData.rating}</span>
+                    <span className="text-slate-400"> / 5</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Avatar Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                  Select Avatar
+                </label>
+                <div className="grid grid-cols-4 gap-3">
+                  {availablePhotos.map((photo) => (
+                    <button
+                      key={photo.name}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, photo: photo.name })}
+                      className={`relative p-4 rounded-2xl transition-all ${
+                        formData.photo === photo.name
+                          ? `${activeTab === 'massage' ? 'bg-emerald-50 border-2 border-emerald-500 shadow-emerald-500/20' : 'bg-blue-50 border-2 border-blue-500 shadow-blue-500/20'} shadow-lg`
+                          : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
+                      }`}
+                    >
+                      <div className={`w-14 h-14 mx-auto bg-gradient-to-br ${photo.color} rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
+                        {photo.label.split(' ')[1]}
+                      </div>
+                      <p className="text-xs text-slate-500 mt-2 text-center">{photo.label}</p>
+                      {formData.photo === photo.name && (
+                        <div className={`absolute top-2 right-2 w-5 h-5 ${activeTab === 'massage' ? 'bg-emerald-500' : 'bg-blue-500'} rounded-full flex items-center justify-center`}>
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Photo URL */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Custom Photo URL <span className="font-normal text-slate-400">(Optional)</span>
+                </label>
+                <input
+                  type="url"
+                  value={formData.photoUrl}
+                  onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
+                  placeholder="https://example.com/photo.jpg"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                />
+                <p className="text-xs text-slate-400 mt-2">
+                  If provided, this URL will override the selected avatar
+                </p>
+              </div>
+
+              {/* Active Status */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                <div>
+                  <p className="font-semibold text-slate-700">Visibility</p>
+                  <p className="text-sm text-slate-500">Show this testimonial on the website</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                  className={`relative w-14 h-8 rounded-full transition-colors ${
+                    formData.isActive ? (activeTab === 'massage' ? 'bg-emerald-500' : 'bg-blue-500') : 'bg-slate-300'
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                      formData.isActive ? 'translate-x-7' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 px-8 py-5 bg-slate-50 border-t border-slate-100">
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-6 py-2.5 text-slate-600 hover:bg-slate-200 rounded-xl transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600 shadow-emerald-500/30' : 'from-blue-500 to-blue-600 shadow-blue-500/30'} text-white rounded-xl hover:opacity-90 transition shadow-lg font-medium disabled:opacity-50`}
+              >
+                {saving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                {saving ? 'Saving...' : 'Save Testimonial'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Click outside to close filter dropdown */}
+      {showFilterDropdown && (
+        <div
+          className="fixed inset-0 z-10"
+          onClick={() => setShowFilterDropdown(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+export default Testimonials
