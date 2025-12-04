@@ -15,12 +15,12 @@ interface Service {
 interface BookingFormProps {
   onClose?: () => void;
   onSuccess?: () => void;
-  selectedService: Service | null;
-  selectedDate: number;
-  selectedTime: string;
+  selectedService?: Service | null;
+  selectedDate?: number;
+  selectedTime?: string;
 }
 
-const BookingForm = ({ onClose, onSuccess, selectedService, selectedDate, selectedTime }: BookingFormProps) => {
+const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate = 0, selectedTime = '' }: BookingFormProps) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: "",

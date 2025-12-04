@@ -3,7 +3,7 @@ import {
   Activity, Server, Database, Cloud, Clock, CheckCircle2, XCircle,
   RefreshCw, Wifi, HardDrive, Globe, Zap,
   AlertTriangle, Menu, TrendingUp, Users, Calendar, MessageSquare,
-  Code, Copy, Check, ChevronDown, ChevronRight, ExternalLink
+  Code, Copy, Check, ChevronDown, ChevronRight, ExternalLink as _ExternalLink
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 

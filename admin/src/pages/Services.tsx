@@ -153,12 +153,12 @@ const Services = () => {
     benefitsTitle: "Benefits You'll Feel",
     targetAudienceTitle: "Who It's For"
   })
-  const [loadingContent, setLoadingContent] = useState(true)
-  const [savingContent, setSavingContent] = useState(false)
+  const [_loadingContent, _setLoadingContent] = useState(true)
+  const [_savingContent, _setSavingContent] = useState(false)
   const [newBenefit, setNewBenefit] = useState('')
   const [newTargetAudience, setNewTargetAudience] = useState('')
-  const [editingBenefitIndex, setEditingBenefitIndex] = useState<number | null>(null)
-  const [editingTargetIndex, setEditingTargetIndex] = useState<number | null>(null)
+  const [_editingBenefitIndex, _setEditingBenefitIndex] = useState<number | null>(null)
+  const [_editingTargetIndex, _setEditingTargetIndex] = useState<number | null>(null)
   const [editBenefitText, setEditBenefitText] = useState('')
   const [editTargetText, setEditTargetText] = useState('')
 
@@ -212,7 +212,7 @@ const Services = () => {
 
   const fetchServicePageContent = async () => {
     try {
-      setLoadingContent(true)
+      _setLoadingContent(true)
       const response = await fetch(`${API_BASE_URL}/service-page-content`)
       const data = await response.json()
 
@@ -222,13 +222,13 @@ const Services = () => {
     } catch (err) {
       console.error('Error fetching service page content:', err)
     } finally {
-      setLoadingContent(false)
+      _setLoadingContent(false)
     }
   }
 
-  const saveServicePageContent = async () => {
+  const _saveServicePageContent = async () => {
     try {
-      setSavingContent(true)
+      _setSavingContent(true)
       const response = await fetch(`${API_BASE_URL}/service-page-content`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -246,12 +246,12 @@ const Services = () => {
       console.error('Error saving service page content:', err)
       alert('Error saving content. Please check console for details.')
     } finally {
-      setSavingContent(false)
+      _setSavingContent(false)
     }
   }
 
   // Add new benefit
-  const handleAddBenefit = () => {
+  const _handleAddBenefit = () => {
     if (!newBenefit.trim()) return
     const updatedContent = {
       ...servicePageContent,
@@ -262,29 +262,29 @@ const Services = () => {
   }
 
   // Remove benefit
-  const handleRemoveBenefit = (index: number) => {
+  const _handleRemoveBenefit = (index: number) => {
     const updatedBenefits = servicePageContent.benefits.filter((_, i) => i !== index)
     setServicePageContent({ ...servicePageContent, benefits: updatedBenefits })
   }
 
   // Start editing benefit
-  const handleStartEditBenefit = (index: number) => {
-    setEditingBenefitIndex(index)
+  const _handleStartEditBenefit = (index: number) => {
+    _setEditingBenefitIndex(index)
     setEditBenefitText(servicePageContent.benefits[index].description)
   }
 
   // Save edited benefit
-  const handleSaveEditBenefit = (index: number) => {
+  const _handleSaveEditBenefit = (index: number) => {
     if (!editBenefitText.trim()) return
     const updatedBenefits = [...servicePageContent.benefits]
     updatedBenefits[index] = { ...updatedBenefits[index], description: editBenefitText.trim() }
     setServicePageContent({ ...servicePageContent, benefits: updatedBenefits })
-    setEditingBenefitIndex(null)
+    _setEditingBenefitIndex(null)
     setEditBenefitText('')
   }
 
   // Add new target audience
-  const handleAddTargetAudience = () => {
+  const _handleAddTargetAudience = () => {
     if (!newTargetAudience.trim()) return
     const updatedContent = {
       ...servicePageContent,
@@ -295,24 +295,24 @@ const Services = () => {
   }
 
   // Remove target audience
-  const handleRemoveTargetAudience = (index: number) => {
+  const _handleRemoveTargetAudience = (index: number) => {
     const updatedTargetAudience = servicePageContent.targetAudience.filter((_, i) => i !== index)
     setServicePageContent({ ...servicePageContent, targetAudience: updatedTargetAudience })
   }
 
   // Start editing target audience
-  const handleStartEditTarget = (index: number) => {
-    setEditingTargetIndex(index)
+  const _handleStartEditTarget = (index: number) => {
+    _setEditingTargetIndex(index)
     setEditTargetText(servicePageContent.targetAudience[index].description)
   }
 
   // Save edited target audience
-  const handleSaveEditTarget = (index: number) => {
+  const _handleSaveEditTarget = (index: number) => {
     if (!editTargetText.trim()) return
     const updatedTargetAudience = [...servicePageContent.targetAudience]
     updatedTargetAudience[index] = { ...updatedTargetAudience[index], description: editTargetText.trim() }
     setServicePageContent({ ...servicePageContent, targetAudience: updatedTargetAudience })
-    setEditingTargetIndex(null)
+    _setEditingTargetIndex(null)
     setEditTargetText('')
   }
 

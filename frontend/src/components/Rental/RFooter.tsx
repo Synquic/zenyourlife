@@ -14,7 +14,11 @@ import bluearrow from '../../assets/bluearrow.png';
 import RBooking from './RBooking';
 import { useTranslation } from "react-i18next";
 
-const Footer = () => {
+interface FooterProps {
+  onContactClick?: () => void;
+}
+
+const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
   const { t } = useTranslation();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 

@@ -41,11 +41,12 @@ interface BookingSettings {
 type DayName = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 
 interface BookingDateProps {
+  onClose?: () => void;
   onSuccess?: () => void;
-  selectedService: Service | null;
+  selectedService?: Service | null;
 }
 
-const BookingDate = ({ onSuccess, selectedService }: BookingDateProps) => {
+const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: BookingDateProps) => {
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<number | null>(null); // null means no date selected initially
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
