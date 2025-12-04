@@ -8,8 +8,8 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // Check if admin session cookie exists
   if (!isAdminAuthenticated()) {
-    // Redirect to login page if not authenticated
-    return <Navigate to="/admin" replace />
+    // Redirect to login page if not authenticated (basename is /admin, so this goes to /admin/)
+    return <Navigate to="/" replace />
   }
 
   return <>{children}</>

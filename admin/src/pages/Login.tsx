@@ -30,7 +30,7 @@ const Login = () => {
     if (formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
       // Create session cookie
       createAdminSession(formData.email)
-      // Navigate to dashboard
+      // Navigate to dashboard (basename is /admin, so this goes to /admin/dashboard)
       navigate('/dashboard')
     } else {
       setError('Invalid email or password')
