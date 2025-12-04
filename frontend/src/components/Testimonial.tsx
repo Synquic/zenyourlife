@@ -8,7 +8,7 @@ import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import Booking from "./Booking";
 import { X } from "lucide-react";
 
-const API_BASE_URL = 'http://localhost:5000/api';
+import { API_BASE_URL } from '../config/api';
 
 // Map photo names to imported images
 const photoMap: { [key: string]: string } = {

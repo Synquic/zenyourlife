@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 // Available images for selection with colors
 const availableImages = [

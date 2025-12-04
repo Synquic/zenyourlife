@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Search, Bell, Plus, Edit2, Trash2, X, Save, Loader2, Star, Quote, MessageCircle, Filter, Eye, EyeOff, ChevronDown, Sparkles, Home, Menu } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 // Available profile images for selection
 const availablePhotos = [

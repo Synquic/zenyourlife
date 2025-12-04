@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Plus, Sparkles, Building2, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, ArrowRight, Home, AlertCircle, Activity, Zap, BarChart3, Eye, Menu } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 interface Appointment {
   _id: string

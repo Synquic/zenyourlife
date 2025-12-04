@@ -163,7 +163,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // Catch-all routes for SPA (must be after API routes)
-if (process.env.NODE_ENV === 'production') {
+
   // Admin panel catch-all route
   app.get('/admin/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../admin/dist/index.html'));
@@ -173,7 +173,7 @@ if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
-}
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

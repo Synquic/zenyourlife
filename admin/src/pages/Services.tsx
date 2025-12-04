@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, Bell, Plus, Edit2, Trash2, X, Save, Loader2, Sparkles, Clock, DollarSign, Filter, ChevronDown, Eye, EyeOff, LayoutGrid, List, Heart, Users, FileText, Image, Upload, Menu } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 // Import massage images
 import m1 from '../assets/m1.png'

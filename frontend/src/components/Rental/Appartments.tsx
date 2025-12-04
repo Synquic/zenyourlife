@@ -4,7 +4,7 @@ import apat2 from "../../assets/Apat2.png";
 import blueArrow from "../../assets/bluearrow.png";
 import { useTranslation } from "react-i18next";
 
-const API_BASE_URL = 'http://localhost:5000/api';
+import { API_BASE_URL } from '../../config/api';
 
 // Map image names to imported images
 const imageMap: { [key: string]: string } = {

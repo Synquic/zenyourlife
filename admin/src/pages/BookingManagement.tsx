@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Calendar as _Calendar, Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle, ToggleLeft, ToggleRight, Clock, Save, Clock3, Settings2, CalendarDays, Edit3 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 interface DaySchedule {
   isWorking: boolean

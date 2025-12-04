@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Search, Users as UsersIcon, Mail, Phone, MapPin, Calendar, X, Loader2, Eye, UserCircle, CalendarCheck, Home, Sparkles, TrendingUp, Clock, Menu } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-const API_BASE_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
 
 interface UserData {
   id: string

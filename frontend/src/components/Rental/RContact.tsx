@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Facebook, Instagram, Twitter, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import RNavbar from "./RNavbar";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+import { API_BASE_URL } from '../../config/api';
 
 interface RContactProps {
   isModal?: boolean;
