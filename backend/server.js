@@ -15,6 +15,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve static files for frontend and admin (in production)
+if (process.env.NODE_ENV === 'production') {
+  // Serve admin panel at /admin
+  app.use('/admin', express.static(path.join(__dirname, '../admin/dist')));
+
+  // Serve frontend at root
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+}
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
 .then(async () => {
@@ -152,6 +161,19 @@ app.get('/api/health', async (req, res) => {
     });
   }
 });
+
+// Catch-all routes for SPA (must be after API routes)
+if (process.env.NODE_ENV === 'production') {
+  // Admin panel catch-all route
+  app.get('/admin/*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../admin/dist/index.html'));
+  });
+
+  // Frontend catch-all route (must be last)
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+}
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
