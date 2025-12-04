@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import BookingDate from '../components/BookingDate'
 import TickImage from '../assets/tick.png'
 import MasterPrimaryButton from '../assets/Master Primary Button (4).png'
+import { API_BASE_URL } from "../config/api";
 
 interface ContentSection {
   title: string;
@@ -103,7 +104,7 @@ const ParticularService = () => {
       try {
         // Always fetch fresh data from API to get latest updates (with translation)
         console.log('Fetching fresh service data by ID:', serviceId);
-        const serviceResponse = await fetch(`http://localhost:5000/api/services/${serviceId}?lang=${currentLang}`);
+        const serviceResponse = await fetch(`${API_BASE_URL}/services/${serviceId}?lang=${currentLang}`);
         const serviceData = await serviceResponse.json();
         console.log('Fetched service data:', serviceData);
 
@@ -142,7 +143,7 @@ const ParticularService = () => {
         }
 
         // Fall back to generic service page content if no content
-        const response = await fetch('http://localhost:5000/api/service-page-content');
+        const response = await fetch(`${API_BASE_URL}/service-page-content`)
         const data = await response.json();
 
         if (data.success) {

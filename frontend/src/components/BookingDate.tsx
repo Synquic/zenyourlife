@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { X, AlertCircle, Filter, Calendar, Ban } from "lucide-react";
 import BookingForm from "./BookingForm";
+import { API_BASE_URL } from "../config/api";
 
 interface Service {
   _id: string;
@@ -84,7 +85,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/blocked-dates/settings');
+        const response = await fetch(`${API_BASE_URL}/blocked-dates/settings`)
         const data = await response.json();
 
         if (data.success && data.data) {
@@ -98,7 +99,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
 
     const fetchBlockedDates = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/blocked-dates/active');
+        const response = await fetch(`${API_BASE_URL}/blocked-dates/active`)
         const data = await response.json();
 
         if (data.success) {
@@ -201,7 +202,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
         const appointmentDate = dates[selectedDate].fullDate;
 
         const response = await fetch(
-          `http://localhost:5000/api/appointments/booked-slots?date=${appointmentDate.toISOString()}`
+          `${API_BASE_URL}/appointments/booked-slots?date=${appointmentDate.toISOString()}`
         );
         const data = await response.json();
 

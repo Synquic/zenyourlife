@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import RApproved from './RApproved';
+import { API_BASE_URL } from "../../config/api";
 
 interface PropertyData {
   _id: string;
@@ -101,7 +102,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
     setSubmitMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/bookings/rental', {
+      const response = await fetch(`${API_BASE_URL}/bookings/rental`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

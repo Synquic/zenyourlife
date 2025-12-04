@@ -3,6 +3,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import znlogo from "../assets/znlogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "../config/api";
 
 interface BenefitItem {
   title?: string;
@@ -63,7 +64,7 @@ const Navbar = () => {
   React.useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/services');
+        const response = await fetch(`${API_BASE_URL}/services`)
         const data = await response.json();
         if (data.success) {
           setServices(data.data);

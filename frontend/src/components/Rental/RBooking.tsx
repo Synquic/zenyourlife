@@ -3,6 +3,7 @@ import { X, SlidersHorizontal, Users, BedDouble, ParkingCircle } from 'lucide-re
 import Apat1 from '../../assets/Apat1.png';
 import Apat2 from '../../assets/Apat2.png';
 import RBookingDate from './RBookingDate';
+import { API_BASE_URL } from "../../config/api";
 
 // Image mapping for property images
 const imageMap: { [key: string]: string } = {
@@ -37,7 +38,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/properties');
+        const response = await fetch(`${API_BASE_URL}/properties`)
         const data = await response.json();
 
         if (data.success) {

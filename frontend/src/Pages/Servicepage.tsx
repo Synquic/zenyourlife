@@ -17,6 +17,7 @@ import { ArrowRight } from 'lucide-react'
 import Expert from '../components/Expert'
 import Testimonial from '../components/Testimonial'
 import Footer from '../components/Footer'
+import { API_BASE_URL } from "../config/api";
 
 // Image array for cycling through service images (m1 to m9)
 const serviceImages = [m1, m2, m3, m4, m5, m6, m7, m8, m9]
@@ -95,8 +96,8 @@ const Servicepage = () => {
 
         // Fetch services and page content in parallel (with language parameter)
         const [servicesRes, pageContentRes] = await Promise.all([
-          fetch(`http://localhost:5000/api/services?lang=${currentLang}`),
-          fetch('http://localhost:5000/api/page-content/services')
+          fetch(`${API_BASE_URL}/services?lang=${currentLang}`),
+          fetch(`${API_BASE_URL}/page-content/services`)
         ]);
 
         const servicesData = await servicesRes.json();

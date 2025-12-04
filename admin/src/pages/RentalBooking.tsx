@@ -51,7 +51,8 @@ interface BookingData {
   updatedAt: string
 }
 
-const API_URL = 'http://localhost:5000/api'
+import { API_BASE_URL } from '../config/api'
+const API_URL = API_BASE_URL
 
 const RentalBooking = () => {
   // const [sidebarOpen, setSidebarOpen] = useState(false)

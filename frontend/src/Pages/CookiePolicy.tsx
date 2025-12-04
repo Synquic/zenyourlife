@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import { ChevronDown } from 'lucide-react'
 import Footer from '../components/Footer'
 import { useTranslation } from 'react-i18next'
+import { API_BASE_URL } from "../config/api";
 
 interface AccordionItemProps {
   title: string
@@ -69,7 +70,7 @@ const CookiePolicy = () => {
       setLoading(true)
       try {
         const lang = i18n.language?.substring(0, 2) || 'en'
-        const response = await fetch(`http://localhost:5000/api/legal-pages/cookie-policy?language=${lang}`)
+        const response = await fetch(`${API_BASE_URL}/legal-pages/cookie-policy?language=${lang}`)
         const result = await response.json()
         if (result.success && result.data) {
           setPageData(result.data)

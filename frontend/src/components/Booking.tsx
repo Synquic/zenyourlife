@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import BookingDate from "./BookingDate";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import TickImage from "../assets/tick.png";
+import { API_BASE_URL } from "../config/api";
 
 interface BookingProps {
   onClose?: () => void;
@@ -32,7 +33,7 @@ const Booking = ({ onClose }: BookingProps) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/services');
+        const response = await fetch(`${API_BASE_URL}/services`)
 
         console.log("respon =" ,response);
         const data = await response.json();

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertCircle } from "lucide-react";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
+import { API_BASE_URL } from "../config/api";
 
 interface Service {
   _id: string;
@@ -146,7 +147,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
       console.log('═══════════════════════════════════════════════════════\n');
 
       // Submit to Enrollment API
-      const response = await fetch('http://localhost:5000/api/enrollments', {
+      const response = await fetch(`${API_BASE_URL}/enrollments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
