@@ -16,17 +16,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/bookings" element={<ProtectedRoute><RentalBooking /></ProtectedRoute>} />
-        <Route path="/massage-appointments" element={<ProtectedRoute><MassageBooking /></ProtectedRoute>} />
-        <Route path="/booking-management" element={<ProtectedRoute><BookingManagement /></ProtectedRoute>} />
-        <Route path="/inquiries" element={<ProtectedRoute><Inquiries /></ProtectedRoute>} />
-        <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
-        <Route path="/testimonials" element={<ProtectedRoute><Testimonials /></ProtectedRoute>} />
-        <Route path="/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
-        <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-        <Route path="/health" element={<ProtectedRoute><HealthCheck /></ProtectedRoute>} />
+        <Route path="/admin" element={<Login />} />
+        <Route path="/admin/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/admin/bookings" element={<ProtectedRoute><RentalBooking /></ProtectedRoute>} />
+        <Route path="/admin/massage-appointments" element={<ProtectedRoute><MassageBooking /></ProtectedRoute>} />
+        <Route path="/admin/booking-management" element={<ProtectedRoute><BookingManagement /></ProtectedRoute>} />
+        <Route path="/admin/inquiries" element={<ProtectedRoute><Inquiries /></ProtectedRoute>} />
+        <Route path="/admin/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
+        <Route path="/admin/testimonials" element={<ProtectedRoute><Testimonials /></ProtectedRoute>} />
+        <Route path="/admin/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+        <Route path="/admin/health" element={<ProtectedRoute><HealthCheck /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

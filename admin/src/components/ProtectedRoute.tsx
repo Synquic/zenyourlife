@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // Check if admin session cookie exists
   if (!isAdminAuthenticated()) {
     // Redirect to login page if not authenticated
-    return <Navigate to="/" replace />
+    return <Navigate to="/admin" replace />
   }
 
   return <>{children}</>
