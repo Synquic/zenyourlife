@@ -15,13 +15,7 @@ import tp5 from "../assets/tp5.png";
 import lock from "../assets/lock.png";
 
 import {
-  Facebook,
-  Instagram,
-  Linkedin,
-  Youtube,
-  MapPin,
-  Phone,
-  Mail,
+  
   X,
 } from "lucide-react";
 import NavbarHome from "../components/NavbarHome";

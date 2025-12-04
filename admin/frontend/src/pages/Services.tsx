@@ -4,17 +4,41 @@ import Sidebar from '../components/Sidebar'
 
 const API_BASE_URL = 'http://localhost:5000/api'
 
+// Import massage images
+import m1 from '../assets/m1.png'
+import m2 from '../assets/m2.png'
+import m3 from '../assets/m3.png'
+import m4 from '../assets/m4.png'
+import m5 from '../assets/m5.png'
+import m6 from '../assets/m6.png'
+import m7 from '../assets/m7.png'
+import m8 from '../assets/m8.png'
+import m9 from '../assets/m9.png'
+
+// Image mapping
+const imageMap: { [key: string]: string } = {
+  'm1.png': m1,
+  'm2.png': m2,
+  'm3.png': m3,
+  'm4.png': m4,
+  'm5.png': m5,
+  'm6.png': m6,
+  'm7.png': m7,
+  'm8.png': m8,
+  'm9.png': m9,
+}
+
 // Available images for selection with colors
 const availableImages = [
-  { name: 'm1.png', label: 'Massage 1', color: 'from-rose-400 to-rose-600' },
-  { name: 'm2.png', label: 'Massage 2', color: 'from-violet-400 to-violet-600' },
-  { name: 'm3.png', label: 'Massage 3', color: 'from-blue-400 to-blue-600' },
-  { name: 'm4.png', label: 'Massage 4', color: 'from-cyan-400 to-cyan-600' },
-  { name: 'm5.png', label: 'Massage 5', color: 'from-emerald-400 to-emerald-600' },
-  { name: 'm6.png', label: 'Massage 6', color: 'from-amber-400 to-amber-600' },
-  { name: 'm7.png', label: 'Massage 7', color: 'from-orange-400 to-orange-600' },
-  { name: 'm8.png', label: 'Massage 8', color: 'from-pink-400 to-pink-600' },
-  { name: 'm9.png', label: 'Massage 9', color: 'from-indigo-400 to-indigo-600' },
+  { name: 'm1.png', label: 'Massage 1', color: 'from-rose-400 to-rose-600', src: m1 },
+  { name: 'm2.png', label: 'Massage 2', color: 'from-violet-400 to-violet-600', src: m2 },
+  { name: 'm3.png', label: 'Massage 3', color: 'from-blue-400 to-blue-600', src: m3 },
+  { name: 'm4.png', label: 'Massage 4', color: 'from-cyan-400 to-cyan-600', src: m4 },
+  { name: 'm5.png', label: 'Massage 5', color: 'from-emerald-400 to-emerald-600', src: m5 },
+  { name: 'm6.png', label: 'Massage 6', color: 'from-amber-400 to-amber-600', src: m6 },
+  { name: 'm7.png', label: 'Massage 7', color: 'from-orange-400 to-orange-600', src: m7 },
+  { name: 'm8.png', label: 'Massage 8', color: 'from-pink-400 to-pink-600', src: m8 },
+  { name: 'm9.png', label: 'Massage 9', color: 'from-indigo-400 to-indigo-600', src: m9 },
 ]
 
 // Category configurations
@@ -631,10 +655,9 @@ const Services = () => {
     return categories.find(c => c.value === category) || categories[0]
   }
 
-  // Get image color
-  const getImageColor = (image: string) => {
-    const found = availableImages.find(img => img.name === image)
-    return found?.color || 'from-gray-400 to-gray-600'
+  // Get image source
+  const getImageSrc = (image: string) => {
+    return imageMap[image] || m1
   }
 
   // Stats
@@ -677,7 +700,7 @@ const Services = () => {
                   placeholder="Search services..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-violet-500/20 focus:bg-white transition-all outline-none"
+                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
                 />
               </div>
               {/* Notification */}
@@ -686,7 +709,7 @@ const Services = () => {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               {/* Profile */}
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-violet-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20">
                 A
               </div>
             </div>
@@ -703,7 +726,7 @@ const Services = () => {
                   <p className="text-sm font-medium text-slate-500">Total Services</p>
                   <p className="text-3xl font-bold text-slate-800 mt-1">{totalServices}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-violet-400 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/30">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
               </div>
@@ -714,7 +737,7 @@ const Services = () => {
                   <p className="text-sm font-medium text-slate-500">Active Services</p>
                   <p className="text-3xl font-bold text-slate-800 mt-1">{activeServices}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <Eye className="w-7 h-7 text-white" />
                 </div>
               </div>
@@ -752,7 +775,7 @@ const Services = () => {
                     <button
                       onClick={() => { setFilterCategory('all'); setShowFilterDropdown(false) }}
                       className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition ${
-                        filterCategory === 'all' ? 'text-violet-600 font-medium bg-violet-50' : 'text-slate-600'
+                        filterCategory === 'all' ? 'text-[#B8922D] font-medium bg-[#FFEEC3]/30' : 'text-slate-600'
                       }`}
                     >
                       All Categories
@@ -762,7 +785,7 @@ const Services = () => {
                         key={cat.value}
                         onClick={() => { setFilterCategory(cat.value); setShowFilterDropdown(false) }}
                         className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition flex items-center gap-2 ${
-                          filterCategory === cat.value ? 'text-violet-600 font-medium bg-violet-50' : 'text-slate-600'
+                          filterCategory === cat.value ? 'text-[#B8922D] font-medium bg-[#FFEEC3]/30' : 'text-slate-600'
                         }`}
                       >
                         <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${cat.color}`}></span>
@@ -777,13 +800,13 @@ const Services = () => {
               <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition ${viewMode === 'grid' ? 'bg-violet-100 text-violet-600' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-2 rounded-lg transition ${viewMode === 'grid' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   <LayoutGrid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition ${viewMode === 'list' ? 'bg-violet-100 text-violet-600' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-2 rounded-lg transition ${viewMode === 'list' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -796,7 +819,7 @@ const Services = () => {
 
             <button
               onClick={handleAddNew}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition shadow-lg shadow-violet-500/30 text-sm font-medium"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-sm font-medium"
             >
               <Plus className="w-4 h-4" />
               Add Service
@@ -806,7 +829,7 @@ const Services = () => {
           {/* Loading State */}
           {loading && (
             <div className="flex flex-col items-center justify-center h-64 bg-white rounded-2xl">
-              <Loader2 className="w-10 h-10 animate-spin text-violet-500 mb-4" />
+              <Loader2 className="w-10 h-10 animate-spin text-[#DFB13B] mb-4" />
               <span className="text-slate-500">Loading services...</span>
             </div>
           )}
@@ -834,7 +857,7 @@ const Services = () => {
               <p className="text-slate-500 mb-6">Get started by adding your first service</p>
               <button
                 onClick={handleAddNew}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-500 text-white rounded-xl hover:bg-violet-600 transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition"
               >
                 <Plus className="w-4 h-4" />
                 Add Service
@@ -854,10 +877,12 @@ const Services = () => {
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     {/* Image */}
-                    <div className={`h-36 bg-gradient-to-br ${getImageColor(service.image)} flex items-center justify-center relative`}>
-                      <span className="text-5xl font-bold text-white/30">
-                        {service.image?.replace('.png', '').toUpperCase() || 'IMG'}
-                      </span>
+                    <div className="h-36 relative overflow-hidden">
+                      <img
+                        src={service.imageUrl || getImageSrc(service.image)}
+                        alt={service.title}
+                        className="w-full h-full object-cover"
+                      />
 
                       {/* Category Badge */}
                       <div className="absolute top-3 left-3">
@@ -898,7 +923,7 @@ const Services = () => {
                           <span className="text-sm">{service.duration} mins</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="text-xl font-bold text-violet-600">${service.price}</span>
+                          <span className="text-xl font-bold text-[#B8922D]">${service.price}</span>
                         </div>
                       </div>
 
@@ -906,7 +931,7 @@ const Services = () => {
                       <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
                         <button
                           onClick={() => handleEdit(service)}
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition text-sm font-medium"
+                          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
                         >
                           <Edit2 className="w-4 h-4" />
                           Edit
@@ -948,10 +973,12 @@ const Services = () => {
                       <tr key={service._id} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 bg-gradient-to-br ${getImageColor(service.image)} rounded-xl flex items-center justify-center`}>
-                              <span className="text-xs font-bold text-white/70">
-                                {service.image?.replace('.png', '').toUpperCase()}
-                              </span>
+                            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                              <img
+                                src={service.imageUrl || getImageSrc(service.image)}
+                                alt={service.title}
+                                className="w-full h-full object-cover"
+                              />
                             </div>
                             <div>
                               <p className="font-medium text-slate-800">{service.title}</p>
@@ -966,7 +993,7 @@ const Services = () => {
                         </td>
                         <td className="py-4 px-6 text-sm text-slate-600">{service.duration} mins</td>
                         <td className="py-4 px-6">
-                          <span className="font-semibold text-violet-600">${service.price}</span>
+                          <span className="font-semibold text-[#B8922D]">${service.price}</span>
                         </td>
                         <td className="py-4 px-6">
                           <button
@@ -984,7 +1011,7 @@ const Services = () => {
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleEdit(service)}
-                              className="p-2 text-slate-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition"
+                              className="p-2 text-slate-500 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
@@ -1014,7 +1041,7 @@ const Services = () => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
             {/* Modal Header */}
-            <div className="relative bg-gradient-to-r from-violet-500 to-violet-600 px-8 py-6">
+            <div className="relative bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-8 py-6">
               <button
                 onClick={() => setShowModal(false)}
                 className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition"
@@ -1029,7 +1056,7 @@ const Services = () => {
                   <h2 className="text-xl font-bold text-white">
                     {editingService ? 'Edit Service' : 'Add New Service'}
                   </h2>
-                  <p className="text-violet-100 text-sm mt-0.5">
+                  <p className="text-[#FFEEC3] text-sm mt-0.5">
                     {editingService ? 'Update service details' : 'Create a new wellness service'}
                   </p>
                 </div>
@@ -1048,7 +1075,7 @@ const Services = () => {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Swedish Massage"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
                 />
               </div>
 
@@ -1062,7 +1089,7 @@ const Services = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe the service..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none"
                 />
               </div>
 
@@ -1075,7 +1102,7 @@ const Services = () => {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none appearance-none cursor-pointer"
                   >
                     {categories.map(cat => (
                       <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -1093,7 +1120,7 @@ const Services = () => {
                       value={formData.duration}
                       onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
                       min="0"
-                      className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none"
+                      className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
                     />
                   </div>
                 </div>
@@ -1130,18 +1157,20 @@ const Services = () => {
                       onClick={() => setFormData({ ...formData, image: img.name })}
                       className={`relative p-3 rounded-2xl transition-all ${
                         formData.image === img.name
-                          ? 'bg-violet-50 border-2 border-violet-500 shadow-lg shadow-violet-500/20'
+                          ? 'bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20'
                           : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
                       }`}
                     >
-                      <div className={`h-16 bg-gradient-to-br ${img.color} rounded-xl flex items-center justify-center mb-2`}>
-                        <span className="text-xl font-bold text-white/50">
-                          {img.name.replace('.png', '').toUpperCase()}
-                        </span>
+                      <div className="h-16 rounded-xl overflow-hidden mb-2">
+                        <img
+                          src={img.src}
+                          alt={img.label}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <p className="text-xs text-slate-500 text-center">{img.label}</p>
                       {formData.image === img.name && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-violet-500 rounded-full flex items-center justify-center">
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
@@ -1162,7 +1191,7 @@ const Services = () => {
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   placeholder="https://example.com/image.jpg"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
                 />
                 <p className="text-xs text-slate-400 mt-2">
                   If provided, this URL will override the selected image
@@ -1179,7 +1208,7 @@ const Services = () => {
                   type="button"
                   onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                   className={`relative w-14 h-8 rounded-full transition-colors ${
-                    formData.isActive ? 'bg-violet-500' : 'bg-slate-300'
+                    formData.isActive ? 'bg-[#DFB13B]' : 'bg-slate-300'
                   }`}
                 >
                   <div
@@ -1276,7 +1305,7 @@ const Services = () => {
                               <button
                                 type="button"
                                 onClick={() => handleStartEditContentSection(index)}
-                                className="p-1.5 text-slate-400 hover:text-violet-600 hover:bg-violet-50 rounded transition"
+                                className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
@@ -1366,7 +1395,7 @@ const Services = () => {
                             <button
                               type="button"
                               onClick={() => handleStartEditServiceBenefit(index)}
-                              className="p-1.5 text-slate-400 hover:text-violet-600 hover:bg-violet-50 rounded transition"
+                              className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
@@ -1455,7 +1484,7 @@ const Services = () => {
                             <button
                               type="button"
                               onClick={() => handleStartEditServiceTarget(index)}
-                              className="p-1.5 text-slate-400 hover:text-violet-600 hover:bg-violet-50 rounded transition"
+                              className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
@@ -1481,7 +1510,7 @@ const Services = () => {
               <div className="border-t border-slate-200 pt-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Image className="w-5 h-5 text-indigo-500" />
+                    <Image className="w-5 h-5 text-[#DFB13B]" />
                     <label className="text-sm font-semibold text-slate-700">
                       Service Gallery <span className="font-normal text-slate-400">(Max 4 images)</span>
                     </label>
@@ -1499,13 +1528,13 @@ const Services = () => {
                         onChange={(e) => setImageUrlInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddImageUrl())}
                         placeholder="Paste image URL here..."
-                        className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all outline-none text-sm"
+                        className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm"
                       />
                       <button
                         type="button"
                         onClick={handleAddImageUrl}
                         disabled={!imageUrlInput.trim()}
-                        className="px-4 py-2.5 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2.5 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -1526,8 +1555,8 @@ const Services = () => {
                       onClick={() => fileInputRef.current?.click()}
                       className={`relative border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
                         isDragging
-                          ? 'border-indigo-500 bg-indigo-50'
-                          : 'border-slate-300 hover:border-indigo-400 hover:bg-slate-50'
+                          ? 'border-[#DFB13B] bg-[#FFEEC3]/20'
+                          : 'border-slate-300 hover:border-[#DFB13B]/50 hover:bg-slate-50'
                       }`}
                     >
                       <input
@@ -1540,12 +1569,12 @@ const Services = () => {
                       />
                       {uploadingImage ? (
                         <div className="flex flex-col items-center">
-                          <Loader2 className="w-6 h-6 text-indigo-500 animate-spin mb-2" />
+                          <Loader2 className="w-6 h-6 text-[#DFB13B] animate-spin mb-2" />
                           <p className="text-sm text-slate-600">Uploading...</p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center">
-                          <Upload className="w-6 h-6 text-indigo-400 mb-2" />
+                          <Upload className="w-6 h-6 text-[#DFB13B] mb-2" />
                           <p className="text-sm font-medium text-slate-700">
                             {isDragging ? 'Drop images here' : 'Drag & drop or click to browse'}
                           </p>
@@ -1603,7 +1632,7 @@ const Services = () => {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-500 to-violet-600 text-white rounded-xl hover:from-violet-600 hover:to-violet-700 transition shadow-lg shadow-violet-500/30 font-medium disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 font-medium disabled:opacity-50"
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

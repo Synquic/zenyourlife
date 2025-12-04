@@ -172,7 +172,7 @@ const Inquiries = () => {
                   placeholder="Search inquiries..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-4 py-2 w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  className="pl-9 pr-4 py-2 w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]"
                 />
               </div>
             </div>
@@ -186,7 +186,7 @@ const Inquiries = () => {
                 onClick={() => setStatusFilter(status)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   statusFilter === status
-                    ? 'bg-emerald-500 text-white'
+                    ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
@@ -207,7 +207,7 @@ const Inquiries = () => {
           <div className="w-96 border-r border-gray-200 bg-white overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center h-64">
-                <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
+                <Loader2 className="w-8 h-8 text-[#DFB13B] animate-spin" />
               </div>
             ) : error ? (
               <div className="flex items-center justify-center h-64 text-red-500">
@@ -226,12 +226,12 @@ const Inquiries = () => {
                     key={inquiry._id}
                     onClick={() => setSelectedInquiry(inquiry)}
                     className={`p-4 cursor-pointer transition-all hover:bg-gray-50 ${
-                      selectedInquiry?._id === inquiry._id ? 'bg-emerald-50 border-l-4 border-emerald-500' : ''
+                      selectedInquiry?._id === inquiry._id ? 'bg-[#FFEEC3]/20 border-l-4 border-[#DFB13B]' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-full flex items-center justify-center text-white font-semibold text-sm">
                           {inquiry.firstName.charAt(0)}{inquiry.lastName.charAt(0)}
                         </div>
                         <div>
@@ -266,7 +266,7 @@ const Inquiries = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/30">
+                      <div className="w-16 h-16 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-[#DFB13B]/30">
                         {selectedInquiry.firstName.charAt(0)}{selectedInquiry.lastName.charAt(0)}
                       </div>
                       <div>
@@ -338,7 +338,7 @@ const Inquiries = () => {
                 {/* Message */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-emerald-500" />
+                    <MessageSquare className="w-5 h-5 text-[#DFB13B]" />
                     Message
                   </h3>
                   <div className="bg-gray-50 rounded-lg p-4">

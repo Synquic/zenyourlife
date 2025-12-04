@@ -93,13 +93,64 @@ app.use('/api/translate', translationRoutes);
 app.use('/api/blocked-dates', blockedDateRoutes);
 app.use('/api/legal-pages', legalPageRoutes);
 
-// Health Check Route
+// Health Check Routes
 app.get('/', (req, res) => {
   res.json({
     message: 'ZenYourLife API is running!',
     status: 'OK',
     timestamp: new Date().toISOString()
   });
+});
+
+// API Health Check endpoint
+app.get('/api', (req, res) => {
+  res.json({
+    success: true,
+    message: 'ZenYourLife API Server',
+    status: 'healthy',
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    endpoints: {
+      services: '/api/services',
+      properties: '/api/properties',
+      appointments: '/api/appointments',
+      contact: '/api/contact',
+      testimonials: '/api/testimonials',
+      legalPages: '/api/legal-pages',
+      upload: '/api/upload'
+    }
+  });
+});
+
+// Detailed health check with database status
+app.get('/api/health', async (req, res) => {
+  try {
+    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+
+    res.json({
+      success: true,
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      server: {
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        nodeVersion: process.version,
+        platform: process.platform
+      },
+      database: {
+        status: dbStatus,
+        name: mongoose.connection.name || 'N/A'
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      status: 'unhealthy',
+      error: error.message
+    });
+  }
 });
 
 // Error Handling Middleware

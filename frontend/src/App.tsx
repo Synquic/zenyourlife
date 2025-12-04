@@ -20,6 +20,7 @@ import RPrivacy from "./Pages/RentalPages/RPrivacy";
 import RContact from "./components/Rental/RContact";
 
 const App = () => {
+  
   return (
     <>
       <Routes>

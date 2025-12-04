@@ -346,7 +346,7 @@ const BookingManagement = () => {
           {loading ? (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 className="w-8 h-8 text-[#0D9488] animate-spin mx-auto mb-3" />
+                <Loader2 className="w-8 h-8 text-[#DFB13B] animate-spin mx-auto mb-3" />
                 <p className="text-slate-500 text-sm">Loading booking settings...</p>
               </div>
             </div>
@@ -415,7 +415,7 @@ const BookingManagement = () => {
                   onClick={() => setActiveTab('schedule')}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     activeTab === 'schedule'
-                      ? 'bg-[#0D9488] text-white shadow-lg shadow-[#0D9488]/20'
+                      ? 'bg-[#DFB13B] text-white shadow-lg shadow-[#DFB13B]/20'
                       : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
                   }`}
                 >
@@ -499,7 +499,7 @@ const BookingManagement = () => {
                                   <button
                                     onClick={handleSaveDaySchedule}
                                     disabled={saving}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-[#0D9488] text-white rounded-lg text-sm font-medium hover:bg-[#0F766E] transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-2 px-3 py-1.5 bg-[#DFB13B] text-white rounded-lg text-sm font-medium hover:bg-[#C9A032] transition-colors disabled:opacity-50"
                                   >
                                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     Save
@@ -539,7 +539,7 @@ const BookingManagement = () => {
                                       value={newSlot}
                                       onChange={(e) => setNewSlot(e.target.value)}
                                       placeholder="e.g., 10:00 or 2:30"
-                                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488]"
+                                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]"
                                       onKeyDown={(e) => e.key === 'Enter' && handleAddSlotToDay()}
                                     />
                                     <button

@@ -330,7 +330,7 @@ const Users = () => {
                 placeholder="Search by name, email or phone..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl w-80 focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                className="pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl w-80 focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
               />
             </div>
           </div>
@@ -344,7 +344,7 @@ const Users = () => {
               onClick={() => setActiveTab('massage')}
               className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'massage'
-                  ? 'bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white shadow-lg shadow-[#0D9488]/20'
+                  ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/20'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -360,7 +360,7 @@ const Users = () => {
               onClick={() => setActiveTab('rental')}
               className={`flex items-center gap-2.5 px-6 py-3 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'rental'
-                  ? 'bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white shadow-lg shadow-[#0D9488]/20'
+                  ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/20'
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
@@ -376,7 +376,7 @@ const Users = () => {
 
           {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-5 mb-8">
-            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-[#0D9488]/20 transition-all">
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-[#DFB13B]/20 transition-all">
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-500 mb-1">Total Customers</p>
@@ -386,8 +386,8 @@ const Users = () => {
                     <span className="text-emerald-600 font-medium">Active</span> users
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-gradient-to-br from-[#0D9488]/10 to-[#0D9488]/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <UsersIcon className="w-6 h-6 text-[#0D9488]" />
+                <div className="w-12 h-12 bg-gradient-to-br from-[#DFB13B]/10 to-[#DFB13B]/5 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <UsersIcon className="w-6 h-6 text-[#DFB13B]" />
                 </div>
               </div>
             </div>
@@ -457,7 +457,7 @@ const Users = () => {
             {currentLoading && (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <Loader2 className="w-8 h-8 text-[#0D9488] animate-spin mx-auto mb-3" />
+                  <Loader2 className="w-8 h-8 text-[#DFB13B] animate-spin mx-auto mb-3" />
                   <p className="text-slate-500 text-sm">Loading customers...</p>
                 </div>
               </div>
@@ -538,7 +538,7 @@ const Users = () => {
                         <button
                           onClick={() => activeTab === 'massage' ? fetchMassageUserDetails(user.email) : fetchRentalUserDetails(user.email)}
                           disabled={loadingDetails}
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-[#0D9488] hover:text-white transition-all text-sm font-medium group-hover:bg-[#0D9488] group-hover:text-white"
+                          className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-[#DFB13B] hover:text-white transition-all text-sm font-medium group-hover:bg-[#DFB13B] group-hover:text-white"
                         >
                           <Eye className="w-4 h-4" />
                           View
@@ -577,7 +577,7 @@ const Users = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header with Gradient */}
-            <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] px-6 py-8 text-white relative">
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-8 text-white relative">
               <button
                 onClick={() => { setIsModalOpen(false); setSelectedMassageUser(null) }}
                 className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-all"
@@ -674,7 +674,7 @@ const Users = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header with Gradient */}
-            <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] px-6 py-8 text-white relative">
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-8 text-white relative">
               <button
                 onClick={() => { setIsModalOpen(false); setSelectedRentalUser(null) }}
                 className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-all"

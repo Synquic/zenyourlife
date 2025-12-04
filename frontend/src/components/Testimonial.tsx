@@ -150,6 +150,7 @@ const Testimonial = () => {
     };
 
     fetchTestimonials();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLang]);
 
   // Get photo source - prefer photoUrl, fallback to mapped photo

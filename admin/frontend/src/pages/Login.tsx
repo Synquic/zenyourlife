@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import znlogo from '../assets/znlogo.png'
+import { createAdminSession } from '../utils/cookies'
 
-const ADMIN_EMAIL = 'admin@zenyourlife.in'
+const ADMIN_EMAIL = 'admin@zenyourlife.be'
 const ADMIN_PASSWORD = 'admin12345'
 
 const Login = () => {
@@ -27,9 +28,8 @@ const Login = () => {
     e.preventDefault()
 
     if (formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
-      // Store auth state in localStorage
-      localStorage.setItem('isAdminLoggedIn', 'true')
-      localStorage.setItem('adminEmail', formData.email)
+      // Create session cookie
+      createAdminSession(formData.email)
       // Navigate to dashboard
       navigate('/dashboard')
     } else {
@@ -78,7 +78,7 @@ const Login = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your username or email"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]/50 transition"
             />
           </div>
 
@@ -94,7 +94,7 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-transparent transition pr-10"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]/50 transition pr-10"
               />
               <button
                 type="button"
@@ -109,7 +109,7 @@ const Login = () => {
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-gray-800 text-white py-3 rounded-lg text-sm font-medium hover:bg-gray-900 transition"
+            className="w-full bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white py-3 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-[#DFB13B]/30 transition"
           >
             Log In
           </button>

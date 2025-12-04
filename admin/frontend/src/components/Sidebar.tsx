@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarCheck, MessageSquare, Building2, Sparkles, Users, Settings, LogOut, Quote, ChevronRight, Flower2, X, Settings2 } from 'lucide-react'
+import { LayoutDashboard, CalendarCheck, MessageSquare, Building2, Sparkles, Users, LogOut, Quote, ChevronRight, Flower2, X, Settings2 } from 'lucide-react'
 import znlogo from '../assets/znlogo.png'
+import { destroyAdminSession } from '../utils/cookies'
 
 interface MenuItem {
   name: string
@@ -28,11 +29,12 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
     { name: 'Services', icon: <Sparkles className="w-5 h-5" />, path: '/services' },
     { name: 'Testimonials', icon: <Quote className="w-5 h-5" />, path: '/testimonials' },
     { name: 'Users', icon: <Users className="w-5 h-5" />, path: '/users' },
+    // { name: 'System Health', icon: <Activity className="w-5 h-5" />, path: '/health' },
   ]
 
   const handleLogout = () => {
-    localStorage.removeItem('isAdminLoggedIn')
-    localStorage.removeItem('adminEmail')
+    // Destroy session cookies
+    destroyAdminSession()
     navigate('/')
   }
 
@@ -63,12 +65,7 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
         <div className="px-4 sm:px-6 py-4 sm:py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                  <img src={znlogo} alt="ZenYourLife" className="w-6 h-6 sm:w-7 sm:h-7 object-contain" />
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
-              </div>
+              <img src={znlogo} alt="ZenYourLife" className="w-10 h-10 sm:w-11 sm:h-11 object-contain" />
               <div>
                 <h1 className="text-sm sm:text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   ZenYourLife
@@ -103,7 +100,7 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
                   onClick={() => handleNavigation(item.path)}
                   className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 group ${
                     isActive(item.path)
-                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                      ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30'
                       : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
@@ -132,25 +129,15 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
         {/* Bottom Section */}
         <div className="px-3 py-3 mt-auto">
           {/* Settings */}
-          <button
-            onClick={() => handleNavigation('/settings')}
-            className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 mb-2 ${
-              isActive('/settings')
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30'
-                : 'text-slate-600 hover:bg-slate-50'
-            }`}
-          >
-            <Settings className="w-5 h-5" />
-            <span className="flex-1 text-left">Settings</span>
-          </button>
+          
 
           {/* User Profile */}
           <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer">
             <div className="relative">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-violet-400 to-violet-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-violet-500/20">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-[#DFB13B]/20">
                 A
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-emerald-400 rounded-full border-2 border-white"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#DFB13B] rounded-full border-2 border-white"></div>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs sm:text-sm font-semibold text-slate-700 truncate">Admin User</p>

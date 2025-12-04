@@ -22,7 +22,7 @@ interface Property {
 }
 
 interface RBookingProps {
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
@@ -80,12 +80,14 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
             <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-            </button>
+            {onClose && (
+              <button
+                onClick={onClose}
+                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              </button>
+            )}
           </div>
         </div>
 

@@ -181,7 +181,7 @@ const Dashboard = () => {
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0D9488] to-[#0F766E] flex items-center justify-center shadow-lg shadow-[#0D9488]/20">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#DFB13B] to-[#C9A032] flex items-center justify-center shadow-lg shadow-[#DFB13B]/20">
                   <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <div>
@@ -199,7 +199,7 @@ const Dashboard = () => {
           {loading && (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
                   <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-white" />
                 </div>
                 <p className="text-slate-500 font-medium text-sm sm:text-base">Loading your dashboard...</p>
@@ -222,7 +222,7 @@ const Dashboard = () => {
           {!loading && (
             <>
               {/* Welcome Banner */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-[#0D9488] via-[#0F766E] to-[#115E59] rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
+              <div className="relative overflow-hidden bg-gradient-to-r from-[#DFB13B] via-[#C9A032] to-[#B8922D] rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
                 <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                 <div className="absolute bottom-0 left-1/3 w-16 sm:w-32 h-16 sm:h-32 bg-white/5 rounded-full translate-y-1/2" />
                 <div className="relative z-10">

@@ -278,7 +278,7 @@ const Testimonials = () => {
                   placeholder="Search testimonials..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all outline-none"
+                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
                 />
               </div>
               {/* Notification */}
@@ -287,7 +287,7 @@ const Testimonials = () => {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               {/* Profile */}
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-emerald-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20">
                 A
               </div>
             </div>
@@ -299,7 +299,7 @@ const Testimonials = () => {
               onClick={() => setActiveTab('massage')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'massage'
-                  ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/30'
+                  ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -310,7 +310,7 @@ const Testimonials = () => {
               onClick={() => setActiveTab('rental')}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'rental'
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30'
+                  ? 'bg-gradient-to-r from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] text-white shadow-lg shadow-[#DFB13B]/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -330,7 +330,7 @@ const Testimonials = () => {
                   <p className="text-sm font-medium text-slate-500">Total Reviews</p>
                   <p className="text-3xl font-bold text-slate-800 mt-1">{totalTestimonials}</p>
                 </div>
-                <div className={`w-14 h-14 bg-gradient-to-br ${activeTab === 'massage' ? 'from-emerald-400 to-emerald-600' : 'from-blue-400 to-blue-600'} rounded-2xl flex items-center justify-center shadow-lg ${activeTab === 'massage' ? 'shadow-emerald-500/30' : 'shadow-blue-500/30'}`}>
+                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <MessageCircle className="w-7 h-7 text-white" />
                 </div>
               </div>
@@ -341,7 +341,7 @@ const Testimonials = () => {
                   <p className="text-sm font-medium text-slate-500">Active Reviews</p>
                   <p className="text-3xl font-bold text-slate-800 mt-1">{activeTestimonials}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/30">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <Eye className="w-7 h-7 text-white" />
                 </div>
               </div>
@@ -382,7 +382,7 @@ const Testimonials = () => {
                         key={status}
                         onClick={() => { setFilterStatus(status as 'all' | 'active' | 'inactive'); setShowFilterDropdown(false) }}
                         className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition capitalize ${
-                          filterStatus === status ? 'text-emerald-600 font-medium bg-emerald-50' : 'text-slate-600'
+                          filterStatus === status ? 'text-[#B8922D] font-medium bg-[#FFEEC3]/30' : 'text-slate-600'
                         }`}
                       >
                         {status === 'all' ? 'All Status' : status}
@@ -405,7 +405,7 @@ const Testimonials = () => {
               </button>
               <button
                 onClick={handleAddNew}
-                className={`flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600 shadow-emerald-500/30' : 'from-blue-500 to-blue-600 shadow-blue-500/30'} text-white rounded-xl hover:opacity-90 transition shadow-lg text-sm font-medium`}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 Add Testimonial
@@ -416,7 +416,7 @@ const Testimonials = () => {
           {/* Loading State */}
           {loading && (
             <div className="flex flex-col items-center justify-center h-64 bg-white rounded-2xl">
-              <Loader2 className="w-10 h-10 animate-spin text-emerald-500 mb-4" />
+              <Loader2 className="w-10 h-10 animate-spin text-[#DFB13B] mb-4" />
               <span className="text-slate-500">Loading testimonials...</span>
             </div>
           )}
@@ -451,7 +451,7 @@ const Testimonials = () => {
                 </button>
                 <button
                   onClick={handleAddNew}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 ${activeTab === 'massage' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded-xl transition`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DFB13B] hover:bg-[#C9A032] text-white rounded-xl transition"
                 >
                   <Plus className="w-4 h-4" />
                   Add Testimonial
@@ -485,7 +485,7 @@ const Testimonials = () => {
                         onClick={() => handleToggleStatus(testimonial)}
                         className={`px-3 py-1 rounded-full text-xs font-medium transition ${
                           testimonial.isActive
-                            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                            ? 'bg-[#FFEEC3]/50 text-[#B8922D] hover:bg-[#FFEEC3]'
                             : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                         }`}
                       >
@@ -525,7 +525,7 @@ const Testimonials = () => {
                   <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center gap-2">
                     <button
                       onClick={() => handleEdit(testimonial)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
                     >
                       <Edit2 className="w-4 h-4" />
                       Edit
@@ -562,7 +562,7 @@ const Testimonials = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`relative bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600' : 'from-blue-500 to-blue-600'} px-8 py-6`}>
+            <div className="relative bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-8 py-6">
               <button
                 onClick={() => setShowModal(false)}
                 className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition"
@@ -597,7 +597,7 @@ const Testimonials = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
                   />
                 </div>
                 <div>
@@ -609,7 +609,7 @@ const Testimonials = () => {
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     placeholder="@johndoe"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
                   />
                 </div>
               </div>
@@ -624,7 +624,7 @@ const Testimonials = () => {
                   onChange={(e) => setFormData({ ...formData, text: e.target.value })}
                   placeholder="What did the customer say about their experience..."
                   rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none"
                 />
               </div>
 
@@ -672,7 +672,7 @@ const Testimonials = () => {
                       onClick={() => setFormData({ ...formData, photo: photo.name })}
                       className={`relative p-4 rounded-2xl transition-all ${
                         formData.photo === photo.name
-                          ? `${activeTab === 'massage' ? 'bg-emerald-50 border-2 border-emerald-500 shadow-emerald-500/20' : 'bg-blue-50 border-2 border-blue-500 shadow-blue-500/20'} shadow-lg`
+                          ? 'bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20'
                           : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
                       }`}
                     >
@@ -681,7 +681,7 @@ const Testimonials = () => {
                       </div>
                       <p className="text-xs text-slate-500 mt-2 text-center">{photo.label}</p>
                       {formData.photo === photo.name && (
-                        <div className={`absolute top-2 right-2 w-5 h-5 ${activeTab === 'massage' ? 'bg-emerald-500' : 'bg-blue-500'} rounded-full flex items-center justify-center`}>
+                        <div className="absolute top-2 right-2 w-5 h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
                           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
@@ -719,7 +719,7 @@ const Testimonials = () => {
                   type="button"
                   onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                   className={`relative w-14 h-8 rounded-full transition-colors ${
-                    formData.isActive ? (activeTab === 'massage' ? 'bg-emerald-500' : 'bg-blue-500') : 'bg-slate-300'
+                    formData.isActive ? 'bg-[#DFB13B]' : 'bg-slate-300'
                   }`}
                 >
                   <div
@@ -742,7 +742,7 @@ const Testimonials = () => {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${activeTab === 'massage' ? 'from-emerald-500 to-emerald-600 shadow-emerald-500/30' : 'from-blue-500 to-blue-600 shadow-blue-500/30'} text-white rounded-xl hover:opacity-90 transition shadow-lg font-medium disabled:opacity-50`}
+                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 font-medium disabled:opacity-50"
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

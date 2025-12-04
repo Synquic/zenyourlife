@@ -2,12 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import znlogo from '../assets/znlogo.png';
 import main1 from '../assets/main1.png';
-import main2 from '../assets/main2.png';
+// import main2 from '../assets/main2.png';
 import tp1 from '../assets/tp1.jpg';
 import tp2 from '../assets/tp2.jpg';
 import tp3 from '../assets/tp3.jpg';
 import tp4 from '../assets/tp4.jpg';
 import tp5 from '../assets/tp5.png';
+
+import zenurlifeRental from '../assets/zenurlifeRental.jpg';
 
 const MainLanding = () => {
   const navigate = useNavigate();
@@ -153,7 +155,7 @@ const MainLanding = () => {
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span>Groot-Bijgaarden, Belgium</span>
+                  <span>Schapenbaan 45 ,1731 Relegem</span>
                 </div>
               </div>
             </div>
@@ -164,7 +166,7 @@ const MainLanding = () => {
               className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
               <img
-                src={main2}
+                src={zenurlifeRental}
                 alt="Book A Rental"
                 className="w-full h-80 object-cover"
               />

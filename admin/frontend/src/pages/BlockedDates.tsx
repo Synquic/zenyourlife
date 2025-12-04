@@ -269,7 +269,7 @@ const BlockedDates = () => {
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white rounded-xl hover:shadow-lg hover:shadow-[#0D9488]/20 transition-all text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/20 transition-all text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 Block Date
@@ -349,7 +349,7 @@ const BlockedDates = () => {
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <div className="text-center">
-                  <Loader2 className="w-8 h-8 text-[#0D9488] animate-spin mx-auto mb-3" />
+                  <Loader2 className="w-8 h-8 text-[#DFB13B] animate-spin mx-auto mb-3" />
                   <p className="text-slate-500 text-sm">Loading blocked dates...</p>
                 </div>
               </div>
@@ -364,7 +364,7 @@ const BlockedDates = () => {
                 </p>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="mt-4 px-4 py-2 bg-[#0D9488] text-white rounded-lg text-sm font-medium hover:bg-[#0F766E] transition-colors"
+                  className="mt-4 px-4 py-2 bg-[#DFB13B] text-white rounded-lg text-sm font-medium hover:bg-[#C9A032] transition-colors"
                 >
                   Block a Date
                 </button>
@@ -534,7 +534,7 @@ const BlockedDates = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] px-6 py-5 text-white relative sticky top-0">
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-5 text-white relative sticky top-0">
               <button
                 onClick={() => setShowAddModal(false)}
                 className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-all"
@@ -563,7 +563,7 @@ const BlockedDates = () => {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] transition-all"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all"
                 />
               </div>
 
@@ -640,7 +640,7 @@ const BlockedDates = () => {
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
                   placeholder="e.g., Holiday, Personal day, etc."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] transition-all"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all"
                 />
               </div>
 
@@ -682,7 +682,7 @@ const BlockedDates = () => {
                 <button
                   onClick={handleAddDate}
                   disabled={!selectedDate || submitting || (blockType === 'slots' && selectedTimeSlots.length === 0)}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white rounded-xl font-medium hover:shadow-lg hover:shadow-[#0D9488]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl font-medium hover:shadow-lg hover:shadow-[#DFB13B]/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {submitting ? (
                     <>
@@ -770,7 +770,7 @@ const BlockedDates = () => {
                     value={newSlot}
                     onChange={(e) => setNewSlot(e.target.value)}
                     placeholder="e.g., 10:00 or 6:30"
-                    className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] transition-all"
+                    className="flex-1 px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all"
                     onKeyDown={(e) => e.key === 'Enter' && handleAddSlot()}
                   />
                   <button

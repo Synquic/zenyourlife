@@ -242,7 +242,7 @@ const MassageBooking = () => {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-[#0D9488] mx-auto mb-4" />
+            <Loader2 className="w-10 h-10 animate-spin text-[#DFB13B] mx-auto mb-4" />
             <p className="text-slate-500 font-medium">Loading appointments...</p>
           </div>
         </div>
@@ -263,7 +263,7 @@ const MassageBooking = () => {
             <p className="text-slate-500 text-sm mb-6">{error}</p>
             <button
               onClick={fetchBookings}
-              className="bg-[#0D9488] text-white px-6 py-2.5 rounded-xl hover:bg-[#0B7B72] transition font-medium"
+              className="bg-[#DFB13B] text-white px-6 py-2.5 rounded-xl hover:bg-[#C9A032] transition font-medium"
             >
               Try Again
             </button>
@@ -296,7 +296,7 @@ const MassageBooking = () => {
             </div>
             <button
               onClick={openNewBookingModal}
-              className="flex items-center gap-2 bg-[#0D9488] text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:bg-[#0B7B72] transition font-medium shadow-sm shadow-[#0D9488]/20 text-sm sm:text-base"
+              className="flex items-center gap-2 bg-[#DFB13B] text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:bg-[#C9A032] transition font-medium shadow-sm shadow-[#DFB13B]/20 text-sm sm:text-base"
             >
               <Plus className="w-4 h-4" />
               <span className="hidden sm:inline">New Appointment</span>
@@ -318,7 +318,7 @@ const MassageBooking = () => {
                   placeholder="Search appointments..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                  className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                 />
               </div>
 
@@ -341,7 +341,7 @@ const MassageBooking = () => {
                   >
                     {tab.label}
                     <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
-                      statusFilter === tab.key ? 'bg-[#0D9488]/10 text-[#0D9488]' : 'bg-slate-200/50'
+                      statusFilter === tab.key ? 'bg-[#DFB13B]/10 text-[#DFB13B]' : 'bg-slate-200/50'
                     }`}>
                       {tab.count}
                     </span>
@@ -372,7 +372,7 @@ const MassageBooking = () => {
                         onClick={() => setSelectedBooking(booking)}
                         className={`p-4 cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-[#0D9488]/5 border-l-3 border-l-[#0D9488]'
+                            ? 'bg-[#DFB13B]/5 border-l-3 border-l-[#DFB13B]'
                             : 'hover:bg-slate-50'
                         }`}
                       >
@@ -420,7 +420,7 @@ const MassageBooking = () => {
               <div className="max-w-3xl mx-auto space-y-6">
                 {/* Booking Header Card */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] px-6 py-5 text-white">
+                  <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-5 text-white">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-xl font-bold">
@@ -510,8 +510,8 @@ const MassageBooking = () => {
                   {/* Customer Information */}
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                        <User className="w-4 h-4 text-[#0D9488]" />
+                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                        <User className="w-4 h-4 text-[#DFB13B]" />
                       </div>
                       <h3 className="font-semibold text-slate-800">Customer Information</h3>
                     </div>
@@ -545,8 +545,8 @@ const MassageBooking = () => {
                   {/* Appointment Details */}
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-4 h-4 text-[#0D9488]" />
+                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-[#DFB13B]" />
                       </div>
                       <h3 className="font-semibold text-slate-800">Appointment Details</h3>
                     </div>
@@ -578,13 +578,13 @@ const MassageBooking = () => {
                   {/* Service Details */}
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-[#0D9488]" />
+                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 text-[#DFB13B]" />
                       </div>
                       <h3 className="font-semibold text-slate-800">Service</h3>
                     </div>
                     <div className="space-y-3">
-                      <div className="p-3 bg-gradient-to-r from-[#0D9488]/5 to-transparent rounded-xl">
+                      <div className="p-3 bg-gradient-to-r from-[#DFB13B]/5 to-transparent rounded-xl">
                         <p className="font-medium text-slate-800">{selectedBooking.serviceTitle}</p>
                         <p className="text-xs text-slate-500 mt-1">Wellness Treatment</p>
                       </div>
@@ -594,8 +594,8 @@ const MassageBooking = () => {
                   {/* Booking Timeline */}
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                        <Clock className="w-4 h-4 text-[#0D9488]" />
+                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                        <Clock className="w-4 h-4 text-[#DFB13B]" />
                       </div>
                       <h3 className="font-semibold text-slate-800">Timeline</h3>
                     </div>
@@ -616,8 +616,8 @@ const MassageBooking = () => {
                 {(selectedBooking.specialRequests || selectedBooking.message) && (
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 text-[#0D9488]" />
+                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                        <MessageSquare className="w-4 h-4 text-[#DFB13B]" />
                       </div>
                       <h3 className="font-semibold text-slate-800">Additional Notes</h3>
                     </div>
@@ -659,7 +659,7 @@ const MassageBooking = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#0D9488] to-[#0F766E] px-6 py-5 text-white">
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-5 text-white">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-semibold">Create New Appointment</h2>
@@ -679,8 +679,8 @@ const MassageBooking = () => {
                 {/* Customer Information */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                      <User className="w-4 h-4 text-[#0D9488]" />
+                    <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                      <User className="w-4 h-4 text-[#DFB13B]" />
                     </div>
                     <h3 className="font-semibold text-slate-800">Customer Information</h3>
                   </div>
@@ -691,7 +691,7 @@ const MassageBooking = () => {
                         type="text"
                         value={newBookingForm.firstName}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, firstName: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         required
                       />
                     </div>
@@ -701,7 +701,7 @@ const MassageBooking = () => {
                         type="text"
                         value={newBookingForm.lastName}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, lastName: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         required
                       />
                     </div>
@@ -711,7 +711,7 @@ const MassageBooking = () => {
                         type="email"
                         value={newBookingForm.email}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, email: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         required
                       />
                     </div>
@@ -721,7 +721,7 @@ const MassageBooking = () => {
                         type="tel"
                         value={newBookingForm.phoneNumber}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, phoneNumber: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         placeholder="+32 123456789"
                         required
                       />
@@ -731,7 +731,7 @@ const MassageBooking = () => {
                       <select
                         value={newBookingForm.country}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, country: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                       >
                         {Object.entries(countryNames).map(([code, name]) => (
                           <option key={code} value={code}>{name}</option>
@@ -748,7 +748,7 @@ const MassageBooking = () => {
                             onClick={() => setNewBookingForm({ ...newBookingForm, gender: g })}
                             className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all capitalize ${
                               newBookingForm.gender === g
-                                ? 'bg-[#0D9488] text-white border-[#0D9488]'
+                                ? 'bg-[#DFB13B] text-white border-[#DFB13B]'
                                 : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
                             }`}
                           >
@@ -763,15 +763,15 @@ const MassageBooking = () => {
                 {/* Service Selection */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-[#0D9488]" />
+                    <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-[#DFB13B]" />
                     </div>
                     <h3 className="font-semibold text-slate-800">Service Selection</h3>
                   </div>
                   <select
                     value={newBookingForm.serviceId}
                     onChange={(e) => setNewBookingForm({ ...newBookingForm, serviceId: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                     required
                   >
                     <option value="">Select a service</option>
@@ -786,8 +786,8 @@ const MassageBooking = () => {
                 {/* Appointment Details */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-4 h-4 text-[#0D9488]" />
+                    <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-4 h-4 text-[#DFB13B]" />
                     </div>
                     <h3 className="font-semibold text-slate-800">Appointment Details</h3>
                   </div>
@@ -798,7 +798,7 @@ const MassageBooking = () => {
                         type="date"
                         value={newBookingForm.appointmentDate}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, appointmentDate: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         required
                       />
                     </div>
@@ -808,7 +808,7 @@ const MassageBooking = () => {
                         type="time"
                         value={newBookingForm.appointmentTime}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, appointmentTime: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
                         required
                       />
                     </div>
@@ -818,8 +818,8 @@ const MassageBooking = () => {
                 {/* Additional Information */}
                 <div>
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-[#0D9488]/10 rounded-lg flex items-center justify-center">
-                      <MessageSquare className="w-4 h-4 text-[#0D9488]" />
+                    <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
+                      <MessageSquare className="w-4 h-4 text-[#DFB13B]" />
                     </div>
                     <h3 className="font-semibold text-slate-800">Additional Information</h3>
                   </div>
@@ -829,7 +829,7 @@ const MassageBooking = () => {
                       <textarea
                         value={newBookingForm.specialRequests}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, specialRequests: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm h-20 resize-none"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm h-20 resize-none"
                         placeholder="Any special requests from the customer..."
                       />
                     </div>
@@ -838,7 +838,7 @@ const MassageBooking = () => {
                       <textarea
                         value={newBookingForm.message}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, message: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 focus:border-[#0D9488] focus:bg-white transition-all text-sm h-20 resize-none"
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm h-20 resize-none"
                         placeholder="Additional notes..."
                       />
                     </div>
@@ -858,7 +858,7 @@ const MassageBooking = () => {
                 <button
                   type="submit"
                   disabled={savingBooking}
-                  className="flex-1 px-4 py-2.5 bg-[#0D9488] text-white rounded-xl hover:bg-[#0B7B72] transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm shadow-[#0D9488]/20"
+                  className="flex-1 px-4 py-2.5 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm shadow-[#DFB13B]/20"
                 >
                   {savingBooking ? (
                     <>

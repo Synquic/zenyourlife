@@ -39,6 +39,48 @@ const upload = multer({
   }
 });
 
+// Upload service status/health check
+router.get('/', (req, res) => {
+  try {
+    // Count files in upload directory
+    const files = fs.existsSync(uploadDir) ? fs.readdirSync(uploadDir) : [];
+    const imageFiles = files.filter(f => /\.(jpg|jpeg|png|gif|webp)$/i.test(f));
+
+    // Calculate total size
+    let totalSize = 0;
+    imageFiles.forEach(file => {
+      const filePath = path.join(uploadDir, file);
+      const stats = fs.statSync(filePath);
+      totalSize += stats.size;
+    });
+
+    res.json({
+      success: true,
+      message: 'Upload Service Operational',
+      status: 'healthy',
+      data: {
+        uploadDirectory: uploadDir,
+        totalFiles: imageFiles.length,
+        totalSize: `${(totalSize / (1024 * 1024)).toFixed(2)} MB`,
+        maxFileSize: '5 MB',
+        allowedTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+        endpoints: {
+          uploadSingle: 'POST /api/upload/image',
+          uploadMultiple: 'POST /api/upload/images',
+          deleteImage: 'DELETE /api/upload/image/:filename'
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      status: 'unhealthy',
+      message: 'Upload service error',
+      error: error.message
+    });
+  }
+});
+
 // Upload single image
 router.post('/image', upload.single('image'), (req, res) => {
   try {

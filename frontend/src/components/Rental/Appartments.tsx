@@ -221,6 +221,7 @@ const Apartment = () => {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLang]);
 
   return (
