@@ -254,40 +254,40 @@ const Testimonials = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-8 py-4 sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   Testimonials
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Manage customer reviews and feedback</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 hidden sm:block">Manage customer reviews and feedback</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <div className="relative">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Search - Hidden on mobile */}
+              <div className="relative hidden md:block">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search testimonials..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
+                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-48 lg:w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
                 />
               </div>
               {/* Notification */}
-              <button className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative">
+              <button className="p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative flex-shrink-0">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               {/* Profile */}
-              <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20 flex-shrink-0">
                 A
               </div>
             </div>
@@ -297,83 +297,97 @@ const Testimonials = () => {
           <div className="flex gap-2 mt-4">
             <button
               onClick={() => setActiveTab('massage')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'massage'
                   ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <Sparkles className="w-4 h-4" />
-              Massage Testimonials
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Massage</span> Testimonials
             </button>
             <button
               onClick={() => setActiveTab('rental')}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
                 activeTab === 'rental'
                   ? 'bg-gradient-to-r from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] text-white shadow-lg shadow-[#DFB13B]/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <Home className="w-4 h-4" />
-              Rental Testimonials
+              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden xs:inline">Rental</span> Testimonials
             </button>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Total Reviews</p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{totalTestimonials}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Total Reviews</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{totalTestimonials}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
-                  <MessageCircle className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                  <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Active Reviews</p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{activeTestimonials}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Active Reviews</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{activeTestimonials}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
-                  <Eye className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                  <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Average Rating</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Average Rating</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <p className="text-3xl font-bold text-slate-800">{avgRating}</p>
-                    <Star className="w-6 h-6 text-amber-400 fill-amber-400" />
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-800">{avgRating}</p>
+                    <Star className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400 fill-amber-400" />
                   </div>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <Star className="w-7 h-7 text-white fill-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <Star className="w-6 h-6 sm:w-7 sm:h-7 text-white fill-white" />
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Mobile Search */}
+          <div className="md:hidden mb-4">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search testimonials..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all outline-none"
+              />
+            </div>
+          </div>
+
           {/* Action Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Filter Dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:border-slate-300 transition"
                 >
-                  <Filter className="w-4 h-4" />
+                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   {filterStatus === 'all' ? 'All Status' : filterStatus === 'active' ? 'Active' : 'Inactive'}
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 {showFilterDropdown && (
                   <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 py-2 min-w-[140px] z-20">
@@ -391,24 +405,24 @@ const Testimonials = () => {
                   </div>
                 )}
               </div>
-              <span className="text-sm text-slate-500">
-                Showing {filteredTestimonials.length} of {totalTestimonials}
+              <span className="text-xs sm:text-sm text-slate-500">
+                {filteredTestimonials.length}/{totalTestimonials}
               </span>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={handleSeedTestimonials}
-                className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition text-sm font-medium"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-100 text-slate-700 rounded-lg sm:rounded-xl hover:bg-slate-200 transition text-xs sm:text-sm font-medium"
               >
-                Seed Demo Data
+                <span className="hidden sm:inline">Seed</span> Demo
               </button>
               <button
                 onClick={handleAddNew}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-sm font-medium"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-xs sm:text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
-                Add Testimonial
+                <span className="hidden sm:inline">Add</span> Testimonial
               </button>
             </div>
           </div>
@@ -462,28 +476,28 @@ const Testimonials = () => {
 
           {/* Testimonials Grid */}
           {!loading && !error && filteredTestimonials.length > 0 && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {filteredTestimonials.map((testimonial, index) => (
                 <div
                   key={testimonial._id}
-                  className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {/* Card Header */}
-                  <div className="p-5 pb-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-12 h-12 bg-gradient-to-br ${getAvatarColor(testimonial.photo)} rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg`}>
+                  <div className="p-4 sm:p-5 pb-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${getAvatarColor(testimonial.photo)} rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-lg flex-shrink-0`}>
                           {testimonial.name.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <h3 className="font-semibold text-slate-800">{testimonial.name}</h3>
-                          <p className="text-sm text-slate-500">{testimonial.role || 'Customer'}</p>
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-slate-800 text-sm sm:text-base truncate">{testimonial.name}</h3>
+                          <p className="text-xs sm:text-sm text-slate-500 truncate">{testimonial.role || 'Customer'}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => handleToggleStatus(testimonial)}
-                        className={`px-3 py-1 rounded-full text-xs font-medium transition ${
+                        className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium transition flex-shrink-0 ${
                           testimonial.isActive
                             ? 'bg-[#FFEEC3]/50 text-[#B8922D] hover:bg-[#FFEEC3]'
                             : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
@@ -495,56 +509,56 @@ const Testimonials = () => {
                   </div>
 
                   {/* Rating */}
-                  <div className="px-5 py-3">
-                    <div className="flex items-center gap-1">
+                  <div className="px-4 sm:px-5 py-2 sm:py-3">
+                    <div className="flex items-center gap-0.5 sm:gap-1">
                       {Array.from({ length: 5 }, (_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${
+                          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
                             i < testimonial.rating
                               ? 'text-amber-400 fill-amber-400'
                               : 'text-slate-200'
                           }`}
                         />
                       ))}
-                      <span className="text-sm text-slate-500 ml-2">{testimonial.rating}.0</span>
+                      <span className="text-xs sm:text-sm text-slate-500 ml-1.5 sm:ml-2">{testimonial.rating}.0</span>
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className="px-5 pb-4">
+                  <div className="px-4 sm:px-5 pb-3 sm:pb-4">
                     <div className="relative">
-                      <Quote className="w-8 h-8 text-slate-100 absolute -top-1 -left-1" />
-                      <p className="text-sm text-slate-600 leading-relaxed line-clamp-4 relative z-10 pl-4">
+                      <Quote className="w-6 h-6 sm:w-8 sm:h-8 text-slate-100 absolute -top-1 -left-1" />
+                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-4 relative z-10 pl-3 sm:pl-4">
                         {testimonial.text}
                       </p>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="px-5 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center gap-2">
+                  <div className="px-3 sm:px-5 py-3 sm:py-4 bg-slate-50/50 border-t border-slate-100 flex items-center gap-1 sm:gap-2">
                     <button
                       onClick={() => handleEdit(testimonial)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg sm:rounded-xl transition text-xs sm:text-sm font-medium"
                     >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       Edit
                     </button>
-                    <div className="w-px h-6 bg-slate-200"></div>
+                    <div className="w-px h-5 sm:h-6 bg-slate-200"></div>
                     <button
                       onClick={() => handleToggleStatus(testimonial)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg sm:rounded-xl transition text-xs sm:text-sm font-medium"
                     >
-                      {testimonial.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      {testimonial.isActive ? 'Hide' : 'Show'}
+                      {testimonial.isActive ? <EyeOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> : <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                      <span className="hidden xs:inline">{testimonial.isActive ? 'Hide' : 'Show'}</span>
                     </button>
-                    <div className="w-px h-6 bg-slate-200"></div>
+                    <div className="w-px h-5 sm:h-6 bg-slate-200"></div>
                     <button
                       onClick={() => handleDelete(testimonial._id)}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition text-sm font-medium"
+                      className="flex-1 flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg sm:rounded-xl transition text-xs sm:text-sm font-medium"
                     >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
+                      <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="hidden xs:inline">Delete</span>
                     </button>
                   </div>
                 </div>

@@ -80,6 +80,21 @@ const enrollmentSchema = new mongoose.Schema({
     default: ''
   },
 
+  // Reminder Preferences
+  reminderPreference: {
+    type: String,
+    enum: ['email', 'sms'],
+    default: 'email'
+  },
+  reminderSentToCustomer: {
+    type: Boolean,
+    default: false
+  },
+  reminderSentToAdmin: {
+    type: Boolean,
+    default: false
+  },
+
   // Status
   status: {
     type: String,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Send, CheckCircle, XCircle, Loader2, Calendar, User, Clock, Mail, Phone, MapPin, X, Save, Sparkles, CalendarCheck, MessageSquare, FileText, Menu } from 'lucide-react'
+import { Search, Plus, Send, CheckCircle, XCircle, Loader2, Calendar, User, Clock, Mail, Phone, MapPin, X, Save, Sparkles, CalendarCheck, MessageSquare, FileText, Menu, Trash2 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 interface ServiceOption {
@@ -58,8 +58,10 @@ const MassageBooking = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const [showNewBookingModal, setShowNewBookingModal] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
   const [services, setServices] = useState<ServiceOption[]>([])
   const [savingBooking, setSavingBooking] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [newBookingForm, setNewBookingForm] = useState({
     firstName: '',
     lastName: '',
@@ -192,6 +194,28 @@ const MassageBooking = () => {
       alert('Failed to update booking status')
     } finally {
       setActionLoading(null)
+    }
+  }
+
+  const deleteBooking = async (id: string) => {
+    try {
+      setDeleting(true)
+      const response = await fetch(`${API_URL}/enrollments/${id}`, {
+        method: 'DELETE'
+      })
+      if (!response.ok) throw new Error('Failed to delete appointment')
+      const data = await response.json()
+      if (data.success) {
+        setBookings(prev => prev.filter(b => b._id !== id))
+        if (selectedBooking?._id === id) {
+          setSelectedBooking(bookings.length > 1 ? bookings.find(b => b._id !== id) || null : null)
+        }
+        setShowDeleteConfirm(null)
+      }
+    } catch {
+      alert('Failed to delete appointment')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -504,6 +528,13 @@ const MassageBooking = () => {
                       Cancel
                     </button>
                   )}
+                  <button
+                    onClick={() => setShowDeleteConfirm(selectedBooking._id)}
+                    className="flex items-center gap-2 bg-red-500 text-white px-5 py-2.5 rounded-xl hover:bg-red-600 transition font-medium shadow-sm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    Delete
+                  </button>
                 </div>
 
                 {/* Info Grid */}
@@ -875,6 +906,51 @@ const MassageBooking = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowDeleteConfirm(null)}>
+          <div
+            className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Delete Appointment?</h3>
+              <p className="text-slate-500 text-sm mb-6">
+                Are you sure you want to delete this appointment? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(null)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => deleteBooking(showDeleteConfirm)}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl hover:bg-red-600 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

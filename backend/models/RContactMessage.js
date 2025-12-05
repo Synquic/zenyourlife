@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const contactMessageSchema = new mongoose.Schema({
+const rContactMessageSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
@@ -30,11 +30,6 @@ const contactMessageSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  source: {
-    type: String,
-    enum: ['massage', 'rental'],
-    default: 'massage'
-  },
   status: {
     type: String,
     enum: ['new', 'read', 'replied', 'archived'],
@@ -46,4 +41,4 @@ const contactMessageSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('ContactMessage', contactMessageSchema);
+module.exports = mongoose.model('RContactMessage', rContactMessageSchema);

@@ -676,40 +676,40 @@ const Services = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 sm:px-8 py-4 sticky top-0 z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   Services
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Manage your wellness services and pricing</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 hidden sm:block">Manage your wellness services and pricing</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Search */}
-              <div className="relative">
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Search - Hidden on mobile, shown in action bar instead */}
+              <div className="relative hidden md:block">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Search services..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
+                  className="pl-10 pr-4 py-2.5 bg-slate-100/80 border-0 rounded-xl text-sm w-48 lg:w-64 focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all outline-none"
                 />
               </div>
               {/* Notification */}
-              <button className="p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative">
+              <button className="p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative flex-shrink-0">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
               </button>
               {/* Profile */}
-              <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20 flex-shrink-0">
                 A
               </div>
             </div>
@@ -717,58 +717,73 @@ const Services = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto p-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Total Services</p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{totalServices}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Total Services</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{totalServices}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
-                  <Sparkles className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Active Services</p>
-                  <p className="text-3xl font-bold text-slate-800 mt-1">{activeServices}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Active Services</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{activeServices}</p>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
-                  <Eye className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                  <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
+            <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">Avg. Price</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">Avg. Price</p>
                   <div className="flex items-center gap-1 mt-1">
-                    <p className="text-3xl font-bold text-slate-800">${avgPrice}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-800">${avgPrice}</p>
                   </div>
                 </div>
-                <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <DollarSign className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <DollarSign className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
           </div>
 
+          {/* Mobile Search - Only shown on mobile */}
+          <div className="md:hidden mb-4">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search services..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all outline-none"
+              />
+            </div>
+          </div>
+
           {/* Action Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               {/* Category Filter */}
               <div className="relative">
                 <button
                   onClick={() => setShowFilterDropdown(!showFilterDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:border-slate-300 transition"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:border-slate-300 transition"
                 >
-                  <Filter className="w-4 h-4" />
-                  {filterCategory === 'all' ? 'All Categories' : getCategoryConfig(filterCategory).label}
-                  <ChevronDown className="w-4 h-4" />
+                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">{filterCategory === 'all' ? 'All' : getCategoryConfig(filterCategory).label}</span>
+                  <span className="xs:hidden">{filterCategory === 'all' ? 'All' : getCategoryConfig(filterCategory).label.slice(0, 3)}</span>
+                  <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 {showFilterDropdown && (
                   <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 py-2 min-w-[160px] z-20">
@@ -797,29 +812,29 @@ const Services = () => {
               </div>
 
               {/* View Toggle */}
-              <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1">
+              <div className="flex items-center bg-white border border-slate-200 rounded-lg sm:rounded-xl p-0.5 sm:p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition ${viewMode === 'grid' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${viewMode === 'grid' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
                 >
-                  <LayoutGrid className="w-4 h-4" />
+                  <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition ${viewMode === 'list' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
+                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${viewMode === 'list' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
                 >
-                  <List className="w-4 h-4" />
+                  <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
 
-              <span className="text-sm text-slate-500">
-                Showing {filteredServices.length} of {totalServices}
+              <span className="text-xs sm:text-sm text-slate-500">
+                {filteredServices.length}/{totalServices}
               </span>
             </div>
 
             <button
               onClick={handleAddNew}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-sm font-medium"
+              className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 text-xs sm:text-sm font-medium w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               Add Service
@@ -954,81 +969,149 @@ const Services = () => {
 
           {/* Services List View */}
           {!loading && !error && filteredServices.length > 0 && viewMode === 'list' && (
-            <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-slate-50/50">
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Service</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Category</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Duration</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Price</th>
-                    <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Status</th>
-                    <th className="text-right py-4 px-6 text-sm font-semibold text-slate-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredServices.map((service) => {
-                    const catConfig = getCategoryConfig(service.category)
-                    return (
-                      <tr key={service._id} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
-                        <td className="py-4 px-6">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                              <img
-                                src={service.imageUrl || getImageSrc(service.image)}
-                                alt={service.title}
-                                className="w-full h-full object-cover"
-                              />
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden md:block bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-slate-50/50">
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Service</th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Category</th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Duration</th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Price</th>
+                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Status</th>
+                      <th className="text-right py-4 px-6 text-sm font-semibold text-slate-600">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredServices.map((service) => {
+                      const catConfig = getCategoryConfig(service.category)
+                      return (
+                        <tr key={service._id} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                                <img
+                                  src={service.imageUrl || getImageSrc(service.image)}
+                                  alt={service.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-800">{service.title}</p>
+                                <p className="text-xs text-slate-500 truncate max-w-[200px]">{service.description}</p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium text-slate-800">{service.title}</p>
-                              <p className="text-xs text-slate-500 truncate max-w-[200px]">{service.description}</p>
+                          </td>
+                          <td className="py-4 px-6">
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
+                              {catConfig.label}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-sm text-slate-600">{service.duration} mins</td>
+                          <td className="py-4 px-6">
+                            <span className="font-semibold text-[#B8922D]">${service.price}</span>
+                          </td>
+                          <td className="py-4 px-6">
+                            <button
+                              onClick={() => handleToggleStatus(service)}
+                              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                                service.isActive
+                                  ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
+                                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                              }`}
+                            >
+                              {service.isActive ? 'Active' : 'Inactive'}
+                            </button>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleEdit(service)}
+                                className="p-2 text-slate-500 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDelete(service._id)}
+                                className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
                             </div>
-                          </div>
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
-                            {catConfig.label}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-slate-600">{service.duration} mins</td>
-                        <td className="py-4 px-6">
-                          <span className="font-semibold text-[#B8922D]">${service.price}</span>
-                        </td>
-                        <td className="py-4 px-6">
-                          <button
-                            onClick={() => handleToggleStatus(service)}
-                            className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                              service.isActive
-                                ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                                : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                            }`}
-                          >
-                            {service.isActive ? 'Active' : 'Inactive'}
-                          </button>
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="flex items-center justify-end gap-2">
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {filteredServices.map((service) => {
+                  const catConfig = getCategoryConfig(service.category)
+                  return (
+                    <div key={service._id} className="bg-white rounded-xl border border-slate-100 p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                          <img
+                            src={service.imageUrl || getImageSrc(service.image)}
+                            alt={service.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="font-medium text-slate-800 truncate">{service.title}</p>
+                              <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{service.description}</p>
+                            </div>
                             <button
-                              onClick={() => handleEdit(service)}
-                              className="p-2 text-slate-500 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition"
+                              onClick={() => handleToggleStatus(service)}
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition flex-shrink-0 ${
+                                service.isActive
+                                  ? 'bg-emerald-100 text-emerald-700'
+                                  : 'bg-slate-100 text-slate-500'
+                              }`}
                             >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(service._id)}
-                              className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                            >
-                              <Trash2 className="w-4 h-4" />
+                              {service.isActive ? 'Active' : 'Inactive'}
                             </button>
                           </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
+                              {catConfig.label}
+                            </span>
+                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {service.duration}m
+                            </span>
+                            <span className="font-semibold text-sm text-[#B8922D]">${service.price}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                        <button
+                          onClick={() => handleEdit(service)}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition text-xs font-medium"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          Edit
+                        </button>
+                        <div className="w-px h-5 bg-slate-200"></div>
+                        <button
+                          onClick={() => handleDelete(service._id)}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition text-xs font-medium"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </>
           )}
 
           {/* Service Detail Page Content Section */}

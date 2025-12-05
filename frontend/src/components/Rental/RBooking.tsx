@@ -20,6 +20,7 @@ interface Property {
   bedrooms: number;
   parking: string;
   image: string;
+  imageUrl?: string;
 }
 
 interface RBookingProps {
@@ -32,6 +33,13 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Helper function to get image source - prefer imageUrl from backend, fallback to mapped image
+  const getImageSrc = (property: Property): string => {
+    if (property.imageUrl) return property.imageUrl;
+    if (property.image && imageMap[property.image]) return imageMap[property.image];
+    return Apat1; // Default fallback
+  };
 
   // Fetch properties from backend
   useEffect(() => {
@@ -126,7 +134,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
                 {/* Property Image */}
                 <div className="flex-shrink-0">
                   <img
-                    src={imageMap[property.image] || property.image}
+                    src={getImageSrc(property)}
                     alt={property.name}
                     className="w-20 h-20 rounded-lg object-cover"
                   />
@@ -170,7 +178,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
               {/* Property Image */}
               <div className="hidden sm:block flex-shrink-0">
                 <img
-                  src={imageMap[property.image] || property.image}
+                  src={getImageSrc(property)}
                   alt={property.name}
                   className="w-28 h-28 rounded-lg object-cover"
                 />

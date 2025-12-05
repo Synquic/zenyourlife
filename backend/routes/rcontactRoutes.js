@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
-const ContactMessage = require('../models/ContactMessage');
+const RContactMessage = require('../models/RContactMessage');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -12,14 +12,14 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Function to send admin notification email for massage inquiry
+// Function to send admin notification email
 const sendAdminNotificationEmail = async (contactData) => {
   const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: adminEmail,
-    subject: `New Massage Inquiry from ${contactData.firstName} ${contactData.lastName}`,
+    subject: `New Rental Inquiry from ${contactData.firstName} ${contactData.lastName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -34,7 +34,7 @@ const sendAdminNotificationEmail = async (contactData) => {
             padding: 20px;
           }
           .header {
-            background: linear-gradient(135deg, #DFB13B 0%, #C9A032 100%);
+            background: linear-gradient(135deg, #6EA8FF 0%, #4A90E2 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -84,26 +84,15 @@ const sendAdminNotificationEmail = async (contactData) => {
             color: #888;
             font-size: 12px;
           }
-          .highlight-box {
-            background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
-            border-left: 4px solid #DFB13B;
-            padding: 15px;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 20px;
-          }
         </style>
       </head>
       <body>
         <div class="header">
-          <h1>New Massage Inquiry</h1>
-          <p style="margin: 10px 0 0 0; opacity: 0.9;">A potential customer is interested in your massage services</p>
+          <h1>New Rental Inquiry</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9;">A new customer is interested in your rental property</p>
         </div>
 
         <div class="content">
-          <div class="highlight-box">
-            <strong>Action Required:</strong> A new inquiry has been submitted through the contact form.
-          </div>
-
           <div class="info-row">
             <span class="info-label">Name:</span>
             <span class="info-value">${contactData.firstName} ${contactData.lastName}</span>
@@ -129,13 +118,13 @@ const sendAdminNotificationEmail = async (contactData) => {
           </div>
 
           <div class="message-box">
-            <div class="message-label">Customer Message:</div>
+            <div class="message-label">Message:</div>
             <div class="message-content">${contactData.message}</div>
           </div>
         </div>
 
         <div class="footer">
-          <p>This is an automated notification from ZenYourLife Massage System</p>
+          <p>This is an automated notification from ZenYourLife Rental System</p>
           <p>© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
         </div>
       </body>
@@ -145,7 +134,7 @@ const sendAdminNotificationEmail = async (contactData) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log('Admin notification email sent successfully for massage inquiry');
+    console.log('Admin notification email sent successfully');
     return true;
   } catch (error) {
     console.error('Error sending admin notification email:', error);
@@ -153,10 +142,10 @@ const sendAdminNotificationEmail = async (contactData) => {
   }
 };
 
-// POST - Submit a new contact message
+// POST - Submit a new rental contact message
 router.post('/', async (req, res) => {
   try {
-    const { firstName, lastName, email, countryCode, phone, message, source } = req.body;
+    const { firstName, lastName, email, countryCode, phone, message } = req.body;
 
     // Validate required fields
     if (!firstName || !lastName || !email || !message) {
@@ -166,14 +155,13 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const contactMessage = new ContactMessage({
+    const contactMessage = new RContactMessage({
       firstName,
       lastName,
       email,
       countryCode: countryCode || '+32',
       phone,
-      message,
-      source:  'massage'
+      message
     });
 
     await contactMessage.save();
@@ -194,7 +182,7 @@ router.post('/', async (req, res) => {
       data: contactMessage
     });
   } catch (error) {
-    console.error('Error saving contact message:', error);
+    console.error('Error saving rental contact message:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to send message. Please try again.'
@@ -202,30 +190,27 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET - Get all contact messages (for admin)
+// GET - Get all rental contact messages (for admin)
 router.get('/', async (req, res) => {
   try {
-    const messages = await ContactMessage.find({ source: 'massage' })
-      .sort({ createdAt: -1 });
-
+    const messages = await RContactMessage.find().sort({ createdAt: -1 });
     res.json({ success: true, data: messages });
   } catch (error) {
-    console.error('Error fetching contact messages:', error);
+    console.error('Error fetching rental contact messages:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch messages' });
   }
 });
 
-
 // GET - Get single message by ID
 router.get('/:id', async (req, res) => {
   try {
-    const message = await ContactMessage.findById(req.params.id);
+    const message = await RContactMessage.findById(req.params.id);
     if (!message) {
       return res.status(404).json({ success: false, message: 'Message not found' });
     }
     res.json({ success: true, data: message });
   } catch (error) {
-    console.error('Error fetching contact message:', error);
+    console.error('Error fetching rental contact message:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch message' });
   }
 });
@@ -234,7 +219,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { status } = req.body;
-    const message = await ContactMessage.findByIdAndUpdate(
+    const message = await RContactMessage.findByIdAndUpdate(
       req.params.id,
       { status },
       { new: true }
@@ -244,7 +229,7 @@ router.put('/:id', async (req, res) => {
     }
     res.json({ success: true, data: message });
   } catch (error) {
-    console.error('Error updating contact message:', error);
+    console.error('Error updating rental contact message:', error);
     res.status(500).json({ success: false, message: 'Failed to update message' });
   }
 });
@@ -252,26 +237,14 @@ router.put('/:id', async (req, res) => {
 // DELETE - Delete a message
 router.delete('/:id', async (req, res) => {
   try {
-    const message = await ContactMessage.findByIdAndDelete(req.params.id);
+    const message = await RContactMessage.findByIdAndDelete(req.params.id);
     if (!message) {
       return res.status(404).json({ success: false, message: 'Message not found' });
     }
     res.json({ success: true, message: 'Message deleted successfully' });
   } catch (error) {
-    console.error('Error deleting contact message:', error);
+    console.error('Error deleting rental contact message:', error);
     res.status(500).json({ success: false, message: 'Failed to delete message' });
-  }
-});
-
-// DELETE ALL - Clear all contact messages (use with caution!)
-router.delete('/cleanup/all', async (req, res) => {
-  try {
-    const result = await ContactMessage.deleteMany({});
-    console.log('Deleted all contact messages:', result.deletedCount);
-    res.json({ success: true, message: `Deleted ${result.deletedCount} messages` });
-  } catch (error) {
-    console.error('Error deleting all contact messages:', error);
-    res.status(500).json({ success: false, message: 'Failed to delete messages' });
   }
 });
 

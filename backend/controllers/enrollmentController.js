@@ -1,8 +1,234 @@
 const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
-// const transporter = require('../config/emailConfig');
-// const { enrollmentConfirmationEmail, adminNotificationEmail } = require('../utils/emailTemplates');
+const nodemailer = require('nodemailer');
+
+// Create email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+
+// Generate customer confirmation email template
+const generateCustomerEmailTemplate = (enrollment) => {
+  const appointmentDate = new Date(enrollment.appointmentDate);
+  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #DFB13B 0%, #C9A032 100%); color: white; padding: 40px 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .header h1 { margin: 0 0 10px 0; font-size: 28px; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .thank-you-box { background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); padding: 25px; border-radius: 10px; margin: 20px 0; text-align: center; border-left: 4px solid #4CAF50; }
+        .thank-you-box h2 { color: #2E7D32; margin: 0 0 10px 0; }
+        .section-title { font-size: 18px; font-weight: bold; color: #DFB13B; margin: 25px 0 15px 0; border-bottom: 2px solid #DFB13B; padding-bottom: 5px; }
+        .info-row { margin: 10px 0; padding: 12px 15px; background: white; border-radius: 5px; }
+        .label { font-weight: 600; color: #555; }
+        .value { color: #333; }
+        .service-highlight { background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%); padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #DFB13B; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Thank You for Choosing Us!</h1>
+          <p>Booking Reference: #${enrollment.enrollmentId}</p>
+        </div>
+        <div class="content">
+          <div class="thank-you-box">
+            <h2>Your Booking is Confirmed!</h2>
+            <p>Thank you, ${enrollment.firstName}! We're excited to welcome you for your massage session.</p>
+          </div>
+
+          <div class="service-highlight">
+            <h3 style="margin-top: 0; color: #C9A032;">💆 ${enrollment.serviceTitle}</h3>
+            <div style="margin-top: 15px;">
+              <div style="margin: 8px 0;"><strong>Duration:</strong> ${enrollment.service?.duration || 60} minutes</div>
+              <div style="margin: 8px 0;"><strong>Price:</strong> €${enrollment.service?.price || 'N/A'}</div>
+            </div>
+          </div>
+
+          <div class="section-title">📅 Appointment Details</div>
+          <div class="info-row">
+            <span class="label">Date:</span>
+            <span class="value">${formattedDate}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Time:</span>
+            <span class="value">${enrollment.appointmentTime}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Day:</span>
+            <span class="value">${enrollment.appointmentDay}</span>
+          </div>
+
+          <div class="section-title">📍 Location</div>
+          <div class="info-row">
+            <span class="value">Schapenbaan 45, 1731 Relegem</span>
+          </div>
+
+          <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 25px; text-align: center;">
+            <p style="margin: 0; color: #1976D2; font-weight: 500;">Please arrive 10 minutes before your appointment time.</p>
+          </div>
+
+          <div class="footer">
+            <p>If you need to reschedule or cancel, please contact us at least 24 hours in advance.</p>
+            <p>Best regards,<br><strong>The ZenYourLife Team</strong></p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+// Generate admin notification email template
+const generateAdminEmailTemplate = (enrollment) => {
+  const appointmentDate = new Date(enrollment.appointmentDate);
+  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #DFB13B 0%, #C9A032 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .header h1 { margin: 0 0 10px 0; font-size: 24px; }
+        .content { background: #f9f9f9; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .alert-box { background: #FFF3E0; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF9800; }
+        .section-title { font-size: 16px; font-weight: bold; color: #555; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid #ddd; }
+        .info-row { margin: 8px 0; padding: 10px; background: white; border-radius: 5px; }
+        .label { font-weight: 600; color: #555; display: inline-block; width: 140px; }
+        .value { color: #333; }
+        .customer-info { background: #E8F5E9; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .service-info { background: #FFF8E1; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .booking-info { background: #E3F2FD; padding: 20px; border-radius: 10px; margin: 15px 0; }
+        .footer { text-align: center; padding: 20px; color: #888; font-size: 12px; background: #f9f9f9; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 10px 10px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔔 New Massage Booking!</h1>
+          <p>Booking ID: #${enrollment.enrollmentId}</p>
+        </div>
+        <div class="content">
+          <div class="alert-box">
+            <strong>⚡ New Appointment:</strong> A customer has booked a massage session.
+          </div>
+
+          <div class="customer-info">
+            <div class="section-title">👤 Customer Information</div>
+            <div class="info-row">
+              <span class="label">Name:</span>
+              <span class="value">${enrollment.fullName}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Email:</span>
+              <span class="value"><a href="mailto:${enrollment.email}">${enrollment.email}</a></span>
+            </div>
+            <div class="info-row">
+              <span class="label">Phone:</span>
+              <span class="value">${enrollment.phoneNumber}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Gender:</span>
+              <span class="value">${enrollment.gender}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Country:</span>
+              <span class="value">${enrollment.country}</span>
+            </div>
+          </div>
+
+          <div class="service-info">
+            <div class="section-title">💆 Service Details</div>
+            <div class="info-row">
+              <span class="label">Service:</span>
+              <span class="value">${enrollment.serviceTitle}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Duration:</span>
+              <span class="value">${enrollment.service?.duration || 60} minutes</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Price:</span>
+              <span class="value">€${enrollment.service?.price || 'N/A'}</span>
+            </div>
+          </div>
+
+          <div class="booking-info">
+            <div class="section-title">📅 Appointment Schedule</div>
+            <div class="info-row">
+              <span class="label">Date:</span>
+              <span class="value">${formattedDate}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Day:</span>
+              <span class="value">${enrollment.appointmentDay}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Time:</span>
+              <span class="value">${enrollment.appointmentTime}</span>
+            </div>
+          </div>
+
+          ${enrollment.specialRequests ? `
+          <div class="section-title">📝 Special Requests</div>
+          <div class="info-row" style="background: #FFFDE7;">
+            <span class="value">${enrollment.specialRequests}</span>
+          </div>
+          ` : ''}
+
+          ${enrollment.message ? `
+          <div class="section-title">💬 Customer Message</div>
+          <div class="info-row" style="background: #FFFDE7;">
+            <span class="value">${enrollment.message}</span>
+          </div>
+          ` : ''}
+
+          <div class="info-row" style="margin-top: 20px; background: #E8F5E9; text-align: center;">
+            <span class="value">Booking created on: ${new Date().toLocaleString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}</span>
+          </div>
+        </div>
+        <div class="footer">
+          <p>This is an automated notification from ZenYourLife Booking System</p>
+          <p>© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
 
 // Create new enrollment
 exports.createEnrollment = async (req, res) => {
@@ -19,7 +245,8 @@ exports.createEnrollment = async (req, res) => {
       country,
       gender,
       specialRequests,
-      message
+      message,
+      reminderPreference
     } = req.body;
 
     // Validate required fields
@@ -59,6 +286,7 @@ exports.createEnrollment = async (req, res) => {
       gender,
       specialRequests: specialRequests || '',
       message: message || '',
+      reminderPreference: reminderPreference || 'email',
       status: 'confirmed'
     });
 
@@ -145,43 +373,66 @@ exports.createEnrollment = async (req, res) => {
     console.log('║                  ✅ ENROLLMENT SAVED SUCCESSFULLY               ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    // Email sending removed - keeping nodemailer setup for future use
-    // Uncomment below to enable email notifications
-    /*
-    // Send confirmation email to customer
-    try {
-      const customerMailOptions = {
-        from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
-        to: enrollment.email,
-        subject: `Booking Confirmed - ${enrollment.serviceTitle}`,
-        html: enrollmentConfirmationEmail(enrollment)
-      };
+    // Send emails based on reminder preference
+    let customerEmailSent = false;
+    let adminEmailSent = false;
 
-      await transporter.sendMail(customerMailOptions);
-      console.log('📧 Confirmation email sent to customer:', enrollment.email);
+    try {
+      if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD &&
+          process.env.EMAIL_USER !== 'your-email@outlook.com' &&
+          process.env.EMAIL_PASSWORD !== 'your-app-password-here') {
+
+        // Send confirmation email to customer if they selected email reminder
+        if (reminderPreference === 'email') {
+          try {
+            const customerMailOptions = {
+              from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
+              to: enrollment.email,
+              subject: `Booking Confirmed - ${enrollment.serviceTitle} | ZenYourLife`,
+              html: generateCustomerEmailTemplate(enrollment)
+            };
+
+            await transporter.sendMail(customerMailOptions);
+            customerEmailSent = true;
+            console.log('📧 Confirmation email sent to customer:', enrollment.email);
+          } catch (emailError) {
+            console.error('❌ Error sending customer email:', emailError.message);
+          }
+        } else {
+          console.log('📱 Customer selected SMS reminder - email not sent');
+        }
+
+        // Always send notification email to admin
+        try {
+          const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+          const adminMailOptions = {
+            from: `"ZenYourLife Booking System" <${process.env.EMAIL_USER}>`,
+            to: adminEmail,
+            subject: `New Booking #${enrollment.enrollmentId} - ${enrollment.serviceTitle}`,
+            html: generateAdminEmailTemplate(enrollment)
+          };
+
+          await transporter.sendMail(adminMailOptions);
+          adminEmailSent = true;
+          console.log('📧 Notification email sent to admin:', adminEmail);
+        } catch (emailError) {
+          console.error('❌ Error sending admin email:', emailError.message);
+        }
+      }
     } catch (emailError) {
-      console.error('❌ Error sending customer email:', emailError.message);
+      console.error('❌ Error with email setup:', emailError.message);
     }
 
-    // Send notification email to admin
-    try {
-      const adminMailOptions = {
-        from: `"ZenYourLife System" <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER,
-        subject: `New Booking #${enrollment.enrollmentId} - ${enrollment.serviceTitle}`,
-        html: adminNotificationEmail(enrollment)
-      };
-
-      await transporter.sendMail(adminMailOptions);
-      console.log('📧 Notification email sent to admin\n');
-    } catch (emailError) {
-      console.error('❌ Error sending admin email:', emailError.message);
-    }
-    */
+    console.log('\n═══════════════════════════════════════════════════════════════');
+    console.log('EMAIL STATUS:');
+    console.log('  Customer Email:', customerEmailSent ? '✅ Sent' : (reminderPreference === 'sms' ? '📱 SMS Selected' : '❌ Not Sent'));
+    console.log('  Admin Email:', adminEmailSent ? '✅ Sent' : '❌ Not Sent');
+    console.log('═══════════════════════════════════════════════════════════════\n');
 
     res.status(201).json({
       success: true,
-      message: 'Enrollment created successfully',
+      message: customerEmailSent ? 'Booking confirmed! Check your email for confirmation.' : 'Booking confirmed successfully!',
+      emailSent: customerEmailSent,
       data: enrollment
     });
   } catch (error) {

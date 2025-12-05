@@ -24,12 +24,17 @@ if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
 }
 
+// Import Reminder Scheduler
+const { startReminderScheduler } = require('./services/reminderScheduler');
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
 .then(async () => {
   console.log('✅ MongoDB Connected Successfully');
   // Auto-assign unique images to services on startup
   await assignUniqueImagesToServices();
+  // Start reminder scheduler after DB connection
+  startReminderScheduler();
 })
 .catch((err) => console.error('❌ MongoDB Connection Error:', err));
 
@@ -80,11 +85,13 @@ const pageContentRoutes = require('./routes/pageContentRoutes');
 const testimonialRoutes = require('./routes/testimonialRoutes');
 const servicePageContentRoutes = require('./routes/servicePageContentRoutes');
 const contactRoutes = require('./routes/contactRoutes');
+const rcontactRoutes = require('./routes/rcontactRoutes');
 const rentalTestimonialRoutes = require('./routes/rentalTestimonialRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const translationRoutes = require('./routes/translationRoutes');
 const blockedDateRoutes = require('./routes/blockedDateRoutes');
 const legalPageRoutes = require('./routes/legalPageRoutes');
+const reminderTestRoutes = require('./routes/reminderTestRoutes');
 
 // Use Routes
 app.use('/api/services', serviceRoutes);
@@ -96,11 +103,13 @@ app.use('/api/page-content', pageContentRoutes);
 app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/service-page-content', servicePageContentRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/rcontact', rcontactRoutes);
 app.use('/api/rental-testimonials', rentalTestimonialRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/translate', translationRoutes);
 app.use('/api/blocked-dates', blockedDateRoutes);
 app.use('/api/legal-pages', legalPageRoutes);
+app.use('/api/reminder-test', reminderTestRoutes);
 
 // Health Check Routes
 app.get('/', (req, res) => {
@@ -162,8 +171,8 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Catch-all routes for SPA (must be after API routes)
-
+// Catch-all routes for SPA (must be after API routes) - Only in production
+if (process.env.NODE_ENV === 'production') {
   // Admin panel catch-all route
   app.get('/admin/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../admin/dist/index.html'));
@@ -173,6 +182,7 @@ app.get('/api/health', async (req, res) => {
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
+}
 
 
 // Error Handling Middleware

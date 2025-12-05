@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import { API_BASE_URL } from "../config/api";
 
@@ -17,11 +17,11 @@ interface BookingFormProps {
   onClose?: () => void;
   onSuccess?: () => void;
   selectedService?: Service | null;
-  selectedDate?: number;
+  selectedDate?: Date | null;
   selectedTime?: string;
 }
 
-const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate = 0, selectedTime = '' }: BookingFormProps) => {
+const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate = null, selectedTime = '' }: BookingFormProps) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -32,8 +32,10 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
     gender: "",
     specialRequests: "",
     message: "",
+    reminderPreference: "email", // email or sms
   });
   const [showError, setShowError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -76,12 +78,11 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
     }
 
     setShowError(false);
+    setIsSubmitting(true);
 
     try {
-      // Calculate the appointment date (current date + selected date offset)
-      const today = new Date();
-      const appointmentDate = new Date(today);
-      appointmentDate.setDate(today.getDate() + selectedDate);
+      // Use the selected date directly (passed from BookingDate component)
+      const appointmentDate = selectedDate ? new Date(selectedDate) : new Date();
 
       // Prepare appointment data
       const appointmentData = {
@@ -96,7 +97,8 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
         country: formData.country,
         gender: formData.gender,
         specialRequests: formData.specialRequests,
-        message: formData.message
+        message: formData.message,
+        reminderPreference: formData.reminderPreference
       };
 
       // Log complete booking information
@@ -190,6 +192,8 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
     } catch (error) {
       console.error("Error submitting appointment:", error);
       alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -301,6 +305,37 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                     <option value="other">{t('booking.other')}</option>
                   </select>
                 </div>
+
+                {/* Reminder */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('booking.reminder') || 'Reminder'}
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="reminderPreference"
+                        value="email"
+                        checked={formData.reminderPreference === "email"}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
+                      />
+                      <span className="text-sm text-gray-700">Email</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="reminderPreference"
+                        value="sms"
+                        checked={formData.reminderPreference === "sms"}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
+                      />
+                      <span className="text-sm text-gray-700">SMS</span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               {/* Right Column - Special Requests and Message */}
@@ -344,12 +379,22 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
             <div className="flex justify-center mt-8">
               <button
                 type="submit"
-                className="relative bg-white/30 backdrop-blur-lg border-2 border-[#B8860B]/50 text-gray-900 px-6 py-3 rounded-full font-medium hover:bg-white/40 hover:border-[#B8860B] transition-all shadow-[0_8px_32px_0_rgba(184,134,11,0.2)] flex items-center gap-2 overflow-hidden group"
+                disabled={isSubmitting}
+                className="relative bg-white/30 backdrop-blur-lg border-2 border-[#B8860B]/50 text-gray-900 px-6 py-3 rounded-full font-medium hover:bg-white/40 hover:border-[#B8860B] transition-all shadow-[0_8px_32px_0_rgba(184,134,11,0.2)] flex items-center gap-2 overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed"
               >
                 {/* Glass shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
-                <span className="relative z-10">{t('booking.submit_form')}</span>
-                <img src={MasterPrimaryButton} alt="" className="h-5 w-auto relative z-10" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                    <span className="relative z-10">{t('booking.submitting') || 'Submitting...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="relative z-10">{t('booking.submit_form')}</span>
+                    <img src={MasterPrimaryButton} alt="" className="h-5 w-auto relative z-10" />
+                  </>
+                )}
               </button>
             </div>
           </form>

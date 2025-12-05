@@ -21,7 +21,7 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
 // /deploy
   const menuItems: MenuItem[] = [
     { name: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, path: '/dashboard' },
-    { name: 'Rental Bookings', icon: <CalendarCheck className="w-5 h-5" />, path: '/bookings' },
+    // { name: 'Rental Bookings', icon: <CalendarCheck className="w-5 h-5" />, path: '/bookings' },
     { name: 'Massage Appointments', icon: <Flower2 className="w-5 h-5" />, path: '/massage-appointments' },
     { name: 'Booking Management', icon: <Settings2 className="w-5 h-5" />, path: '/booking-management' },
     { name: 'Inquiries', icon: <MessageSquare className="w-5 h-5" />, path: '/inquiries' },
@@ -29,7 +29,7 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
     { name: 'Services', icon: <Sparkles className="w-5 h-5" />, path: '/services' },
     { name: 'Testimonials', icon: <Quote className="w-5 h-5" />, path: '/testimonials' },
     { name: 'Users', icon: <Users className="w-5 h-5" />, path: '/users' },
-    { name: 'Health Check', icon: <Activity className="w-5 h-5" />, path: '/health' },
+    // { name: 'Health Check', icon: <Activity className="w-5 h-5" />, path: '/health' },
   ]
 
   const handleLogout = () => {

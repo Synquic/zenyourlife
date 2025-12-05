@@ -32,9 +32,11 @@ const Inquiries = () => {
   const fetchInquiries = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`${API_URL}/contact`)
+      const response = await fetch(`${API_URL}/contact?source=massage`)
+      console.log('Fetch inquiries response:', response)
       if (!response.ok) throw new Error('Failed to fetch inquiries')
       const data = await response.json()
+    console.log('Fetch inquiries response:', data)
       if (data.success) {
         setInquiries(data.data)
         if (data.data.length > 0 && !selectedInquiry) {
@@ -161,8 +163,8 @@ const Inquiries = () => {
                 <Menu className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Inquiries</h1>
-                <p className="text-xs sm:text-sm text-gray-500 mt-1">Manage contact form submissions</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Massage Inquiries</h1>
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">Manage massage contact form submissions</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

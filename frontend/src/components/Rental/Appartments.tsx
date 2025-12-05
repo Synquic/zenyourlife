@@ -3,6 +3,7 @@ import apat1 from "../../assets/Apat1.png";
 import apat2 from "../../assets/Apat2.png";
 import blueArrow from "../../assets/bluearrow.png";
 import { useTranslation } from "react-i18next";
+import RBooking from './RBooking';
 
 import { API_BASE_URL } from '../../config/api';
 
@@ -41,9 +42,10 @@ interface SectionSettings {
 interface CardProps {
   property: PropertyData;
   t: (key: string) => string;
+  onBookNow: () => void;
 }
 
-const Card = ({ property, t }: CardProps) => {
+const Card = ({ property, t, onBookNow }: CardProps) => {
   // Get image source - prefer imageUrl, fallback to mapped image
   const getImageSrc = () => {
     if (property.imageUrl) return property.imageUrl;
@@ -125,7 +127,10 @@ const Card = ({ property, t }: CardProps) => {
           </div>
         )}
 
-        <button className="mt-4 sm:mt-6 flex items-center justify-center gap-2 bg-white/30 backdrop-blur-md border-2 border-blue-600 text-blue-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md hover:bg-white/50 transition-all w-fit font-medium text-sm">
+        <button
+          onClick={onBookNow}
+          className="mt-4 sm:mt-6 flex items-center justify-center gap-2 bg-white/30 backdrop-blur-md border-2 border-blue-600 text-blue-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md hover:bg-white/50 transition-all w-fit font-medium text-sm"
+        >
           {t('rental.apartments.book_now')}
           <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
@@ -142,6 +147,27 @@ const Apartment = () => {
     description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.'
   });
   const [loading, setLoading] = useState(true);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Disable background scroll when modal is open
+  useEffect(() => {
+    if (isBookingModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isBookingModalOpen]);
+
+  const handleBookNow = () => {
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsBookingModalOpen(false);
+  };
 
   // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
   const currentLang = i18n.language?.split('-')[0] || 'en';
@@ -251,7 +277,7 @@ const Apartment = () => {
         {!loading && (
           <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
             {properties.map((property) => (
-              <Card key={property._id} property={property} t={t} />
+              <Card key={property._id} property={property} t={t} onBookNow={handleBookNow} />
             ))}
           </div>
         )}
@@ -263,6 +289,37 @@ const Apartment = () => {
           </div>
         )}
       </div>
+
+      {/* RBooking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[1100px] max-h-[95vh] overflow-hidden shadow-2xl relative">
+            {/* Close Button */}
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white hover:bg-gray-100 rounded-full p-1.5 sm:p-2 transition z-50 shadow-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* RBooking Component */}
+            <RBooking onClose={handleCloseModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Sparkles, Building2, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, ArrowRight, Home, AlertCircle, Activity, Zap, BarChart3, Eye, Menu } from 'lucide-react'
+import { Sparkles, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, ArrowRight, AlertCircle, Activity, Zap, BarChart3, Eye, Menu } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
@@ -17,47 +17,24 @@ interface Appointment {
   phoneNumber: string
 }
 
-interface RentalBooking {
-  _id: string
-  bookingId: string
-  firstName: string
-  lastName: string
-  property: {
-    name: string
-    price: number
-  } | null
-  booking: {
-    checkInDate: string
-  }
-  status: string
-  payment: {
-    totalAmount: number
-  }
-}
-
 interface DashboardStats {
   upcomingBookings: number
   pendingBookings: number
   totalBookings: number
   confirmedRate: number
-  totalRevenue: number
-  rentalBookings: number
 }
 
 const Dashboard = () => {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [appointments, setAppointments] = useState<Appointment[]>([])
-  const [rentalBookings, setRentalBookings] = useState<RentalBooking[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [stats, setStats] = useState<DashboardStats>({
     upcomingBookings: 0,
     pendingBookings: 0,
     totalBookings: 0,
-    confirmedRate: 0,
-    totalRevenue: 0,
-    rentalBookings: 0
+    confirmedRate: 0
   })
 
   useEffect(() => {
@@ -66,12 +43,9 @@ const Dashboard = () => {
         setLoading(true)
         const appointmentsRes = await fetch(`${API_BASE_URL}/appointments`)
         const appointmentsData = await appointmentsRes.json()
-        const rentalsRes = await fetch(`${API_BASE_URL}/bookings`)
-        const rentalsData = await rentalsRes.json()
 
         if (appointmentsData.success) setAppointments(appointmentsData.data)
-        if (rentalsData.success) setRentalBookings(rentalsData.data)
-        calculateStats(appointmentsData.data || [], rentalsData.data || [])
+        calculateStats(appointmentsData.data || [])
       } catch (err) {
         setError('Error connecting to server')
         console.error('Error fetching data:', err)
@@ -82,7 +56,7 @@ const Dashboard = () => {
     fetchData()
   }, [])
 
-  const calculateStats = (appointmentsData: Appointment[], rentalsData: RentalBooking[]) => {
+  const calculateStats = (appointmentsData: Appointment[]) => {
     const now = new Date()
     const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
 
@@ -91,47 +65,27 @@ const Dashboard = () => {
       return aptDate >= now && aptDate <= sevenDaysFromNow && apt.status !== 'cancelled'
     }).length
 
-    const upcomingRentals = rentalsData.filter(booking => {
-      const checkIn = new Date(booking.booking?.checkInDate)
-      return checkIn >= now && checkIn <= sevenDaysFromNow && booking.status !== 'cancelled'
-    }).length
-
     const pendingMassage = appointmentsData.filter(apt => apt.status === 'pending').length
-    const pendingRentals = rentalsData.filter(b => b.status === 'pending').length
 
-    const totalAll = appointmentsData.length + rentalsData.length
-    const confirmedAll = appointmentsData.filter(apt => apt.status === 'confirmed' || apt.status === 'completed').length +
-      rentalsData.filter(b => b.status === 'confirmed' || b.status === 'completed').length
+    const totalAll = appointmentsData.length
+    const confirmedAll = appointmentsData.filter(apt => apt.status === 'confirmed' || apt.status === 'completed').length
     const rate = totalAll > 0 ? Math.round((confirmedAll / totalAll) * 100) : 0
 
-    const revenue = rentalsData.reduce((sum, b) => sum + (b.payment?.totalAmount || 0), 0)
-
     setStats({
-      upcomingBookings: upcomingMassage + upcomingRentals,
-      pendingBookings: pendingMassage + pendingRentals,
+      upcomingBookings: upcomingMassage,
+      pendingBookings: pendingMassage,
       totalBookings: appointmentsData.length,
-      confirmedRate: rate,
-      totalRevenue: revenue,
-      rentalBookings: rentalsData.length
+      confirmedRate: rate
     })
   }
 
-  const recentMassageBookings = appointments.slice(0, 4).map(apt => ({
+  const recentMassageBookings = appointments.slice(0, 6).map(apt => ({
     id: apt._id,
     name: `${apt.firstName} ${apt.lastName}`,
     date: new Date(apt.appointmentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     service: apt.serviceTitle,
     status: apt.status,
     time: apt.appointmentTime
-  }))
-
-  const recentRentalBookings = rentalBookings.slice(0, 4).map(booking => ({
-    id: booking._id,
-    name: `${booking.firstName} ${booking.lastName}`,
-    date: new Date(booking.booking?.checkInDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-    property: booking.property?.name || 'N/A',
-    status: booking.status,
-    amount: booking.payment?.totalAmount || 0
   }))
 
   const getChartData = () => {
@@ -143,14 +97,13 @@ const Dashboard = () => {
       const monthIndex = (currentMonth - i + 12) % 12
       const monthName = months[monthIndex]
       const massageCount = appointments.filter(apt => new Date(apt.appointmentDate).getMonth() === monthIndex).length
-      const rentalCount = rentalBookings.filter(b => new Date(b.booking?.checkInDate).getMonth() === monthIndex).length
-      last6Months.push({ month: monthName, massage: massageCount, rental: rentalCount, total: massageCount + rentalCount })
+      last6Months.push({ month: monthName, massage: massageCount })
     }
     return last6Months
   }
 
   const chartData = getChartData()
-  const maxChartValue = Math.max(...chartData.map(d => d.total), 1)
+  const maxChartValue = Math.max(...chartData.map(d => d.massage), 1)
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -227,8 +180,8 @@ const Dashboard = () => {
                 <div className="absolute bottom-0 left-1/3 w-16 sm:w-32 h-16 sm:h-32 bg-white/5 rounded-full translate-y-1/2" />
                 <div className="relative z-10">
                   <div className="mb-3 sm:mb-0">
-                    <h2 className="text-lg sm:text-2xl font-bold text-white mb-1">Welcome back, Admin! 👋</h2>
-                    <p className="text-white/70 text-xs sm:text-sm">Here's what's happening with your business today.</p>
+                    <h2 className="text-lg sm:text-2xl font-bold text-white mb-1">Welcome back, Admin!</h2>
+                    <p className="text-white/70 text-xs sm:text-sm">Here's what's happening with your massage appointments today.</p>
                   </div>
                   <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
                     <div className="flex-1 sm:flex-none bg-white/10 backdrop-blur rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 text-center">
@@ -240,8 +193,8 @@ const Dashboard = () => {
                       <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Pending</p>
                     </div>
                     <div className="flex-1 sm:flex-none bg-white/10 backdrop-blur rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 text-center">
-                      <p className="text-xl sm:text-3xl font-bold text-white">€{stats.totalRevenue.toLocaleString()}</p>
-                      <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Revenue</p>
+                      <p className="text-xl sm:text-3xl font-bold text-white">{stats.confirmedRate}%</p>
+                      <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Confirmed</p>
                     </div>
                   </div>
                 </div>
@@ -249,7 +202,7 @@ const Dashboard = () => {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-[#0D9488]/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/appointments')}>
+                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-violet-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/appointments')}>
                   <div className="flex items-center justify-between mb-2 sm:mb-3">
                     <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
                       <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
@@ -260,15 +213,15 @@ const Dashboard = () => {
                   <p className="text-xs sm:text-sm text-slate-500">Total Appointments</p>
                 </div>
 
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-[#0D9488]/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/rental-booking')}>
+                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/appointments')}>
                   <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-[#0D9488]/20 group-hover:scale-110 transition-transform">
-                      <Home className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
-                    <span className="text-[10px] sm:text-xs bg-teal-50 text-teal-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">Rental</span>
+                    <span className="text-[10px] sm:text-xs bg-blue-50 text-blue-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">7 Days</span>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.rentalBookings}</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Property Bookings</p>
+                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.upcomingBookings}</p>
+                  <p className="text-xs sm:text-sm text-slate-500">Upcoming Bookings</p>
                 </div>
 
                 <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300">
@@ -289,7 +242,7 @@ const Dashboard = () => {
                     </div>
                     <span className="text-[10px] sm:text-xs bg-emerald-50 text-emerald-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">{stats.confirmedRate}%</span>
                   </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.totalBookings + stats.rentalBookings}</p>
+                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.totalBookings}</p>
                   <p className="text-xs sm:text-sm text-slate-500">All Time Bookings</p>
                 </div>
               </div>
@@ -298,128 +251,66 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column - Bookings */}
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-                  {/* Recent Bookings Section */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                    {/* Massage Bookings */}
-                    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                      <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-purple-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md shadow-violet-500/20">
-                              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Massage Bookings</h3>
-                              <p className="text-[10px] sm:text-xs text-slate-500">{stats.totalBookings} total</p>
-                            </div>
+                  {/* Recent Massage Bookings */}
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-purple-50">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md shadow-violet-500/20">
+                            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                           </div>
-                          <button
-                            onClick={() => navigate('/appointments')}
-                            className="flex items-center gap-1 text-[10px] sm:text-xs text-violet-600 hover:text-violet-700 font-medium bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm hover:shadow transition-all"
-                          >
-                            View All
-                            <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                          </button>
+                          <div>
+                            <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Recent Massage Bookings</h3>
+                            <p className="text-[10px] sm:text-xs text-slate-500">{stats.totalBookings} total appointments</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="divide-y divide-slate-50">
-                        {recentMassageBookings.length === 0 ? (
-                          <div className="p-6 sm:p-8 text-center">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
-                            </div>
-                            <p className="text-slate-500 text-xs sm:text-sm">No bookings yet</p>
-                          </div>
-                        ) : (
-                          recentMassageBookings.map((booking) => {
-                            const statusConfig = getStatusConfig(booking.status)
-                            return (
-                              <div key={booking.id} className="px-3 sm:px-5 py-2.5 sm:py-3.5 hover:bg-slate-50/50 transition group">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2 sm:gap-3">
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-violet-100 to-purple-100 rounded-lg flex items-center justify-center text-violet-600 font-semibold text-xs sm:text-sm">
-                                      {booking.name.split(' ').map(n => n[0]).join('')}
-                                    </div>
-                                    <div>
-                                      <p className="font-medium text-slate-800 text-xs sm:text-sm">{booking.name}</p>
-                                      <p className="text-[10px] sm:text-xs text-slate-500 truncate max-w-[100px] sm:max-w-[140px]">{booking.service}</p>
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <span className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-semibold uppercase ${statusConfig.bg} ${statusConfig.text}`}>
-                                      {booking.status}
-                                    </span>
-                                    <p className="text-[8px] sm:text-[10px] text-slate-400 mt-0.5 sm:mt-1">{booking.date} • {booking.time}</p>
-                                  </div>
-                                </div>
-                              </div>
-                            )
-                          })
-                        )}
+                        <button
+                          onClick={() => navigate('/appointments')}
+                          className="flex items-center gap-1 text-[10px] sm:text-xs text-violet-600 hover:text-violet-700 font-medium bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm hover:shadow transition-all"
+                        >
+                          View All
+                          <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+                        </button>
                       </div>
                     </div>
-
-                    {/* Rental Bookings */}
-                    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                      <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-teal-50 to-emerald-50">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 sm:gap-3">
-                            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-[#0D9488] to-[#0F766E] rounded-lg sm:rounded-xl flex items-center justify-center shadow-md shadow-[#0D9488]/20">
-                              <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Rental Bookings</h3>
-                              <p className="text-[10px] sm:text-xs text-slate-500">{stats.rentalBookings} total</p>
-                            </div>
+                    <div className="divide-y divide-slate-50">
+                      {recentMassageBookings.length === 0 ? (
+                        <div className="p-6 sm:p-8 text-center">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                            <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
                           </div>
-                          <button
-                            onClick={() => navigate('/rental-booking')}
-                            className="flex items-center gap-1 text-[10px] sm:text-xs text-[#0D9488] hover:text-[#0B7B72] font-medium bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm hover:shadow transition-all"
-                          >
-                            View All
-                            <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                          </button>
+                          <p className="text-slate-500 text-xs sm:text-sm">No bookings yet</p>
                         </div>
-                      </div>
-                      <div className="divide-y divide-slate-50">
-                        {recentRentalBookings.length === 0 ? (
-                          <div className="p-6 sm:p-8 text-center">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-slate-100 rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3">
-                              <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-slate-400" />
-                            </div>
-                            <p className="text-slate-500 text-xs sm:text-sm">No bookings yet</p>
-                          </div>
-                        ) : (
-                          recentRentalBookings.map((booking) => {
-                            const statusConfig = getStatusConfig(booking.status)
-                            return (
-                              <div key={booking.id} className="px-3 sm:px-5 py-2.5 sm:py-3.5 hover:bg-slate-50/50 transition group">
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2 sm:gap-3">
-                                    <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-lg flex items-center justify-center text-teal-600 font-semibold text-xs sm:text-sm">
-                                      {booking.name.split(' ').map(n => n[0]).join('')}
-                                    </div>
-                                    <div>
-                                      <p className="font-medium text-slate-800 text-xs sm:text-sm">{booking.name}</p>
-                                      <p className="text-[10px] sm:text-xs text-slate-500 truncate max-w-[100px] sm:max-w-[140px]">{booking.property}</p>
-                                    </div>
+                      ) : (
+                        recentMassageBookings.map((booking) => {
+                          const statusConfig = getStatusConfig(booking.status)
+                          return (
+                            <div key={booking.id} className="px-3 sm:px-5 py-2.5 sm:py-3.5 hover:bg-slate-50/50 transition group">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                  <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-violet-100 to-purple-100 rounded-lg flex items-center justify-center text-violet-600 font-semibold text-xs sm:text-sm">
+                                    {booking.name.split(' ').map(n => n[0]).join('')}
                                   </div>
-                                  <div className="text-right">
-                                    <span className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-semibold uppercase ${statusConfig.bg} ${statusConfig.text}`}>
-                                      {booking.status}
-                                    </span>
-                                    <p className="text-[8px] sm:text-[10px] text-slate-400 mt-0.5 sm:mt-1">{booking.date} • €{booking.amount}</p>
+                                  <div>
+                                    <p className="font-medium text-slate-800 text-xs sm:text-sm">{booking.name}</p>
+                                    <p className="text-[10px] sm:text-xs text-slate-500 truncate max-w-[120px] sm:max-w-[200px]">{booking.service}</p>
                                   </div>
                                 </div>
+                                <div className="text-right">
+                                  <span className={`px-1.5 sm:px-2 py-0.5 rounded-md text-[8px] sm:text-[10px] font-semibold uppercase ${statusConfig.bg} ${statusConfig.text}`}>
+                                    {booking.status}
+                                  </span>
+                                  <p className="text-[8px] sm:text-[10px] text-slate-400 mt-0.5 sm:mt-1">{booking.date} • {booking.time}</p>
+                                </div>
                               </div>
-                            )
-                          })
-                        )}
-                      </div>
+                            </div>
+                          )
+                        })
+                      )}
                     </div>
                   </div>
 
-                  {/* Chart Section - Now Below Bookings */}
+                  {/* Chart Section */}
                   <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
                       <div className="flex items-center gap-2 sm:gap-3">
@@ -434,11 +325,7 @@ const Dashboard = () => {
                       <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs">
                         <div className="flex items-center gap-1.5 sm:gap-2">
                           <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-violet-500 to-purple-600"></div>
-                          <span className="text-slate-600 font-medium">Massage</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-[#0D9488] to-[#0F766E]"></div>
-                          <span className="text-slate-600 font-medium">Rental</span>
+                          <span className="text-slate-600 font-medium">Massage Appointments</span>
                         </div>
                       </div>
                     </div>
@@ -447,23 +334,18 @@ const Dashboard = () => {
                         const currentMonthName = new Date().toLocaleString('en-US', { month: 'short' })
                         const isCurrentMonth = data.month === currentMonthName
                         const massageHeight = maxChartValue > 0 ? (data.massage / maxChartValue) * 100 : 0
-                        const rentalHeight = maxChartValue > 0 ? (data.rental / maxChartValue) * 100 : 0
                         return (
                           <div key={index} className="flex flex-col items-center gap-1 sm:gap-2 flex-1 group">
                             <div className="hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity bg-slate-800 text-white text-xs px-2 py-1 rounded-lg mb-1">
-                              {data.total} bookings
+                              {data.massage} bookings
                             </div>
                             <div className="flex gap-0.5 sm:gap-1.5">
                               <div
-                                className={`w-3 sm:w-6 rounded-t-md sm:rounded-t-lg transition-all duration-500 ${isCurrentMonth ? 'bg-gradient-to-t from-violet-600 to-purple-500' : 'bg-gradient-to-t from-violet-400 to-purple-300'}`}
+                                className={`w-6 sm:w-10 rounded-t-md sm:rounded-t-lg transition-all duration-500 ${isCurrentMonth ? 'bg-gradient-to-t from-violet-600 to-purple-500' : 'bg-gradient-to-t from-violet-400 to-purple-300'}`}
                                 style={{ height: `${Math.max(massageHeight, 8)}px` }}
                               />
-                              <div
-                                className={`w-3 sm:w-6 rounded-t-md sm:rounded-t-lg transition-all duration-500 ${isCurrentMonth ? 'bg-gradient-to-t from-[#0D9488] to-[#14B8A6]' : 'bg-gradient-to-t from-[#5EEAD4] to-[#99F6E4]'}`}
-                                style={{ height: `${Math.max(rentalHeight, 8)}px` }}
-                              />
                             </div>
-                            <span className={`text-[10px] sm:text-xs font-medium ${isCurrentMonth ? 'text-[#0D9488] bg-teal-50 px-1.5 sm:px-2 py-0.5 rounded-full' : 'text-slate-500'}`}>
+                            <span className={`text-[10px] sm:text-xs font-medium ${isCurrentMonth ? 'text-violet-600 bg-violet-50 px-1.5 sm:px-2 py-0.5 rounded-full' : 'text-slate-500'}`}>
                               {data.month}
                             </span>
                           </div>
@@ -483,43 +365,29 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-2">
                       <button
-                        onClick={() => navigate('/rental-booking')}
-                        className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-[#0D9488] to-[#0F766E] text-white p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-[#0D9488]/25 transition-all group"
+                        onClick={() => navigate('/appointments')}
+                        className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-violet-500/25 transition-all group"
                       >
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
+                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
                         <div className="text-left flex-1">
-                          <span className="text-xs sm:text-sm font-semibold block">New Rental Booking</span>
-                          <span className="text-[10px] sm:text-xs text-white/70">Create property reservation</span>
+                          <span className="text-xs sm:text-sm font-semibold block">Massage Bookings</span>
+                          <span className="text-[10px] sm:text-xs text-white/70">View all appointments</span>
                         </div>
                         <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </button>
 
                       <button
-                        onClick={() => navigate('/massage-appointments')}
+                        onClick={() => navigate('/services')}
                         className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-slate-50 to-slate-100 text-slate-700 p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-md transition-all group border border-slate-200"
                       >
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-violet-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                          <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                         </div>
                         <div className="text-left flex-1">
-                          <span className="text-xs sm:text-sm font-semibold block">Massage Bookings</span>
-                          <span className="text-[10px] sm:text-xs text-slate-500">View appointments</span>
-                        </div>
-                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
-                      </button>
-
-                      <button
-                        onClick={() => navigate('/properties')}
-                        className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-slate-50 to-slate-100 text-slate-700 p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-md transition-all group border border-slate-200"
-                      >
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-teal-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-teal-600" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <span className="text-xs sm:text-sm font-semibold block">Properties</span>
-                          <span className="text-[10px] sm:text-xs text-slate-500">Manage listings</span>
+                          <span className="text-xs sm:text-sm font-semibold block">Services</span>
+                          <span className="text-[10px] sm:text-xs text-slate-500">Manage services</span>
                         </div>
                         <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
                       </button>
@@ -528,8 +396,8 @@ const Dashboard = () => {
                         onClick={() => navigate('/users')}
                         className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-slate-50 to-slate-100 text-slate-700 p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-md transition-all group border border-slate-200"
                       >
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
-                          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
+                          <Users className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                         </div>
                         <div className="text-left flex-1">
                           <span className="text-xs sm:text-sm font-semibold block">Customers</span>
@@ -563,12 +431,12 @@ const Dashboard = () => {
                         </div>
                         <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-slate-700">
                           <div className="bg-slate-700/50 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
-                            <p className="text-lg sm:text-2xl font-bold">{stats.totalBookings + stats.rentalBookings}</p>
+                            <p className="text-lg sm:text-2xl font-bold">{stats.totalBookings}</p>
                             <p className="text-[10px] sm:text-xs text-slate-400">Total Bookings</p>
                           </div>
                           <div className="bg-slate-700/50 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
-                            <p className="text-lg sm:text-2xl font-bold text-emerald-400">€{stats.totalRevenue.toLocaleString()}</p>
-                            <p className="text-[10px] sm:text-xs text-slate-400">Revenue</p>
+                            <p className="text-lg sm:text-2xl font-bold text-amber-400">{stats.pendingBookings}</p>
+                            <p className="text-[10px] sm:text-xs text-slate-400">Pending</p>
                           </div>
                         </div>
                       </div>

@@ -33,7 +33,7 @@ const RApproved: React.FC<RApprovedProps> = ({ onClose, onHome }) => {
 
         {/* Confirmation Text */}
         <h2 className="text-2xl font-semibold text-gray-900 text-center mb-2">
-          Your Booking is Confirmed!
+          We will get back to you soon!
         </h2>
         <p className="text-gray-500 text-center mb-8">
           Thank you for booking with ZenYourLife

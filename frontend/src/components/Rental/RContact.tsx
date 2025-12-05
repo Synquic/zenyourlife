@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Facebook, Instagram, Twitter, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import RNavbar from "./RNavbar";
-
 import { API_BASE_URL } from '../../config/api';
 
 interface RContactProps {
@@ -68,7 +67,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
     setSubmitStatus({ type: null, message: "" });
 
     try {
-      const response = await fetch(`${API_BASE_URL}/contact`, {
+      const response = await fetch(`${API_BASE_URL}/rcontact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,9 +80,8 @@ const RContact = ({ isModal = false }: RContactProps) => {
       if (response.ok && data.success) {
         setSubmitStatus({
           type: "success",
-          message: t('rental.contact.success_message'),
+          message: t('rental.contact.success_message') || "Your message has been sent successfully!",
         });
-        // Reset form
         setFormData({
           firstName: "",
           lastName: "",
@@ -95,14 +93,14 @@ const RContact = ({ isModal = false }: RContactProps) => {
       } else {
         setSubmitStatus({
           type: "error",
-          message: data.message || t('rental.contact.error_message'),
+          message: data.message || t('rental.contact.error_message') || "Failed to send message",
         });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
       setSubmitStatus({
         type: "error",
-        message: t('rental.contact.connection_error'),
+        message: t('rental.contact.connection_error') || "Connection error. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -275,7 +273,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                     {isSubmitting ? (
                       <>
                         <Loader2 size={18} className="animate-spin" />
-                        {t('rental.contact.sending')}
+                        {t('rental.contact.sending') || "Sending..."}
                       </>
                     ) : (
                       t('rental.contact.send_message')
@@ -462,12 +460,12 @@ const RContact = ({ isModal = false }: RContactProps) => {
                       onChange={handleChange}
                       className="px-3 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition text-sm"
                     >
-                      <option value="+32">🇧🇪 +32</option>
-                      <option value="+1">🇺🇸 +1</option>
-                      <option value="+44">🇬🇧 +44</option>
-                      <option value="+33">🇫🇷 +33</option>
-                      <option value="+49">🇩🇪 +49</option>
-                      <option value="+31">🇳🇱 +31</option>
+                      <option value="+32">+32</option>
+                      <option value="+1">+1</option>
+                      <option value="+44">+44</option>
+                      <option value="+33">+33</option>
+                      <option value="+49">+49</option>
+                      <option value="+31">+31</option>
                     </select>
                     <input
                       type="tel"
@@ -522,7 +520,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   {isSubmitting ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      {t('rental.contact.sending')}
+                      {t('rental.contact.sending') || "Sending..."}
                     </>
                   ) : (
                     t('rental.contact.send_message')
