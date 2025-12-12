@@ -292,7 +292,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        {/* <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex space-x-4 mb-4 md:mb-0">
             <a
               href="#"
@@ -322,7 +322,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
           <p className="text-gray-400 text-sm">
             © 2025 zenyouths.be. {t('rental.footer.all_rights')}
           </p>
-        </div>
+        </div> */}
       </div>
     </footer>
 
