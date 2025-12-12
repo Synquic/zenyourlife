@@ -685,85 +685,88 @@ const MassageBooking = () => {
 
       {/* New Booking Modal */}
       {showNewBookingModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowNewBookingModal(false)}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4" onClick={() => setShowNewBookingModal(false)}>
           <div
-            className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl"
+            className="bg-white rounded-xl sm:rounded-2xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-5 text-white">
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-4 sm:px-6 py-4 sm:py-5 text-white sticky top-0 z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold">Create New Appointment</h2>
-                  <p className="text-white/70 text-sm mt-0.5">Add a new massage appointment</p>
+                  <h2 className="text-lg sm:text-xl font-semibold">Create New Appointment</h2>
+                  <p className="text-white/70 text-xs sm:text-sm mt-0.5">Add a new massage appointment</p>
                 </div>
                 <button
                   onClick={() => setShowNewBookingModal(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition"
+                  className="p-1.5 sm:p-2 hover:bg-white/10 rounded-lg transition"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            <form onSubmit={handleCreateBooking} className="overflow-y-auto max-h-[calc(90vh-100px)]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <div className="p-6 space-y-6">
+            <form onSubmit={handleCreateBooking} className="overflow-y-auto max-h-[calc(95vh-140px)] sm:max-h-[calc(90vh-140px)]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
                 {/* Customer Information */}
-                <div>
+                <div className="bg-slate-50/50 rounded-xl p-4 sm:p-5 border border-slate-100">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
                       <User className="w-4 h-4 text-[#DFB13B]" />
                     </div>
-                    <h3 className="font-semibold text-slate-800">Customer Information</h3>
+                    <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Customer Information</h3>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">First Name</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">First Name</label>
                       <input
                         type="text"
                         value={newBookingForm.firstName}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, firstName: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
+                        placeholder="Enter first name"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Last Name</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Last Name</label>
                       <input
                         type="text"
                         value={newBookingForm.lastName}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, lastName: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
+                        placeholder="Enter last name"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Email</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Email</label>
                       <input
                         type="email"
                         value={newBookingForm.email}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, email: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
+                        placeholder="email@example.com"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Phone</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Phone</label>
                       <input
                         type="tel"
                         value={newBookingForm.phoneNumber}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, phoneNumber: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
                         placeholder="+32 123456789"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Country</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Country</label>
                       <select
                         value={newBookingForm.country}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, country: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm appearance-none cursor-pointer"
                       >
                         {Object.entries(countryNames).map(([code, name]) => (
                           <option key={code} value={code}>{name}</option>
@@ -771,17 +774,17 @@ const MassageBooking = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Gender</label>
-                      <div className="flex gap-2">
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Gender</label>
+                      <div className="flex gap-1.5 sm:gap-2">
                         {['male', 'female', 'other'].map(g => (
                           <button
                             key={g}
                             type="button"
                             onClick={() => setNewBookingForm({ ...newBookingForm, gender: g })}
-                            className={`flex-1 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all capitalize ${
+                            className={`flex-1 px-2 sm:px-3 py-2.5 rounded-lg sm:rounded-xl border text-xs sm:text-sm font-medium transition-all capitalize ${
                               newBookingForm.gender === g
-                                ? 'bg-[#DFB13B] text-white border-[#DFB13B]'
-                                : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300'
+                                ? 'bg-[#DFB13B] text-white border-[#DFB13B] shadow-sm'
+                                : 'bg-white text-slate-600 border-slate-200 hover:border-[#DFB13B]/50'
                             }`}
                           >
                             {g}
@@ -793,54 +796,54 @@ const MassageBooking = () => {
                 </div>
 
                 {/* Service Selection */}
-                <div>
+                <div className="bg-slate-50/50 rounded-xl p-4 sm:p-5 border border-slate-100">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-[#DFB13B]" />
                     </div>
-                    <h3 className="font-semibold text-slate-800">Service Selection</h3>
+                    <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Service Selection</h3>
                   </div>
                   <select
                     value={newBookingForm.serviceId}
                     onChange={(e) => setNewBookingForm({ ...newBookingForm, serviceId: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                    className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm appearance-none cursor-pointer"
                     required
                   >
                     <option value="">Select a service</option>
                     {services.map((service) => (
                       <option key={service._id} value={service._id}>
-                        {service.title} - ${service.price} ({service.duration} mins)
+                        {service.title} - €{service.price} ({service.duration} mins)
                       </option>
                     ))}
                   </select>
                 </div>
 
                 {/* Appointment Details */}
-                <div>
+                <div className="bg-slate-50/50 rounded-xl p-4 sm:p-5 border border-slate-100">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
                       <Calendar className="w-4 h-4 text-[#DFB13B]" />
                     </div>
-                    <h3 className="font-semibold text-slate-800">Appointment Details</h3>
+                    <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Appointment Details</h3>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Appointment Date</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Date</label>
                       <input
                         type="date"
                         value={newBookingForm.appointmentDate}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, appointmentDate: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Appointment Time</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Time</label>
                       <input
                         type="time"
                         value={newBookingForm.appointmentTime}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, appointmentTime: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm"
                         required
                       />
                     </div>
@@ -848,29 +851,30 @@ const MassageBooking = () => {
                 </div>
 
                 {/* Additional Information */}
-                <div>
+                <div className="bg-slate-50/50 rounded-xl p-4 sm:p-5 border border-slate-100">
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
                       <MessageSquare className="w-4 h-4 text-[#DFB13B]" />
                     </div>
-                    <h3 className="font-semibold text-slate-800">Additional Information</h3>
+                    <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Additional Information</h3>
+                    <span className="text-xs text-slate-400 ml-auto">Optional</span>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Special Requests</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Special Requests</label>
                       <textarea
                         value={newBookingForm.specialRequests}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, specialRequests: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm h-20 resize-none"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm h-16 sm:h-20 resize-none"
                         placeholder="Any special requests from the customer..."
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-slate-600 mb-1.5">Message</label>
+                      <label className="block text-xs sm:text-sm font-medium text-slate-600 mb-1.5">Message</label>
                       <textarea
                         value={newBookingForm.message}
                         onChange={(e) => setNewBookingForm({ ...newBookingForm, message: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm h-20 resize-none"
+                        className="w-full px-3 sm:px-4 py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-sm h-16 sm:h-20 resize-none"
                         placeholder="Additional notes..."
                       />
                     </div>
@@ -879,28 +883,30 @@ const MassageBooking = () => {
               </div>
 
               {/* Actions */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex gap-3">
+              <div className="px-4 sm:px-6 py-3 sm:py-4 bg-slate-50 border-t border-slate-200 flex gap-2 sm:gap-3 sticky bottom-0">
                 <button
                   type="button"
                   onClick={() => setShowNewBookingModal(false)}
-                  className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl hover:bg-white transition font-medium"
+                  className="flex-1 px-3 sm:px-4 py-2.5 border border-slate-200 text-slate-600 rounded-lg sm:rounded-xl hover:bg-white transition font-medium text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={savingBooking}
-                  className="flex-1 px-4 py-2.5 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm shadow-[#DFB13B]/20"
+                  className="flex-1 px-3 sm:px-4 py-2.5 bg-[#DFB13B] text-white rounded-lg sm:rounded-xl hover:bg-[#C9A032] transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm shadow-[#DFB13B]/20 text-sm"
                 >
                   {savingBooking ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Creating...
+                      <span className="hidden sm:inline">Creating...</span>
+                      <span className="sm:hidden">Wait...</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      Create Appointment
+                      <span className="hidden sm:inline">Create Appointment</span>
+                      <span className="sm:hidden">Create</span>
                     </>
                   )}
                 </button>

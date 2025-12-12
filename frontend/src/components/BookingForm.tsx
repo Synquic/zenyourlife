@@ -270,6 +270,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                       className="px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
                     >
                       <option value="BE">🇧🇪</option>
+                      <option value="IN">🇮🇳</option>
                       <option value="US">🇺🇸</option>
                       <option value="GB">🇬🇧</option>
                       <option value="FR">🇫🇷</option>

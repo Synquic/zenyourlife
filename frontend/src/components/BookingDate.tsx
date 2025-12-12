@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { X, AlertCircle, Filter, Calendar } from "lucide-react";
+import { X, AlertCircle, Calendar, Clock } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { API_BASE_URL } from "../config/api";
 
@@ -37,6 +37,7 @@ interface WeeklySchedule {
 interface BookingSettings {
   weeklySchedule: WeeklySchedule;
   timeSlots: string[];
+  minAdvanceBooking: number; // hours
 }
 
 type DayName = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
@@ -51,8 +52,6 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   const { t } = useTranslation();
   const [selectedDate, setSelectedDate] = useState<number | null>(null); // null means no date selected initially
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
-  const [showError, setShowError] = useState(false);
-  const [showDateError, setShowDateError] = useState(false);
   const [showBookingFormModal, setShowBookingFormModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
@@ -130,9 +129,52 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
     return bookingSettings.weeklySchedule[dayOfWeek]?.isWorking ?? true;
   };
 
-  // Check if a date is fully blocked (whole day blocked OR non-working day)
+  // Check if a date is completely too soon (all time slots would be blocked)
+  const isDateTooSoon = (dateToCheck: Date): boolean => {
+    if (!bookingSettings || !bookingSettings.minAdvanceBooking) return false;
+
+    const now = new Date();
+    const minAdvanceMs = bookingSettings.minAdvanceBooking * 60 * 60 * 1000;
+    const minAllowedDateTime = new Date(now.getTime() + minAdvanceMs);
+
+    // Get the latest possible time slot for this day
+    const daySlots = getTimeSlotsForDay(dateToCheck);
+    if (daySlots.length === 0) return true;
+
+    // Find the latest time slot
+    const latestSlot = daySlots[daySlots.length - 1];
+    const [hours, minutes] = latestSlot.split(':').map(Number);
+
+    const latestSlotDateTime = new Date(dateToCheck);
+    latestSlotDateTime.setHours(hours, minutes, 0, 0);
+
+    // If even the latest slot is before minimum allowed time, block the whole day
+    return latestSlotDateTime < minAllowedDateTime;
+  };
+
+  // Check if a specific time slot is too soon based on advance booking
+  const isTimeSlotTooSoon = (dateToCheck: Date, timeSlot: string): boolean => {
+    if (!bookingSettings || !bookingSettings.minAdvanceBooking) return false;
+
+    const now = new Date();
+    const minAdvanceMs = bookingSettings.minAdvanceBooking * 60 * 60 * 1000;
+    const minAllowedDateTime = new Date(now.getTime() + minAdvanceMs);
+
+    const [hours, minutes] = timeSlot.split(':').map(Number);
+    const slotDateTime = new Date(dateToCheck);
+    slotDateTime.setHours(hours, minutes, 0, 0);
+
+    return slotDateTime < minAllowedDateTime;
+  };
+
+  // Check if a date is fully blocked (whole day blocked OR non-working day OR too soon)
   const isDateFullyBlocked = (dateToCheck: Date) => {
-    // First check if it's a non-working day
+    // First check if it's too soon based on advance booking setting
+    if (isDateTooSoon(dateToCheck)) {
+      return true;
+    }
+
+    // Check if it's a non-working day
     if (!isWorkingDay(dateToCheck)) {
       return true;
     }
@@ -245,8 +287,6 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
     }
     setSelectedDate(index);
     setSelectedTime(null); // Reset time when date changes
-    setShowError(false);
-    setShowDateError(false);
   };
 
   return (
@@ -259,14 +299,9 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
               <h1 className="text-xl font-semibold text-gray-900">
                 {t('booking.title')}
               </h1>
-              <div className="flex items-center gap-2">
-                <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
-                  <Filter className="w-4 h-4 text-gray-600" />
-                </button>
-                <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
-                  <X className="w-4 h-4 text-gray-600" />
-                </button>
-              </div>
+              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
             </div>
           </div>
 
@@ -287,8 +322,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 <Calendar className="w-5 h-5 text-gray-600" />
               </button>
             </div>
-            <div className="overflow-x-auto scrollbar-hide">
-              <div className="inline-flex gap-3">
+            <div className="overflow-x-auto scrollbar-hide -mx-2 px-2">
+              <div className="inline-flex gap-2 sm:gap-3 pb-2">
                 {dates.slice(0, 10).map((item, index) => {
                   const isBlocked = isDateFullyBlocked(item.fullDate);
                   return (
@@ -296,7 +331,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                       key={index}
                       onClick={() => handleDateSelect(index)}
                       disabled={isBlocked}
-                      className={`flex flex-col items-center justify-center py-3 px-4 rounded-lg transition-all min-w-[70px] shrink-0 relative ${
+                      className={`flex flex-col items-center justify-center py-2 sm:py-3 px-3 sm:px-4 rounded-lg transition-all min-w-[55px] sm:min-w-[70px] shrink-0 relative ${
                         isBlocked
                           ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                           : selectedDate === index
@@ -310,16 +345,24 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           <div className="w-px h-[80%] bg-gray-300 rotate-45 absolute"></div>
                         </div>
                       )}
-                      <span className={`text-xs font-medium mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
-                      <span className={`text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
+                      <span className={`text-[10px] sm:text-xs font-medium mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
+                      <span className={`text-base sm:text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
-            {/* Blocked dates info */}
+            {/* Booking info messages */}
+            {bookingSettings?.minAdvanceBooking && bookingSettings.minAdvanceBooking > 0 && (
+              <p className="mt-3 text-xs text-amber-600 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                Bookings require at least {bookingSettings.minAdvanceBooking >= 24
+                  ? `${Math.floor(bookingSettings.minAdvanceBooking / 24)} day${Math.floor(bookingSettings.minAdvanceBooking / 24) !== 1 ? 's' : ''}${bookingSettings.minAdvanceBooking % 24 > 0 ? ` ${bookingSettings.minAdvanceBooking % 24} hours` : ''}`
+                  : `${bookingSettings.minAdvanceBooking} hours`} advance notice
+              </p>
+            )}
             {blockedDatesInfo.length > 0 && (
-              <p className="mt-3 text-xs text-gray-400 flex items-center gap-1">
+              <p className="mt-2 text-xs text-gray-400 flex items-center gap-1">
                 <span className="w-3 h-3 inline-flex items-center justify-center text-gray-400">/</span>
                 {t('booking.some_dates_blocked') || 'Some dates are unavailable for booking'}
               </p>
@@ -342,19 +385,53 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                       {availableTimeSlots.map((time: string, index: number) => {
                         const isBooked = isSlotBooked(time);
                         const isBlockedByAdmin = blockedTimeSlotsForDate.includes(time);
-                        const isUnavailable = isBooked || isBlockedByAdmin;
+                        const isTooSoon = selectedDate !== null && isTimeSlotTooSoon(dates[selectedDate].fullDate, time);
+                        const isUnavailable = isBooked || isBlockedByAdmin || isTooSoon;
                         return (
                           <button
                             key={index}
                             onClick={() => {
-                              if (!isUnavailable) {
+                              if (!isUnavailable && selectedDate !== null) {
                                 setSelectedTime(index);
-                                setShowError(false);
+
+                                // Calculate the appointment date
+                                const appointmentDate = dates[selectedDate].fullDate;
+
+                                // Log selected date and time information
+                                console.log('═══════════════════════════════════════════════════════');
+                                console.log('STEP 2: DATE & TIME SELECTION');
+                                console.log('═══════════════════════════════════════════════════════');
+                                console.log('Selected Date & Time:', {
+                                  day: dates[selectedDate].day,
+                                  date: dates[selectedDate].date,
+                                  fullDate: appointmentDate.toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                  }),
+                                  time: time,
+                                  isoString: appointmentDate.toISOString()
+                                });
+                                console.log('\nAccumulated Information:');
+                                console.log({
+                                  service: selectedService?.title,
+                                  price: `€${selectedService?.price}`,
+                                  duration: `${selectedService?.duration} minutes`,
+                                  appointmentDate: appointmentDate.toLocaleDateString(),
+                                  appointmentTime: time
+                                });
+                                console.log('═══════════════════════════════════════════════════════\n');
+
+                                // Auto-proceed to booking form
+                                setShowBookingFormModal(true);
                               }
                             }}
                             disabled={isUnavailable}
                             className={`py-2 px-3 rounded-lg text-sm font-medium transition-all ${
-                              isBlockedByAdmin
+                              isTooSoon
+                                ? "bg-amber-50 text-amber-300 cursor-not-allowed"
+                                : isBlockedByAdmin
                                 ? "bg-gray-100 text-gray-300 cursor-not-allowed line-through"
                                 : isBooked
                                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
@@ -362,29 +439,42 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                                 ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
-                            title={isBlockedByAdmin ? (t('booking.time_blocked') || 'Time slot blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
+                            title={isTooSoon ? 'Too soon - advance booking required' : isBlockedByAdmin ? (t('booking.time_blocked') || 'Time slot blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
                           >
                             {time}
                           </button>
                         );
                       })}
                     </div>
-                    {(bookedSlots.length > 0 || blockedTimeSlotsForDate.length > 0) && (
-                      <div className="mt-3 space-y-1">
-                        {bookedSlots.length > 0 && (
-                          <p className="text-xs text-gray-500">
-                            <AlertCircle className="w-3 h-3 inline mr-1" />
-                            {bookedSlots.length} time slot{bookedSlots.length > 1 ? 's' : ''} already booked for this date
-                          </p>
-                        )}
-                        {blockedTimeSlotsForDate.length > 0 && (
-                          <p className="text-xs text-gray-400">
-                            <span className="inline mr-1">/</span>
-                            {blockedTimeSlotsForDate.length} time slot{blockedTimeSlotsForDate.length > 1 ? 's' : ''} unavailable
-                          </p>
-                        )}
-                      </div>
-                    )}
+                    {(() => {
+                      const tooSoonCount = selectedDate !== null
+                        ? availableTimeSlots.filter(time => isTimeSlotTooSoon(dates[selectedDate].fullDate, time)).length
+                        : 0;
+                      const hasInfo = bookedSlots.length > 0 || blockedTimeSlotsForDate.length > 0 || tooSoonCount > 0;
+
+                      return hasInfo && (
+                        <div className="mt-3 space-y-1">
+                          {tooSoonCount > 0 && (
+                            <p className="text-xs text-amber-600">
+                              <Clock className="w-3 h-3 inline mr-1" />
+                              {tooSoonCount} time slot{tooSoonCount > 1 ? 's' : ''} too soon (advance booking required)
+                            </p>
+                          )}
+                          {bookedSlots.length > 0 && (
+                            <p className="text-xs text-gray-500">
+                              <AlertCircle className="w-3 h-3 inline mr-1" />
+                              {bookedSlots.length} time slot{bookedSlots.length > 1 ? 's' : ''} already booked for this date
+                            </p>
+                          )}
+                          {blockedTimeSlotsForDate.length > 0 && (
+                            <p className="text-xs text-gray-400">
+                              <span className="inline mr-1">/</span>
+                              {blockedTimeSlotsForDate.length} time slot{blockedTimeSlotsForDate.length > 1 ? 's' : ''} unavailable
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </>
                 ) : (
                   <div className="text-center py-6 bg-gray-50 rounded-lg">
@@ -399,75 +489,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
             )}
           </div>
 
-          {/* Error Message */}
-          {showError && (
-            <div className="mb-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-3 rounded-lg shadow-md flex items-center gap-2 animate-pulse">
-              <AlertCircle className="w-5 h-5 shrink-0" />
-              <p className="font-medium text-sm">
-                {t('booking.select_time_error')}
-              </p>
-            </div>
-          )}
-
-          {showDateError && (
-            <div className="mb-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-3 rounded-lg shadow-md flex items-center gap-2 animate-pulse">
-              <AlertCircle className="w-5 h-5 shrink-0" />
-              <p className="font-medium text-sm">
-                {t('booking.select_date_error') || 'Please select an available date'}
-              </p>
-            </div>
-          )}
-
-          {/* Next Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={() => {
-                if (selectedDate === null) {
-                  setShowDateError(true);
-                  return;
-                }
-                if (selectedTime === null) {
-                  setShowError(true);
-                  return;
-                }
-
-                // Calculate the appointment date
-                const appointmentDate = dates[selectedDate].fullDate;
-
-                // Log selected date and time information
-                console.log('═══════════════════════════════════════════════════════');
-                console.log('STEP 2: DATE & TIME SELECTION');
-                console.log('═══════════════════════════════════════════════════════');
-                console.log('Selected Date & Time:', {
-                  day: dates[selectedDate].day,
-                  date: dates[selectedDate].date,
-                  fullDate: appointmentDate.toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }),
-                  time: availableTimeSlots[selectedTime],
-                  isoString: appointmentDate.toISOString()
-                });
-                console.log('\nAccumulated Information:');
-                console.log({
-                  service: selectedService?.title,
-                  price: `€${selectedService?.price}`,
-                  duration: `${selectedService?.duration} minutes`,
-                  appointmentDate: appointmentDate.toLocaleDateString(),
-                  appointmentTime: availableTimeSlots[selectedTime]
-                });
-                console.log('═══════════════════════════════════════════════════════\n');
-
-                setShowBookingFormModal(true);
-              }}
-              className="bg-[#B8860B] hover:bg-[#9A7209] text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-md text-sm"
-            >
-              {t('common.next')}
-            </button>
-          </div>
-        </div>
+                  </div>
       </div>
 
       {/* BookingForm Modal */}
@@ -508,7 +530,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
 
       {/* Calendar Modal - Show all 30 dates */}
       {showCalendarModal && (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[65] flex items-center justify-center p-2 sm:p-4">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50"
@@ -516,9 +538,9 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
           ></div>
 
           {/* Modal Content */}
-          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl relative z-10 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 rounded-t-3xl flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">{t('booking.select_date')}</h2>
                 {blockedDatesInfo.length > 0 && (
@@ -537,8 +559,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
             </div>
 
             {/* Calendar Grid */}
-            <div className="p-6">
-              <div className="grid grid-cols-6 gap-2">
+            <div className="p-4 sm:p-6">
+              <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 sm:gap-2">
                 {dates.map((item, index) => {
                   const isBlocked = isDateFullyBlocked(item.fullDate);
                   return (
@@ -551,7 +573,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                         }
                       }}
                       disabled={isBlocked}
-                      className={`flex flex-col items-center justify-center py-3 px-2 rounded-lg transition-all relative ${
+                      className={`flex flex-col items-center justify-center py-2 sm:py-3 px-1 sm:px-2 rounded-lg transition-all relative ${
                         isBlocked
                           ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                           : selectedDate === index
@@ -565,8 +587,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           <div className="w-px h-[80%] bg-gray-300 rotate-45 absolute"></div>
                         </div>
                       )}
-                      <span className={`text-xs font-medium mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
-                      <span className={`text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
+                      <span className={`text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
+                      <span className={`text-sm sm:text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
                     </button>
                   );
                 })}

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Enrollment = require('../models/Enrollment');
-const { sendCustomerReminder, sendAdminReminder } = require('../services/reminderScheduler');
+const { sendCustomerReminder, sendAdminReminder, sendCustomerSmsReminder, sendAdminSmsReminder } = require('../services/reminderScheduler');
+const { sendTestSms, formatPhoneNumber } = require('../services/twilioSmsService');
 
 // Test customer reminder for a specific enrollment
 router.post('/test-customer-reminder/:enrollmentId', async (req, res) => {
@@ -183,6 +184,190 @@ router.post('/reset-flags/:enrollmentId', async (req, res) => {
       error: error.message
     });
   }
+});
+
+// ============== SMS TEST ROUTES ==============
+
+// Test SMS to a specific phone number
+router.post('/test-sms', async (req, res) => {
+  try {
+    const { phoneNumber, countryCode = 'BE' } = req.body;
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number is required'
+      });
+    }
+
+    console.log('Testing SMS to:', phoneNumber, 'Country:', countryCode);
+    const formattedNumber = formatPhoneNumber(phoneNumber, countryCode);
+    const sent = await sendTestSms(phoneNumber, countryCode);
+
+    res.json({
+      success: sent,
+      message: sent ? 'Test SMS sent successfully!' : 'Failed to send test SMS. Check Twilio credentials.',
+      details: {
+        originalNumber: phoneNumber,
+        formattedNumber: formattedNumber,
+        countryCode: countryCode
+      }
+    });
+  } catch (error) {
+    console.error('Error testing SMS:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing SMS',
+      error: error.message
+    });
+  }
+});
+
+// Test customer SMS reminder for a specific enrollment
+router.post('/test-customer-sms/:enrollmentId', async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findOne({ enrollmentId: req.params.enrollmentId });
+
+    if (!enrollment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enrollment not found'
+      });
+    }
+
+    console.log('Testing customer SMS reminder for enrollment:', enrollment.enrollmentId);
+    const sent = await sendCustomerSmsReminder(enrollment);
+
+    res.json({
+      success: sent,
+      message: sent ? 'Customer SMS reminder sent successfully!' : 'Failed to send customer SMS reminder. Check Twilio credentials.',
+      enrollment: {
+        id: enrollment.enrollmentId,
+        customer: enrollment.fullName,
+        phone: enrollment.phoneNumber,
+        country: enrollment.country,
+        appointmentDate: enrollment.appointmentDate,
+        appointmentTime: enrollment.appointmentTime
+      }
+    });
+  } catch (error) {
+    console.error('Error testing customer SMS reminder:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing customer SMS reminder',
+      error: error.message
+    });
+  }
+});
+
+// Test admin SMS reminder for a specific enrollment
+router.post('/test-admin-sms/:enrollmentId', async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findOne({ enrollmentId: req.params.enrollmentId });
+
+    if (!enrollment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enrollment not found'
+      });
+    }
+
+    console.log('Testing admin SMS reminder for enrollment:', enrollment.enrollmentId);
+    const sent = await sendAdminSmsReminder(enrollment);
+
+    res.json({
+      success: sent,
+      message: sent ? 'Admin SMS reminder sent successfully!' : 'Failed to send admin SMS reminder. Check ADMIN_PHONE_NUMBER and Twilio credentials.',
+      enrollment: {
+        id: enrollment.enrollmentId,
+        customer: enrollment.fullName,
+        appointmentDate: enrollment.appointmentDate,
+        appointmentTime: enrollment.appointmentTime
+      }
+    });
+  } catch (error) {
+    console.error('Error testing admin SMS reminder:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing admin SMS reminder',
+      error: error.message
+    });
+  }
+});
+
+// Test all reminders (email + SMS) for a specific enrollment
+router.post('/test-all/:enrollmentId', async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findOne({ enrollmentId: req.params.enrollmentId });
+
+    if (!enrollment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Enrollment not found'
+      });
+    }
+
+    console.log('Testing all reminders for enrollment:', enrollment.enrollmentId);
+
+    const customerEmailSent = await sendCustomerReminder(enrollment);
+    const customerSmsSent = await sendCustomerSmsReminder(enrollment);
+    const adminEmailSent = await sendAdminReminder(enrollment);
+    const adminSmsSent = await sendAdminSmsReminder(enrollment);
+
+    res.json({
+      success: customerEmailSent || customerSmsSent || adminEmailSent || adminSmsSent,
+      message: 'Test complete',
+      results: {
+        customerEmail: customerEmailSent ? 'Sent successfully' : 'Failed',
+        customerSms: customerSmsSent ? 'Sent successfully' : 'Failed or not configured',
+        adminEmail: adminEmailSent ? 'Sent successfully' : 'Failed',
+        adminSms: adminSmsSent ? 'Sent successfully' : 'Failed or not configured'
+      },
+      enrollment: {
+        id: enrollment.enrollmentId,
+        customer: enrollment.fullName,
+        email: enrollment.email,
+        phone: enrollment.phoneNumber,
+        country: enrollment.country,
+        appointmentDate: enrollment.appointmentDate,
+        appointmentTime: enrollment.appointmentTime,
+        reminderPreference: enrollment.reminderPreference
+      }
+    });
+  } catch (error) {
+    console.error('Error testing all reminders:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing reminders',
+      error: error.message
+    });
+  }
+});
+
+// Check Twilio configuration status
+router.get('/twilio-status', (req, res) => {
+  const twilioConfigured = !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  );
+
+  const adminPhoneConfigured = !!process.env.ADMIN_PHONE_NUMBER;
+
+  res.json({
+    success: true,
+    twilioConfigured: twilioConfigured,
+    adminPhoneConfigured: adminPhoneConfigured,
+    message: twilioConfigured
+      ? 'Twilio is configured and ready for SMS reminders'
+      : 'Twilio is NOT configured. Please add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER to your .env file',
+    details: {
+      accountSid: process.env.TWILIO_ACCOUNT_SID ? 'Set (hidden)' : 'Not set',
+      authToken: process.env.TWILIO_AUTH_TOKEN ? 'Set (hidden)' : 'Not set',
+      phoneNumber: process.env.TWILIO_PHONE_NUMBER ? 'Set (hidden)' : 'Not set',
+      adminPhone: process.env.ADMIN_PHONE_NUMBER ? 'Set (hidden)' : 'Not set'
+    }
+  });
 });
 
 module.exports = router;

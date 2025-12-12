@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const Enrollment = require('../models/Enrollment');
+const { sendCustomerSmsReminder, sendAdminSmsReminder, initializeTwilio } = require('./twilioSmsService');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -237,8 +238,8 @@ const checkCustomerReminders = async () => {
     const tomorrowEnd = new Date(tomorrow);
     tomorrowEnd.setHours(23, 59, 59, 999);
 
-    // Find appointments for tomorrow that haven't received customer reminder
-    const enrollments = await Enrollment.find({
+    // Find appointments for tomorrow that haven't received customer reminder (EMAIL)
+    const emailEnrollments = await Enrollment.find({
       appointmentDate: {
         $gte: tomorrowStart,
         $lte: tomorrowEnd
@@ -248,10 +249,32 @@ const checkCustomerReminders = async () => {
       status: { $in: ['pending', 'confirmed'] }
     });
 
-    console.log(`Found ${enrollments.length} appointments for tomorrow needing customer reminders`);
+    console.log(`Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders`);
 
-    for (const enrollment of enrollments) {
+    for (const enrollment of emailEnrollments) {
       const sent = await sendCustomerReminder(enrollment);
+      if (sent) {
+        await Enrollment.findByIdAndUpdate(enrollment._id, {
+          reminderSentToCustomer: true
+        });
+      }
+    }
+
+    // Find appointments for tomorrow that haven't received customer reminder (SMS)
+    const smsEnrollments = await Enrollment.find({
+      appointmentDate: {
+        $gte: tomorrowStart,
+        $lte: tomorrowEnd
+      },
+      reminderPreference: 'sms',
+      reminderSentToCustomer: false,
+      status: { $in: ['pending', 'confirmed'] }
+    });
+
+    console.log(`Found ${smsEnrollments.length} appointments for tomorrow needing SMS reminders`);
+
+    for (const enrollment of smsEnrollments) {
+      const sent = await sendCustomerSmsReminder(enrollment);
       if (sent) {
         await Enrollment.findByIdAndUpdate(enrollment._id, {
           reminderSentToCustomer: true
@@ -303,8 +326,13 @@ const checkAdminReminders = async () => {
 
       // Send if we're within 5 minutes after the reminder time (to account for cron interval)
       if (timeDiff >= 0 && timeDiff <= 5 * 60 * 1000) {
-        const sent = await sendAdminReminder(enrollment);
-        if (sent) {
+        // Send email reminder to admin
+        const emailSent = await sendAdminReminder(enrollment);
+
+        // Also send SMS reminder to admin if configured
+        const smsSent = await sendAdminSmsReminder(enrollment);
+
+        if (emailSent || smsSent) {
           await Enrollment.findByIdAndUpdate(enrollment._id, {
             reminderSentToAdmin: true
           });
@@ -320,6 +348,9 @@ const checkAdminReminders = async () => {
 const startReminderScheduler = () => {
   console.log('Starting reminder scheduler...');
 
+  // Initialize Twilio for SMS reminders
+  initializeTwilio();
+
   // Check customer reminders every day at 9:00 AM (for tomorrow's appointments)
   cron.schedule('0 9 * * *', () => {
     console.log('Running customer reminder check at 9:00 AM');
@@ -334,6 +365,7 @@ const startReminderScheduler = () => {
   console.log('Reminder scheduler started successfully');
   console.log('- Customer reminders: Daily at 9:00 AM (for next day appointments)');
   console.log('- Admin reminders: Every 5 minutes (15 min before appointment)');
+  console.log('- SMS reminders: Enabled if Twilio credentials are configured');
 };
 
 module.exports = {
@@ -341,5 +373,7 @@ module.exports = {
   checkCustomerReminders,
   checkAdminReminders,
   sendCustomerReminder,
-  sendAdminReminder
+  sendAdminReminder,
+  sendCustomerSmsReminder,
+  sendAdminSmsReminder
 };

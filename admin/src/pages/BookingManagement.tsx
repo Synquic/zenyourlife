@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Calendar as _Calendar, Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle, ToggleLeft, ToggleRight, Clock, Save, Clock3, Settings2, CalendarDays, Edit3 } from 'lucide-react'
+import { Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle, ToggleLeft, ToggleRight, Clock, Save, Clock3, Settings2, CalendarDays, Edit3 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
@@ -62,6 +62,8 @@ const BookingManagement = () => {
   const [editingDaySlots, setEditingDaySlots] = useState<string[]>([])
   const [editingDayWorking, setEditingDayWorking] = useState(true)
   const [newSlot, setNewSlot] = useState('')
+  const [minAdvanceHours, setMinAdvanceHours] = useState<number>(0)
+  const [savingAdvance, setSavingAdvance] = useState(false)
 
   // Blocked dates state
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([])
@@ -80,9 +82,34 @@ const BookingManagement = () => {
       const data = await response.json()
       if (data.success) {
         setSettings(data.data)
+        setMinAdvanceHours(data.data.minAdvanceBooking || 0)
       }
     } catch (error) {
       console.error('Error fetching settings:', error)
+    }
+  }
+
+  // Save minimum advance booking hours
+  const handleSaveAdvanceBooking = async () => {
+    setSavingAdvance(true)
+    try {
+      const response = await fetch(`${API_BASE_URL}/blocked-dates/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ minAdvanceBooking: minAdvanceHours })
+      })
+      const data = await response.json()
+      if (data.success) {
+        setSettings(prev => prev ? { ...prev, minAdvanceBooking: minAdvanceHours } : prev)
+        alert('Advance booking setting saved successfully!')
+      } else {
+        alert(data.message || 'Failed to save setting')
+      }
+    } catch (error) {
+      console.error('Error saving advance booking:', error)
+      alert('Failed to save setting')
+    } finally {
+      setSavingAdvance(false)
     }
   }
 
@@ -353,57 +380,57 @@ const BookingManagement = () => {
           ) : (
             <>
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5 mb-6 sm:mb-8">
-                <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-emerald-200 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Working Days</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-800">{workingDaysCount}</p>
-                      <p className="text-xs text-slate-400 mt-2">Per week</p>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-6 sm:mb-8">
+                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-emerald-200 transition-all">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Working Days</p>
+                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{workingDaysCount}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Per week</p>
                     </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <CalendarDays className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
+                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                      <CalendarDays className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-blue-200 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Total Time Slots</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-800">
+                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-blue-200 transition-all">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Time Slots</p>
+                      <p className="text-xl sm:text-3xl font-bold text-slate-800">
                         {settings ? Object.values(settings.weeklySchedule).reduce((acc, day) => acc + (day.isWorking ? day.timeSlots.length : 0), 0) : 0}
                       </p>
-                      <p className="text-xs text-slate-400 mt-2">Across all days</p>
+                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">All days</p>
                     </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-red-200 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Active Blocks</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-800">{activeBlocksCount}</p>
-                      <p className="text-xs text-slate-400 mt-2">Dates blocked</p>
-                    </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-red-100 to-red-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <CalendarOff className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-purple-200 transition-all">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Partial Blocks</p>
-                      <p className="text-2xl sm:text-3xl font-bold text-slate-800">{partialBlocksCount}</p>
-                      <p className="text-xs text-slate-400 mt-2">Specific slots</p>
+                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-red-200 transition-all">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Active Blocks</p>
+                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{activeBlocksCount}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Blocked</p>
                     </div>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <Clock3 className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-red-100 to-red-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                      <CalendarOff className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-purple-200 transition-all">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Partial Blocks</p>
+                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{partialBlocksCount}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Slots</p>
+                    </div>
+                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                      <Clock3 className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
                     </div>
                   </div>
                 </div>
@@ -413,27 +440,27 @@ const BookingManagement = () => {
               <div className="flex gap-2 mb-6">
                 <button
                   onClick={() => setActiveTab('schedule')}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
                     activeTab === 'schedule'
                       ? 'bg-[#DFB13B] text-white shadow-lg shadow-[#DFB13B]/20'
                       : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
                   }`}
                 >
-                  <Settings2 className="w-4 h-4" />
-                  Weekly Schedule
+                  <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Weekly</span> Schedule
                 </button>
                 <button
                   onClick={() => setActiveTab('blocked')}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
                     activeTab === 'blocked'
                       ? 'bg-red-500 text-white shadow-lg shadow-red-500/20'
                       : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
                   }`}
                 >
-                  <CalendarOff className="w-4 h-4" />
-                  Blocked Dates
+                  <CalendarOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden xs:inline">Blocked</span> Dates
                   {activeBlocksCount > 0 && (
-                    <span className={`px-1.5 py-0.5 rounded-full text-xs ${
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs ${
                       activeTab === 'blocked' ? 'bg-white/20' : 'bg-red-100 text-red-600'
                     }`}>
                       {activeBlocksCount}
@@ -444,33 +471,102 @@ const BookingManagement = () => {
 
               {/* Tab Content */}
               {activeTab === 'schedule' ? (
-                /* Weekly Schedule Tab */
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                <div className="space-y-6">
+                  {/* Advance Booking Settings */}
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 to-orange-50">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Advance Booking Settings</h3>
+                          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Configure how far in advance users can book</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+                        <div className="flex-1">
+                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Minimum Advance Booking (Hours)
+                          </label>
+                          <p className="text-xs text-slate-500 mb-3">
+                            Users must book at least this many hours before the appointment time.
+                            <span className="font-medium"> E.g., 48 hours means users can only book appointments that are at least 2 days away.</span>
+                          </p>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="number"
+                              min="0"
+                              max="720"
+                              value={minAdvanceHours}
+                              onChange={(e) => setMinAdvanceHours(Math.max(0, parseInt(e.target.value) || 0))}
+                              className="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                            />
+                            <span className="text-slate-600 font-medium">hours</span>
+                            <span className="text-slate-400 text-sm">
+                              ({minAdvanceHours >= 24 ? `${Math.floor(minAdvanceHours / 24)} day${Math.floor(minAdvanceHours / 24) !== 1 ? 's' : ''}${minAdvanceHours % 24 > 0 ? ` ${minAdvanceHours % 24}h` : ''}` : `${minAdvanceHours}h`})
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleSaveAdvanceBooking}
+                          disabled={savingAdvance || minAdvanceHours === settings?.minAdvanceBooking}
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {savingAdvance ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="w-4 h-4" />
+                              Save Setting
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {minAdvanceHours > 0 && (
+                        <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                          <p className="text-sm text-amber-800">
+                            <span className="font-semibold">Current setting:</span> Users can only book appointments that are at least <span className="font-bold">{minAdvanceHours} hours</span> ({minAdvanceHours >= 24 ? `${Math.floor(minAdvanceHours / 24)} day${Math.floor(minAdvanceHours / 24) !== 1 ? 's' : ''}` : `${minAdvanceHours} hours`}) from now.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Weekly Schedule Tab */}
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-slate-50/50">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-slate-700">Weekly Working Schedule</h3>
-                        <p className="text-sm text-slate-500 mt-0.5">Configure time slots for each day of the week</p>
+                        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Weekly Working Schedule</h3>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Configure time slots for each day</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="divide-y divide-slate-100">
-                    {DAYS.map(({ key, label }) => {
+                    {DAYS.map(({ key, label, short }) => {
                       const daySchedule = settings?.weeklySchedule[key]
                       const isEditing = editingDay === key
 
                       return (
-                        <div key={key} className={`px-4 sm:px-6 py-4 ${!daySchedule?.isWorking ? 'bg-slate-50/50' : ''}`}>
+                        <div key={key} className={`px-3 sm:px-6 py-3 sm:py-4 ${!daySchedule?.isWorking ? 'bg-slate-50/50' : ''}`}>
                           {isEditing ? (
                             /* Editing Mode */
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <span className="font-semibold text-slate-800">{label}</span>
+                            <div className="space-y-3 sm:space-y-4">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                  <span className="font-semibold text-slate-800 text-sm sm:text-base">{label}</span>
                                   <button
                                     onClick={() => setEditingDayWorking(!editingDayWorking)}
-                                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                    className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[10px] sm:text-xs font-medium transition-all ${
                                       editingDayWorking
                                         ? 'bg-emerald-100 text-emerald-700'
                                         : 'bg-slate-200 text-slate-600'
@@ -478,13 +574,13 @@ const BookingManagement = () => {
                                   >
                                     {editingDayWorking ? (
                                       <>
-                                        <ToggleRight className="w-4 h-4" />
-                                        Working Day
+                                        <ToggleRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        <span className="hidden xs:inline">Working</span>
                                       </>
                                     ) : (
                                       <>
-                                        <ToggleLeft className="w-4 h-4" />
-                                        Day Off
+                                        <ToggleLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        <span className="hidden xs:inline">Day Off</span>
                                       </>
                                     )}
                                   </button>
@@ -492,16 +588,16 @@ const BookingManagement = () => {
                                 <div className="flex items-center gap-2">
                                   <button
                                     onClick={() => setEditingDay(null)}
-                                    className="px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
+                                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg text-xs sm:text-sm font-medium transition-colors"
                                   >
                                     Cancel
                                   </button>
                                   <button
                                     onClick={handleSaveDaySchedule}
                                     disabled={saving}
-                                    className="flex items-center gap-2 px-3 py-1.5 bg-[#DFB13B] text-white rounded-lg text-sm font-medium hover:bg-[#C9A032] transition-colors disabled:opacity-50"
+                                    className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#DFB13B] text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-[#C9A032] transition-colors disabled:opacity-50"
                                   >
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    {saving ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
                                     Save
                                   </button>
                                 </div>
@@ -510,22 +606,22 @@ const BookingManagement = () => {
                               {editingDayWorking && (
                                 <>
                                   {/* Current time slots */}
-                                  <div className="flex flex-wrap gap-2">
+                                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                     {editingDaySlots.length === 0 ? (
-                                      <p className="text-sm text-amber-600">No time slots. Add at least one.</p>
+                                      <p className="text-xs sm:text-sm text-amber-600">No time slots. Add at least one.</p>
                                     ) : (
                                       editingDaySlots.map((slot) => (
                                         <span
                                           key={slot}
-                                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium"
+                                          className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-xs sm:text-sm font-medium"
                                         >
-                                          <Clock className="w-3.5 h-3.5" />
+                                          <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                           {slot}
                                           <button
                                             onClick={() => handleRemoveSlotFromDay(slot)}
-                                            className="ml-1 hover:text-red-500 transition-colors"
+                                            className="ml-0.5 sm:ml-1 hover:text-red-500 transition-colors"
                                           >
-                                            <X className="w-3.5 h-3.5" />
+                                            <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                                           </button>
                                         </span>
                                       ))
@@ -538,16 +634,16 @@ const BookingManagement = () => {
                                       type="text"
                                       value={newSlot}
                                       onChange={(e) => setNewSlot(e.target.value)}
-                                      placeholder="e.g., 10:00 or 2:30"
-                                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]"
+                                      placeholder="e.g., 10:00"
+                                      className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]"
                                       onKeyDown={(e) => e.key === 'Enter' && handleAddSlotToDay()}
                                     />
                                     <button
                                       onClick={handleAddSlotToDay}
                                       disabled={!newSlot}
-                                      className="px-3 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
+                                      className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors disabled:opacity-50"
                                     >
-                                      <Plus className="w-4 h-4" />
+                                      <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                     </button>
                                   </div>
                                 </>
@@ -555,50 +651,51 @@ const BookingManagement = () => {
                             </div>
                           ) : (
                             /* Display Mode */
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-start gap-4">
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-semibold ${
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-start gap-2 sm:gap-4 min-w-0 flex-1">
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center font-semibold text-sm sm:text-base shrink-0 ${
                                   daySchedule?.isWorking
                                     ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white'
                                     : 'bg-slate-200 text-slate-500'
                                 }`}>
-                                  {label.slice(0, 2)}
+                                  <span className="sm:hidden">{short}</span>
+                                  <span className="hidden sm:inline">{label.slice(0, 2)}</span>
                                 </div>
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <h4 className="font-semibold text-slate-800">{label}</h4>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                    <h4 className="font-semibold text-slate-800 text-sm sm:text-base">{label}</h4>
                                     {daySchedule?.isWorking ? (
-                                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                                      <span className="px-1.5 sm:px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] sm:text-xs font-medium">
                                         Working
                                       </span>
                                     ) : (
-                                      <span className="px-2 py-0.5 bg-slate-200 text-slate-600 rounded-full text-xs font-medium">
-                                        Day Off
+                                      <span className="px-1.5 sm:px-2 py-0.5 bg-slate-200 text-slate-600 rounded-full text-[10px] sm:text-xs font-medium">
+                                        Off
                                       </span>
                                     )}
                                   </div>
                                   {daySchedule?.isWorking && daySchedule.timeSlots.length > 0 ? (
-                                    <div className="flex flex-wrap gap-1.5 mt-2">
+                                    <div className="flex flex-wrap gap-1 sm:gap-1.5 mt-1.5 sm:mt-2">
                                       {daySchedule.timeSlots.map((slot) => (
                                         <span
                                           key={slot}
-                                          className="px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-medium"
+                                          className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-slate-100 text-slate-600 rounded text-[10px] sm:text-xs font-medium"
                                         >
                                           {slot}
                                         </span>
                                       ))}
                                     </div>
                                   ) : daySchedule?.isWorking ? (
-                                    <p className="text-sm text-amber-600 mt-1">No time slots configured</p>
+                                    <p className="text-[10px] sm:text-sm text-amber-600 mt-1">No slots</p>
                                   ) : null}
                                 </div>
                               </div>
                               <button
                                 onClick={() => handleEditDay(key)}
-                                className="flex items-center gap-2 px-3 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
+                                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-xs sm:text-sm font-medium transition-colors shrink-0"
                               >
-                                <Edit3 className="w-4 h-4" />
-                                Edit
+                                <Edit3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                <span className="hidden xs:inline">Edit</span>
                               </button>
                             </div>
                           )}
@@ -607,17 +704,18 @@ const BookingManagement = () => {
                     })}
                   </div>
                 </div>
+                </div>
               ) : (
                 /* Blocked Dates Tab */
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-slate-50/50">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-slate-700">Blocked Dates</h3>
-                        <p className="text-sm text-slate-500 mt-0.5">Dates when bookings are not allowed</p>
+                        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Blocked Dates</h3>
+                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Dates when bookings not allowed</p>
                       </div>
-                      <span className="text-sm text-slate-500">
-                        {blockedDates.length} date{blockedDates.length !== 1 ? 's' : ''} blocked
+                      <span className="text-xs sm:text-sm text-slate-500">
+                        {blockedDates.length} blocked
                       </span>
                     </div>
                   </div>

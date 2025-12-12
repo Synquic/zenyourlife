@@ -1,12 +1,35 @@
+import { useState, useEffect } from 'react';
 import tp1 from '../../assets/tp1.jpg';
 import tp2 from '../../assets/tp2.jpg';
 import tp3 from '../../assets/tp3.jpg';
 import tp4 from '../../assets/tp4.jpg';
 import frame7 from '../../assets/frame7.png';
 import { useTranslation } from "react-i18next";
+import RBooking from './RBooking';
 
 const RHeroSection = () => {
   const { t } = useTranslation();
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+
+  // Disable background scroll when modal is open
+  useEffect(() => {
+    if (isBookingModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isBookingModalOpen]);
+
+  const handleReserveClick = () => {
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsBookingModalOpen(false);
+  };
   return (
     <div id="hero" className="relative px-4 sm:px-6 lg:px-8 py-6 sm:py-8 mt-4 sm:mt-8">
       {/* Main Hero Container with rounded corners and top notch */}
@@ -65,7 +88,10 @@ const RHeroSection = () => {
               <p className="text-white text-sm sm:text-base md:text-lg lg:text-xl text-center md:text-right max-w-[400px]">
                 {t('rental.hero.description')}
               </p>
-              <button className="group bg-white/30 backdrop-blur-md border-2 border-[#4F82BE] hover:bg-white hover:text-gray-900 text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-medium transition-all shadow-lg flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={handleReserveClick}
+                className="group bg-white/30 backdrop-blur-md border-2 border-[#4F82BE] hover:bg-white hover:text-gray-900 text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 rounded-xl font-medium transition-all shadow-lg flex items-center gap-2 sm:gap-3"
+              >
                 <span className="font-semibold text-sm sm:text-base">{t('rental.hero.reserve_btn')}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +112,37 @@ const RHeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* RBooking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-[1100px] max-h-[95vh] overflow-hidden shadow-2xl relative">
+            {/* Close Button */}
+            <button
+              onClick={handleCloseModal}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white hover:bg-gray-100 rounded-full p-1.5 sm:p-2 transition z-50 shadow-md"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            {/* RBooking Component */}
+            <RBooking onClose={handleCloseModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

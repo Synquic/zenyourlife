@@ -304,7 +304,7 @@ const Testimonials = () => {
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Massage</span> Testimonials
+              <span className="hidden xs:inline">Massage</span> Massage
             </button>
             <button
               onClick={() => setActiveTab('rental')}
@@ -315,7 +315,7 @@ const Testimonials = () => {
               }`}
             >
               <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden xs:inline">Rental</span> Testimonials
+              <span className="hidden xs:inline">Rental</span> Rental
             </button>
           </div>
         </header>
@@ -570,28 +570,28 @@ const Testimonials = () => {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div
-            className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl"
+            className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="relative bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-8 py-6">
+            <div className="relative bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-4 sm:px-8 py-4 sm:py-6">
               <button
                 onClick={() => setShowModal(false)}
-                className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-xl transition"
+                className="absolute top-3 sm:top-4 right-3 sm:right-4 p-1.5 sm:p-2 hover:bg-white/20 rounded-xl transition"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </button>
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
-                  {editingTestimonial ? <Edit2 className="w-7 h-7 text-white" /> : <Plus className="w-7 h-7 text-white" />}
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
+                  {editingTestimonial ? <Edit2 className="w-5 h-5 sm:w-7 sm:h-7 text-white" /> : <Plus className="w-5 h-5 sm:w-7 sm:h-7 text-white" />}
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">
+                <div className="min-w-0">
+                  <h2 className="text-base sm:text-xl font-bold text-white">
                     {editingTestimonial ? 'Edit Testimonial' : 'Add New Testimonial'}
                   </h2>
-                  <p className="text-white/80 text-sm mt-0.5">
+                  <p className="text-white/80 text-xs sm:text-sm mt-0.5 truncate">
                     {activeTab === 'massage' ? 'Massage & Wellness' : 'Rental Properties'} - {editingTestimonial ? 'Update customer feedback' : 'Add a new customer review'}
                   </p>
                 </div>
@@ -599,11 +599,11 @@ const Testimonials = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-8 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <div className="p-4 sm:p-8 space-y-4 sm:space-y-6 overflow-y-auto max-h-[calc(95vh-180px)] sm:max-h-[calc(90vh-200px)]">
               {/* Name & Role Row */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                     Customer Name *
                   </label>
                   <input
@@ -611,11 +611,11 @@ const Testimonials = () => {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="John Doe"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                     Role / Handle
                   </label>
                   <input
@@ -623,41 +623,41 @@ const Testimonials = () => {
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     placeholder="@johndoe"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                   />
                 </div>
               </div>
 
               {/* Testimonial Text */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Testimonial Text *
                 </label>
                 <textarea
                   value={formData.text}
                   onChange={(e) => setFormData({ ...formData, text: e.target.value })}
                   placeholder="What did the customer say about their experience..."
-                  rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none"
+                  rows={3}
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none text-sm sm:text-base"
                 />
               </div>
 
               {/* Rating */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2 sm:mb-3">
                   Rating
                 </label>
-                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl">
-                  <div className="flex items-center gap-1">
+                <div className="flex items-center justify-between gap-2 p-3 sm:p-4 bg-slate-50 rounded-xl">
+                  <div className="flex items-center gap-0.5 sm:gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
                         type="button"
                         onClick={() => setFormData({ ...formData, rating: star })}
-                        className="p-1 hover:scale-125 transition-transform"
+                        className="p-0.5 sm:p-1 hover:scale-125 transition-transform"
                       >
                         <Star
-                          className={`w-8 h-8 transition ${
+                          className={`w-6 h-6 sm:w-8 sm:h-8 transition ${
                             star <= formData.rating
                               ? 'text-amber-400 fill-amber-400'
                               : 'text-slate-300 hover:text-amber-300'
@@ -666,37 +666,37 @@ const Testimonials = () => {
                       </button>
                     ))}
                   </div>
-                  <div className="ml-auto bg-white px-4 py-2 rounded-lg border border-slate-200">
-                    <span className="font-bold text-slate-800">{formData.rating}</span>
-                    <span className="text-slate-400"> / 5</span>
+                  <div className="bg-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-slate-200">
+                    <span className="font-bold text-slate-800 text-sm sm:text-base">{formData.rating}</span>
+                    <span className="text-slate-400 text-sm sm:text-base"> / 5</span>
                   </div>
                 </div>
               </div>
 
               {/* Avatar Selection */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-3">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2 sm:mb-3">
                   Select Avatar
                 </label>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
                   {availablePhotos.map((photo) => (
                     <button
                       key={photo.name}
                       type="button"
                       onClick={() => setFormData({ ...formData, photo: photo.name })}
-                      className={`relative p-4 rounded-2xl transition-all ${
+                      className={`relative p-2 sm:p-4 rounded-xl sm:rounded-2xl transition-all ${
                         formData.photo === photo.name
                           ? 'bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20'
                           : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
                       }`}
                     >
-                      <div className={`w-14 h-14 mx-auto bg-gradient-to-br ${photo.color} rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg`}>
+                      <div className={`w-10 h-10 sm:w-14 sm:h-14 mx-auto bg-gradient-to-br ${photo.color} rounded-lg sm:rounded-xl flex items-center justify-center text-white font-bold text-base sm:text-xl shadow-lg`}>
                         {photo.label.split(' ')[1]}
                       </div>
-                      <p className="text-xs text-slate-500 mt-2 text-center">{photo.label}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500 mt-1.5 sm:mt-2 text-center truncate">{photo.label}</p>
                       {formData.photo === photo.name && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
+                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         </div>
@@ -708,7 +708,7 @@ const Testimonials = () => {
 
               {/* Custom Photo URL */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Custom Photo URL <span className="font-normal text-slate-400">(Optional)</span>
                 </label>
                 <input
@@ -716,29 +716,29 @@ const Testimonials = () => {
                   value={formData.photoUrl}
                   onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })}
                   placeholder="https://example.com/photo.jpg"
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all outline-none"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                 />
-                <p className="text-xs text-slate-400 mt-2">
+                <p className="text-[10px] sm:text-xs text-slate-400 mt-1.5 sm:mt-2">
                   If provided, this URL will override the selected avatar
                 </p>
               </div>
 
               {/* Active Status */}
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
-                <div>
-                  <p className="font-semibold text-slate-700">Visibility</p>
-                  <p className="text-sm text-slate-500">Show this testimonial on the website</p>
+              <div className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 rounded-xl gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-700 text-sm sm:text-base">Visibility</p>
+                  <p className="text-xs sm:text-sm text-slate-500">Show this testimonial on the website</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
-                  className={`relative w-14 h-8 rounded-full transition-colors ${
+                  className={`relative w-12 h-7 sm:w-14 sm:h-8 rounded-full transition-colors flex-shrink-0 ${
                     formData.isActive ? 'bg-[#DFB13B]' : 'bg-slate-300'
                   }`}
                 >
                   <div
-                    className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                      formData.isActive ? 'translate-x-7' : 'translate-x-1'
+                    className={`absolute top-1 w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full shadow transition-transform ${
+                      formData.isActive ? 'translate-x-6 sm:translate-x-7' : 'translate-x-1'
                     }`}
                   />
                 </button>
@@ -746,24 +746,25 @@ const Testimonials = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 px-8 py-5 bg-slate-50 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-5 bg-slate-50 border-t border-slate-100">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-6 py-2.5 text-slate-600 hover:bg-slate-200 rounded-xl transition font-medium"
+                className="px-4 sm:px-6 py-2 sm:py-2.5 text-slate-600 hover:bg-slate-200 rounded-xl transition font-medium text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 font-medium disabled:opacity-50"
+                className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition shadow-lg shadow-[#DFB13B]/30 font-medium disabled:opacity-50 text-sm sm:text-base"
               >
                 {saving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" />
                 ) : (
-                  <Save className="w-4 h-4" />
+                  <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 )}
-                {saving ? 'Saving...' : 'Save Testimonial'}
+                <span className="hidden sm:inline">{saving ? 'Saving...' : 'Save Testimonial'}</span>
+                <span className="sm:hidden">{saving ? 'Saving...' : 'Save'}</span>
               </button>
             </div>
           </div>

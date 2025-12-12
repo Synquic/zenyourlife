@@ -1,4 +1,4 @@
-import { Filter, X, AlertCircle } from "lucide-react";
+import { Filter, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import BookingDate from "./BookingDate";
@@ -23,7 +23,6 @@ const Booking = ({ onClose }: BookingProps) => {
   const { t } = useTranslation();
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedServiceData, setSelectedServiceData] = useState<Service | null>(null);
-  const [showError, setShowError] = useState(false);
   const [showBookingDate, setShowBookingDate] = useState(false);
   const [showApprovedModal, setShowApprovedModal] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
@@ -158,7 +157,23 @@ const Booking = ({ onClose }: BookingProps) => {
                         onClick={() => {
                           setSelectedService(index);
                           setSelectedServiceData(service);
-                          setShowError(false);
+
+                          // Log selected service
+                          console.log('═══════════════════════════════════════════════════════');
+                          console.log('STEP 1: SERVICE SELECTION');
+                          console.log('═══════════════════════════════════════════════════════');
+                          console.log('Selected Service:', {
+                            id: service._id,
+                            title: service.title,
+                            description: service.description,
+                            category: service.category,
+                            duration: `${service.duration} minutes`,
+                            price: `€${service.price}`
+                          });
+                          console.log('═══════════════════════════════════════════════════════\n');
+
+                          // Auto-proceed to next step
+                          setShowBookingDate(true);
                         }}
                         className={`group relative overflow-hidden transition-all duration-500 rounded-xl p-4 cursor-pointer select-none hover:scale-[1.02] hover:shadow-[0_10px_25px_rgba(0,0,0,0.25)] hover:-translate-y-1 ${
                           selectedService === index
@@ -201,46 +216,6 @@ const Booking = ({ onClose }: BookingProps) => {
                     ))}
                   </div>
 
-              {/* Error Message */}
-              {showError && (
-                <div className="mb-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-3 rounded-lg shadow-md flex items-center gap-2 animate-pulse">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <p className="font-medium text-sm">
-                    {t('booking.select_service_error')}
-                  </p>
-                </div>
-              )}
-
-              {/* Next Button */}
-              <div className="flex justify-end">
-                <button
-                  onClick={() => {
-                    if (selectedService === null) {
-                      setShowError(true);
-                      return;
-                    }
-
-                    // Log selected service information
-                    console.log('═══════════════════════════════════════════════════════');
-                    console.log('STEP 1: SERVICE SELECTION');
-                    console.log('═══════════════════════════════════════════════════════');
-                    console.log('Selected Service:', {
-                      id: selectedServiceData?._id,
-                      title: selectedServiceData?.title,
-                      description: selectedServiceData?.description,
-                      category: selectedServiceData?.category,
-                      duration: `${selectedServiceData?.duration} minutes`,
-                      price: `€${selectedServiceData?.price}`
-                    });
-                    console.log('═══════════════════════════════════════════════════════\n');
-
-                    setShowBookingDate(true);
-                  }}
-                  className="bg-[#B8860B] hover:bg-[#9A7209] text-white px-6 py-3 rounded-xl font-medium transition-colors shadow-md text-sm"
-                >
-                  {t('common.next')}
-                </button>
-              </div>
                 </>
               )}
             </>

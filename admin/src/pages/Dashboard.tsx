@@ -41,11 +41,12 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const appointmentsRes = await fetch(`${API_BASE_URL}/appointments`)
-        const appointmentsData = await appointmentsRes.json()
+        // Fetch from enrollments API (massage bookings)
+        const enrollmentsRes = await fetch(`${API_BASE_URL}/enrollments`)
+        const enrollmentsData = await enrollmentsRes.json()
 
-        if (appointmentsData.success) setAppointments(appointmentsData.data)
-        calculateStats(appointmentsData.data || [])
+        if (enrollmentsData.success) setAppointments(enrollmentsData.data)
+        calculateStats(enrollmentsData.data || [])
       } catch (err) {
         setError('Error connecting to server')
         console.error('Error fetching data:', err)
@@ -265,7 +266,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <button
-                          onClick={() => navigate('/appointments')}
+                          onClick={() => navigate('/massage-appointments')}
                           className="flex items-center gap-1 text-[10px] sm:text-xs text-violet-600 hover:text-violet-700 font-medium bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm hover:shadow transition-all"
                         >
                           View All
@@ -365,7 +366,7 @@ const Dashboard = () => {
                     </div>
                     <div className="space-y-2">
                       <button
-                        onClick={() => navigate('/appointments')}
+                        onClick={() => navigate('/massage-appointments')}
                         className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-violet-500/25 transition-all group"
                       >
                         <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-105 transition-transform">
