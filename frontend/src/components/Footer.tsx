@@ -176,7 +176,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        {/* <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex space-x-3 sm:space-x-4 mb-0">
             <a
               href="#"
@@ -206,7 +206,7 @@ const Footer = () => {
           <p className="text-gray-400 text-xs sm:text-sm text-center">
             © 2025 zenyouths.be. {t('footer.rights')}.
           </p>
-        </div>
+        </div> */}
       </div>
     </footer>
 
