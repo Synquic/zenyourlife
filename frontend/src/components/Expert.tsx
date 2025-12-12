@@ -17,15 +17,15 @@ const Expert = () => {
         <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-center">
           <img
             src={Expert1}
-            alt="Nadia Deleux"
+            alt="Nadia Delens"
             className="rounded-xl sm:rounded-lg w-full"
           />
           <div className="text-center md:text-left">
-            <h2 className="text-2xl sm:text-4xl font-serif text-gray-900 mb-4 sm:mb-6">
+            <h2 className="text-2xl sm:text-4xl font-inter text-gray-900 mb-4 sm:mb-6">
               {t('experts.title')}
             </h2>
             <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
-              Nadia Deleux
+              Nadia Delens
             </h3>
             <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
               {t('experts.description')}

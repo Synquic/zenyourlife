@@ -111,7 +111,7 @@ const CookiePolicy = () => {
       <div className="min-h-screen bg-white pt-20">
         {/* Header Section */}
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">
+          <h1 className="text-4xl md:text-5xl font-inter text-gray-900 mb-4">
             {pageData?.pageTitle || 'Cookie Policy - Zenyourlife'}
           </h1>
           <p className="text-sm text-gray-500 mb-8">
@@ -135,7 +135,7 @@ const CookiePolicy = () => {
           {/* Website Disclaimer Section */}
           {pageData?.disclaimer && (
             <div className="mt-12">
-              <h2 className="text-2xl font-serif text-gray-900 mb-6">
+              <h2 className="text-2xl font-inter text-gray-900 mb-6">
                 {pageData.disclaimer.title}
               </h2>
 

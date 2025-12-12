@@ -117,7 +117,7 @@ const Testimonial = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-serif text-gray-900 leading-tight max-w-full sm:max-w-[600px]">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-inter text-gray-900 leading-tight max-w-full sm:max-w-[600px]">
             {t('rental.testimonial.title')}
           </h2>
 

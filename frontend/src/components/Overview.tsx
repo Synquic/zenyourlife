@@ -37,7 +37,7 @@ const Overview = () => {
           — {t('nav.overview')}
         </span>
 
-        <h2 className="text-4xl font-serif text-gray-900 mb-12 text-center relative z-10">
+        <h2 className="text-4xl font-inter text-gray-900 mb-12 text-center relative z-10">
           {t('about.overview_title')}
         </h2>
 

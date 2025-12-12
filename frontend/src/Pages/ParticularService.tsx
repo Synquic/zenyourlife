@@ -211,7 +211,7 @@ const ParticularService = () => {
           <div className="relative z-20 h-full flex items-center">
             <div className="max-w-xl px-8 md:px-12">
               {/* Heading */}
-              <h1 className="text-4xl md:text-5xl font-serif text-[#d4af37] mb-4 leading-tight italic">
+              <h1 className="text-4xl md:text-5xl font-inter text-[#d4af37] mb-4 leading-tight italic">
                 {service.title}
               </h1>
 
@@ -245,7 +245,7 @@ const ParticularService = () => {
                 <Sparkles className="w-4 h-4" />
                 {t('services.about_service')}
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif text-gray-900">
+              <h2 className="text-3xl md:text-4xl font-inter text-gray-900">
                 {t('services.what_we_offer')}
               </h2>
             </div>
@@ -266,7 +266,7 @@ const ParticularService = () => {
 
                   <div className="ml-4">
                     {/* Section Title */}
-                    <h3 className="text-xl md:text-2xl font-serif mb-3 text-gray-900 group-hover:text-[#d4af37] transition-colors">
+                    <h3 className="text-xl md:text-2xl font-inter mb-3 text-gray-900 group-hover:text-[#d4af37] transition-colors">
                       {section.title}
                     </h3>
                     {/* Section Content */}
@@ -294,7 +294,7 @@ const ParticularService = () => {
                 <CheckCircle2 className="w-4 h-4" />
                 {t('services.gallery')}
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-3">
+              <h2 className="text-3xl md:text-4xl font-inter text-gray-900 mb-3">
                 {t('services.gallery')}
               </h2>
               <p className="text-gray-500 max-w-xl mx-auto">
@@ -362,7 +362,7 @@ const ParticularService = () => {
                 <Heart className="w-4 h-4" />
                 {t('services.wellness_benefits')}
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-3">
+              <h2 className="text-3xl md:text-4xl font-inter text-gray-900 mb-3">
                 {t('services.benefits_title')}
               </h2>
               <p className="text-gray-500 max-w-xl mx-auto">
@@ -398,7 +398,7 @@ const ParticularService = () => {
                   </p>
 
                   {/* Number indicator */}
-                  <div className="absolute bottom-4 right-4 text-4xl font-serif text-[#d4af37]/10 group-hover:text-[#d4af37]/20 transition-colors">
+                  <div className="absolute bottom-4 right-4 text-4xl font-inter text-[#d4af37]/10 group-hover:text-[#d4af37]/20 transition-colors">
                     {String(index + 1).padStart(2, '0')}
                   </div>
                 </div>
@@ -418,7 +418,7 @@ const ParticularService = () => {
                 <Users className="w-4 h-4" />
                 {t('services.perfect_for')}
               </span>
-              <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-3">
+              <h2 className="text-3xl md:text-4xl font-inter text-gray-900 mb-3">
                 {t('services.target_title')}
               </h2>
               <p className="text-gray-500 max-w-xl mx-auto">
@@ -484,7 +484,7 @@ const ParticularService = () => {
           </span>
 
           {/* Heading */}
-          <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-8">
+          <h2 className="text-3xl md:text-4xl font-inter text-gray-900 mb-8">
             {t('services.book_experience')}<br />
             {service.title}
           </h2>

@@ -31,7 +31,7 @@ const Overview = () => {
 
         {/* Heading */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl md:text-4xl font-serif text-gray-900 mb-4 leading-tight">
+          <h2 className="text-3xl md:text-4xl font-inter text-gray-900 mb-4 leading-tight">
             {t('rental.overview.title_1')}<br />
             {t('rental.overview.title_2')}
           </h2>

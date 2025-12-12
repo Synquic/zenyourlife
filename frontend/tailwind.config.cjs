@@ -2,9 +2,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
+        sans: ["Inter", "sans-serif"],
         inter: ["Inter", "sans-serif"],
-        lato: ["Lato", "sans-serif"],
-        playfair: ["Playfair Display", "serif"],
       },
     },
   },

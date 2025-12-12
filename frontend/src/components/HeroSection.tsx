@@ -27,7 +27,7 @@ const HeroSection = () => {
               {t('about.title')}
             </span>
 
-            <h1 className="text-5xl md:text-6xl font-serif text-white mb-6 leading-tight drop-shadow-[0_0_20px_white]">
+            <h1 className="text-5xl md:text-6xl font-inter text-white mb-6 leading-tight drop-shadow-[0_0_20px_white]">
               {t('about.hero_title')}
             </h1>
 

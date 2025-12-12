@@ -34,7 +34,7 @@ const Philosophy = () => {
         </div>
 
         {/* Heading */}
-        <h2 className="text-4xl md:text-5xl font-serif text-gray-900 mb-8 relative z-10">
+        <h2 className="text-4xl md:text-5xl font-inter text-gray-900 mb-8 relative z-10">
           {t('about.philosophy_title')}
         </h2>
 

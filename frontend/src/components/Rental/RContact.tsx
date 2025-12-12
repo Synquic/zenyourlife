@@ -131,7 +131,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
             <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-start">
               {/* Left Side - Heading & Social */}
               <div className="text-center md:text-left">
-                <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif text-gray-900 leading-tight mb-4 sm:mb-8">
+                <h1 className="text-2xl sm:text-4xl md:text-5xl font-inter text-gray-900 leading-tight mb-4 sm:mb-8">
                   {t('rental.contact.heading_line1')}
                   <br />
                   {t('rental.contact.heading_line2')}
@@ -292,7 +292,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
               {/* Left Side */}
               <div className="text-center md:text-left">
                 <p className="text-xs sm:text-sm text-gray-500 mb-2">{t('rental.contact.info_title')}</p>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gray-900">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-inter text-gray-900">
                   {t('rental.contact.info_heading_line1')}
                   <br />
                   {t('rental.contact.info_heading_line2')}
@@ -378,7 +378,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
           <div className="grid md:grid-cols-2 gap-6 sm:gap-12 items-start">
             {/* Left Side - Heading & Social */}
             <div className="text-center md:text-left">
-              <h1 className="text-2xl sm:text-4xl md:text-5xl font-serif text-gray-900 leading-tight mb-4 sm:mb-8">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-inter text-gray-900 leading-tight mb-4 sm:mb-8">
                 {t('rental.contact.heading_line1')}
                 <br />
                 {t('rental.contact.heading_line2')}
@@ -539,7 +539,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
             {/* Left Side */}
             <div className="text-center md:text-left">
               <p className="text-xs sm:text-sm text-gray-500 mb-2">{t('rental.contact.info_title')}</p>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gray-900">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-inter text-gray-900">
                 {t('rental.contact.info_heading_line1')}
                 <br />
                 {t('rental.contact.info_heading_line2')}

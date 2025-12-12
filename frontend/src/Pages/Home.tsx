@@ -69,7 +69,7 @@ const Home = () => {
           {/* Content */}
           <div className="relative z-20 h-full flex items-center">
             <div className="max-w-2xl px-4 sm:px-8 md:px-16">
-              <h1 className="text-2xl sm:text-4xl md:text-6xl font-serif text-white mb-3 sm:mb-6 leading-tight drop-shadow-[0_0_20px_white]">
+              <h1 className="text-2xl sm:text-4xl md:text-6xl font-inter text-white mb-3 sm:mb-6 leading-tight drop-shadow-[0_0_20px_white]">
                 {t('home.hero_title')}
               </h1>
 
@@ -347,7 +347,7 @@ const Home = () => {
             {/* Glass Effect Text Card - Bottom Left */}
             <div className="absolute bottom-3 left-3 right-3 sm:bottom-8 sm:left-8 sm:right-auto sm:max-w-md">
               <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-xl">
-                <h2 className="text-lg sm:text-2xl md:text-3xl font-serif text-white mb-2 sm:mb-4 leading-tight">
+                <h2 className="text-lg sm:text-2xl md:text-3xl font-inter text-white mb-2 sm:mb-4 leading-tight">
                   {t('home.discover_commitment')}
                 </h2>
                 <p className="text-white text-xs sm:text-sm leading-relaxed line-clamp-3 sm:line-clamp-none">
@@ -604,7 +604,7 @@ const Home = () => {
                 <img src={lock} alt="Lock" className="w-2 h-2" />
                 {t('nav.faqs')}
               </span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gray-900 mb-4 sm:mb-8 mt-3 sm:mt-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-inter text-gray-900 mb-4 sm:mb-8 mt-3 sm:mt-4">
                 {t('home.faq_title')}
               </h2>
 

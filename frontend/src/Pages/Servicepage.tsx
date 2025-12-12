@@ -166,7 +166,7 @@ const Servicepage = () => {
               </span>
 
               {/* Heading */}
-              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 sm:mb-6 leading-tight drop-shadow-[0_0_20px_white]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-inter text-white mb-4 sm:mb-6 leading-tight drop-shadow-[0_0_20px_white]">
                 {t('services.hero_title_1')}<br />{t('services.hero_title_2')}
               </h1>
 
@@ -227,7 +227,7 @@ const Servicepage = () => {
               {t('nav.services')}
             </span>
 
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-serif text-gray-900 mb-3 sm:mb-4">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-inter text-gray-900 mb-3 sm:mb-4">
               {t('home.exclusive_services')}
             </h2>
 

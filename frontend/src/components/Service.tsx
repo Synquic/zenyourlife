@@ -7,7 +7,7 @@ const Service = () => {
     <section className="py-20 bg-gradient-to-b from-white to-yellow-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="text-yellow-500 text-sm font-semibold block mb-2 text-center">— {t('nav.overview')}</span>
-          <h2 className="text-4xl font-serif text-gray-900 mb-12 text-center">{t('about.what_we_do')}</h2>
+          <h2 className="text-4xl font-inter text-gray-900 mb-12 text-center">{t('about.what_we_do')}</h2>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">

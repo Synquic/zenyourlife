@@ -77,7 +77,7 @@ const RHeroSection = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 w-full items-center">
             {/* Left Side - Text Content */}
             <div className="text-white space-y-4 sm:space-y-6 text-center md:text-left">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-serif leading-tight">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-inter leading-tight">
                 {t('rental.hero.title_1')}<br />
                 <span className="italic font-light">{t('rental.hero.title_2')}</span>
               </h1>
