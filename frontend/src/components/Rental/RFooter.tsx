@@ -282,13 +282,13 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
               <MapPin className="w-4 h-4 inline mr-2" />
               Wellness center city, Villas 3<br />© Web - contact
             </p>
-            <div className="flex space-x-2 mt-4">
+            {/* <div className="flex space-x-2 mt-4">
               <span className="text-gray-400 text-sm">{t('rental.footer.languages')}:</span>
               <button className="text-white hover:text-yellow-400">En</button>
               <button className="text-gray-400 hover:text-white">Fr</button>
               <button className="text-gray-400 hover:text-white">De</button>
               <button className="text-gray-400 hover:text-white">Nl</button>
-            </div>
+            </div> */}
           </div>
         </div>
 

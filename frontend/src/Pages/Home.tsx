@@ -55,32 +55,53 @@ const Home = () => {
       <NavbarHome />
       <section id="herosection" className="px-3 sm:px-6 lg:px-8 py-4 sm:py-8 mt-14 sm:mt-10">
         {/* Card Container */}
-        <div className="relative max-w-7xl mx-auto h-[480px] sm:h-[600px] md:h-[700px] rounded-2xl sm:rounded-3xl overflow-hidden">
+        <div className="relative max-w-7xl mx-auto h-[520px] sm:h-[600px] md:h-[700px] rounded-2xl sm:rounded-3xl overflow-hidden">
           {/* Background Image */}
           <img
             src={frame2}
             alt="Wellness"
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center"
           />
 
-          {/* Black Gradient Overlay from Left */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 via-60% to-black/30 sm:via-black/85 sm:via-40% sm:to-transparent"></div>
+          {/* Black Gradient Overlay - Stronger bottom gradient on mobile for readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 via-40% to-transparent sm:bg-gradient-to-r sm:from-black sm:via-black/85 sm:via-40% sm:to-transparent"></div>
 
-          {/* Content */}
-          <div className="relative z-20 h-full flex items-center">
-            <div className="max-w-2xl px-4 sm:px-8 md:px-16">
+          {/* Content - Bottom aligned on mobile, centered on desktop */}
+          <div className="relative z-20 h-full flex flex-col justify-end sm:justify-center px-5 sm:px-8 md:px-16 pb-8 sm:pb-0">
+            <div className="max-w-2xl">
+              {/* Trusted Partners Badge - Top on mobile */}
+              <div className="flex items-center gap-2 mb-4 sm:hidden">
+                <div className="flex items-center -space-x-1.5">
+                  <div className="w-6 h-6 rounded-full border-2 border-white shadow-md overflow-hidden">
+                    <img src={tp1} alt="Partner 1" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-6 h-6 rounded-full border-2 border-white shadow-md overflow-hidden">
+                    <img src={tp2} alt="Partner 2" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-6 h-6 rounded-full border-2 border-white shadow-md overflow-hidden">
+                    <img src={tp3} alt="Partner 3" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="w-6 h-6 rounded-full border-2 border-white shadow-md overflow-hidden">
+                    <img src={tp4} alt="Partner 4" className="w-full h-full object-cover" />
+                  </div>
+                </div>
+                <span className="text-white/90 text-xs font-medium">
+                  {t('home.trusted_by')} {t('home.partners')}
+                </span>
+              </div>
+
               <h1 className="text-2xl sm:text-4xl md:text-6xl font-inter text-white mb-3 sm:mb-6 leading-tight drop-shadow-[0_0_20px_white]">
                 {t('home.hero_title')}
               </h1>
 
-              <p className="text-white text-sm sm:text-base mb-5 sm:mb-8 leading-relaxed max-w-[500px]">
+              <p className="text-white/90 text-sm sm:text-base mb-5 sm:mb-8 leading-relaxed max-w-[320px] sm:max-w-[500px]">
                 {t('home.hero_description')}
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center">
+              <div className="flex flex-row gap-3 sm:gap-4 items-center">
                 <button
                   onClick={() => setIsBookingModalOpen(true)}
-                  className="bg-white/10 backdrop-blur-md border border-yellow-400 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-white/20 transition flex items-center justify-center gap-2 text-sm sm:text-base w-fit"
+                  className="bg-white/10 backdrop-blur-md border border-yellow-400 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-white/20 transition flex items-center justify-center gap-2 sm:gap-2 text-sm sm:text-base whitespace-nowrap"
                 >
                   {t('services.schedule_now')}
                   <img
@@ -89,44 +110,44 @@ const Home = () => {
                     className="h-5 sm:h-6 w-auto"
                   />
                 </button>
-                <button onClick={()=>navigate('/Servicepage')} className="bg-white/10 backdrop-blur-md border border-yellow-400 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-white/20 transition text-sm sm:text-base w-fit">
+                <button onClick={()=>navigate('/Servicepage')} className="bg-white/10 backdrop-blur-md border border-yellow-400 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-lg hover:bg-white/20 transition text-sm sm:text-base whitespace-nowrap">
                   {t('services.view_all')}
                 </button>
               </div>
             </div>
           </div>
 
-          {/* Trusted Partners Badge - Bottom Right */}
-          <div className="absolute bottom-3 sm:bottom-5 right-3 sm:right-10 z-20">
-            <div className="bg-white/30 backdrop-blur-lg rounded-xl p-2 sm:p-3 shadow-lg border border-white/40 max-w-[180px] sm:max-w-[240px]">
+          {/* Trusted Partners Badge - Bottom Right on desktop only */}
+          <div className="hidden sm:block absolute bottom-5 right-10 z-20">
+            <div className="bg-white/30 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-white/40">
               {/* Overlapping Avatar Circles */}
-              <div className="flex items-center -space-x-1 sm:-space-x-1.5 mb-1 sm:mb-2">
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white shadow-md overflow-hidden">
+              <div className="flex items-center -space-x-1.5 mb-2">
+                <div className="w-8 h-8 rounded-full border border-white shadow-md overflow-hidden">
                   <img src={tp1} alt="Partner 1" className="w-full h-full object-cover" />
                 </div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white shadow-md overflow-hidden">
+                <div className="w-8 h-8 rounded-full border border-white shadow-md overflow-hidden">
                   <img src={tp2} alt="Partner 2" className="w-full h-full object-cover" />
                 </div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white shadow-md overflow-hidden">
+                <div className="w-8 h-8 rounded-full border border-white shadow-md overflow-hidden">
                   <img src={tp3} alt="Partner 3" className="w-full h-full object-cover" />
                 </div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white shadow-md overflow-hidden">
+                <div className="w-8 h-8 rounded-full border border-white shadow-md overflow-hidden">
                   <img src={tp4} alt="Partner 4" className="w-full h-full object-cover" />
                 </div>
-                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white shadow-md overflow-hidden bg-black flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border border-white shadow-md overflow-hidden bg-black flex items-center justify-center">
                   <img src={tp5} alt="Partner 5" className="w-full h-full object-cover" />
                 </div>
               </div>
 
               {/* Text */}
               <div>
-                <h3 className="text-gray-900 font-semibold text-xs sm:text-sm">
+                <h3 className="text-gray-900 font-semibold text-sm">
                   {t('home.trusted_by')}
                 </h3>
-                <h3 className="text-gray-900 font-semibold text-xs sm:text-sm">
+                <h3 className="text-gray-900 font-semibold text-sm">
                   {t('home.partners')}
                 </h3>
-                <p className="text-gray-700 text-[10px] sm:text-xs mt-1 leading-relaxed hidden sm:block">
+                <p className="text-gray-700 text-xs mt-1 leading-relaxed">
                   {t('home.partners_desc')}
                 </p>
               </div>

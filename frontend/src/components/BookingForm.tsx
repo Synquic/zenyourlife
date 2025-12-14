@@ -200,82 +200,79 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
   return (
     <>
       <div className="bg-gray-50 p-0 -mt-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 w-full max-w-6xl mx-auto">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center sm:text-left">
             {t('booking.title')}
           </h1>
 
           <form onSubmit={handleSubmit}>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {/* Left Column - Form Fields */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* First Name */}
                 <div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="firstName"
-                      placeholder={t('booking.first_name')}
-                      value={formData.firstName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
-                    />
-                    <span className="absolute right-3 top-3 text-red-500">
-                      *
-                    </span>
-                  </div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.first_name')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    placeholder={t('booking.first_name')}
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
+                  />
                 </div>
 
                 {/* Last Name */}
                 <div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      name="lastName"
-                      placeholder={t('booking.last_name')}
-                      value={formData.lastName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
-                    />
-                    <span className="absolute right-3 top-3 text-red-500">
-                      *
-                    </span>
-                  </div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.last_name')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder={t('booking.last_name')}
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
+                  />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder={t('booking.email')}
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
-                    />
-                    <span className="absolute right-3 top-3 text-red-500">
-                      *
-                    </span>
-                  </div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.email')} <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder={t('booking.email')}
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
+                  />
                 </div>
 
                 {/* Phone Number with Country Code */}
-                <div className="relative">
-                  <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.phone') || 'Phone Number'} <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
                     <select
                       name="country"
                       value={formData.country}
                       onChange={handleInputChange}
-                      className="px-3 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
+                      className="px-2 sm:px-3 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base w-20 sm:w-24"
                     >
-                      <option value="BE">🇧🇪</option>
-                      <option value="IN">🇮🇳</option>
-                      <option value="US">🇺🇸</option>
-                      <option value="GB">🇬🇧</option>
-                      <option value="FR">🇫🇷</option>
-                      <option value="DE">🇩🇪</option>
-                      <option value="NL">🇳🇱</option>
+                      <option value="BE">BE</option>
+                      <option value="IN">IN</option>
+                      <option value="US">US</option>
+                      <option value="GB">GB</option>
+                      <option value="FR">FR</option>
+                      <option value="DE">DE</option>
+                      <option value="NL">NL</option>
                     </select>
                     <input
                       type="tel"
@@ -283,22 +280,21 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                       placeholder="+32455689"
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
-                      className="col-span-2 px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
+                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
                     />
                   </div>
-                  <span className="absolute right-3 top-3 text-red-500">*</span>
                 </div>
 
                 {/* Gender Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
                     {t('booking.gender')} <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="gender"
                     value={formData.gender}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition appearance-none"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition appearance-none text-sm sm:text-base"
                   >
                     <option value="">{t('booking.select_gender')}</option>
                     <option value="male">{t('booking.male')}</option>
@@ -309,10 +305,10 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
 
                 {/* Reminder */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('booking.reminder') || 'Reminder'}
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.reminder') || 'Reminder Preference'}
                   </label>
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 sm:gap-6">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
@@ -340,27 +336,33 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
               </div>
 
               {/* Right Column - Special Requests and Message */}
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 sm:gap-4">
                 {/* Special Requests */}
                 <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.special_requests')}
+                  </label>
                   <input
                     type="text"
                     name="specialRequests"
                     placeholder={t('booking.special_requests')}
                     value={formData.specialRequests}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
                   />
                 </div>
 
                 {/* Message */}
                 <div className="flex-1">
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
+                    {t('booking.message') || 'Message'}
+                  </label>
                   <textarea
                     name="message"
                     placeholder={t('booking.message_placeholder')}
                     value={formData.message}
                     onChange={handleInputChange}
-                    className="w-full h-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition resize-none min-h-[200px]"
+                    className="w-full h-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition resize-none min-h-[120px] sm:min-h-[200px] text-sm sm:text-base"
                   ></textarea>
                 </div>
               </div>
@@ -368,32 +370,32 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
 
             {/* Error Message */}
             {showError && (
-              <div className="mt-6 bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-4 rounded-lg shadow-md flex items-center gap-3 animate-pulse">
-                <AlertCircle className="w-6 h-6 shrink-0" />
-                <p className="font-medium">
+              <div className="mt-4 sm:mt-6 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-md flex items-center gap-2 sm:gap-3 animate-pulse">
+                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
+                <p className="font-medium text-sm sm:text-base">
                   {t('booking.fill_required')}
                 </p>
               </div>
             )}
 
             {/* Submit Button */}
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-6 sm:mt-8">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="relative bg-white/30 backdrop-blur-lg border-2 border-[#B8860B]/50 text-gray-900 px-6 py-3 rounded-full font-medium hover:bg-white/40 hover:border-[#B8860B] transition-all shadow-[0_8px_32px_0_rgba(184,134,11,0.2)] flex items-center gap-2 overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed"
+                className="relative bg-white/30 backdrop-blur-lg border-2 border-[#B8860B]/50 text-gray-900 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/40 hover:border-[#B8860B] transition-all shadow-[0_8px_32px_0_rgba(184,134,11,0.2)] flex items-center gap-2 overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
               >
                 {/* Glass shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin relative z-10" />
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin relative z-10" />
                     <span className="relative z-10">{t('booking.submitting') || 'Submitting...'}</span>
                   </>
                 ) : (
                   <>
                     <span className="relative z-10">{t('booking.submit_form')}</span>
-                    <img src={MasterPrimaryButton} alt="" className="h-5 w-auto relative z-10" />
+                    <img src={MasterPrimaryButton} alt="" className="h-4 sm:h-5 w-auto relative z-10" />
                   </>
                 )}
               </button>

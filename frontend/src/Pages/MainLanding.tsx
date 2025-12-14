@@ -27,24 +27,24 @@ const MainLanding = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-yellow-50">
       {/* Navbar */}
       <nav className="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 ">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Logo */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <img
                 src={znlogo}
                 alt="ZenYourLife Logo"
-                className="h-8 w-8 object-contain"
+                className="h-6 w-6 sm:h-8 sm:w-8 object-contain"
               />
-              <span className="text-xl font-semibold text-gray-800">
+              <span className="text-sm sm:text-xl font-semibold text-gray-800">
                 zenyourlife.be
               </span>
             </div>
 
             {/* Right Side - Contact Button and Language Dropdown */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Contact Button */}
-              <button className="bg-[#d4af37] text-white px-6 py-2 rounded-full font-medium hover:bg-[#b8921f] transition shadow-md">
+              <button className="bg-[#d4af37] text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-base font-medium hover:bg-[#b8921f] transition shadow-md">
                 {t('nav.contact')}
               </button>
 
@@ -52,7 +52,7 @@ const MainLanding = () => {
               <select
                 value={currentLang}
                 onChange={(e) => changeLanguage(e.target.value)}
-                className="text-gray-700 text-sm font-semibold bg-transparent border border-gray-300 rounded-lg px-2 py-1.5 cursor-pointer hover:border-[#d4af37] transition"
+                className="text-gray-700 text-xs sm:text-sm font-semibold bg-transparent border border-gray-300 rounded-lg px-1.5 sm:px-2 py-1 sm:py-1.5 cursor-pointer hover:border-[#d4af37] transition"
               >
                 <option value="EN">EN</option>
                 <option value="NL">NL</option>

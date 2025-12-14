@@ -37,6 +37,9 @@ const Navbar = () => {
   const [isFacialOpen, setIsFacialOpen] = React.useState(false);
   const [isMassageOpen, setIsMassageOpen] = React.useState(false);
   const [services, setServices] = React.useState<Service[]>([]);
+  // Mobile accordion states
+  const [isMobileMassageOpen, setIsMobileMassageOpen] = React.useState(false);
+  const [isMobileFacialOpen, setIsMobileFacialOpen] = React.useState(false);
   const langDropdownRef = React.useRef<HTMLDivElement>(null);
   const facialDropdownRef = React.useRef<HTMLDivElement>(null);
   const massageDropdownRef = React.useRef<HTMLDivElement>(null);
@@ -298,43 +301,59 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg max-h-[80vh] overflow-y-auto">
-          <div className="px-4 py-4 space-y-3">
-            {/* Massage Section */}
-            <div className="border-b border-gray-100 pb-3">
-              <p className="text-xs text-gray-500 mb-2 font-medium">{t('nav.massage')}</p>
-              <div className="space-y-1">
-                {massageServices.map((service) => (
-                  <button
-                    key={service._id}
-                    onClick={() => {
-                      handleServiceClick(service.title);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left text-gray-700 hover:text-[#B8860B] py-1.5 text-sm"
-                  >
-                    {service.title}
-                  </button>
-                ))}
-              </div>
+          <div className="px-4 py-4 space-y-1">
+            {/* Massage Section - Accordion */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setIsMobileMassageOpen(!isMobileMassageOpen)}
+                className="w-full flex items-center justify-between py-3 text-gray-900 font-medium"
+              >
+                <span>{t('nav.massage')}</span>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isMobileMassageOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isMobileMassageOpen && (
+                <div className="pb-3 pl-4 space-y-1">
+                  {massageServices.map((service) => (
+                    <button
+                      key={service._id}
+                      onClick={() => {
+                        handleServiceClick(service.title);
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-gray-600 hover:text-[#B8860B] py-2 text-sm"
+                    >
+                      {service.title}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Facial Care Section */}
-            <div className="border-b border-gray-100 pb-3">
-              <p className="text-xs text-gray-500 mb-2 font-medium">{t('nav.facial_care')}</p>
-              <div className="space-y-1">
-                {facialServices.map((service) => (
-                  <button
-                    key={service._id}
-                    onClick={() => {
-                      handleServiceClick(service.title);
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left text-gray-700 hover:text-[#B8860B] py-1.5 text-sm"
-                  >
-                    {service.title}
-                  </button>
-                ))}
-              </div>
+            {/* Facial Care Section - Accordion */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setIsMobileFacialOpen(!isMobileFacialOpen)}
+                className="w-full flex items-center justify-between py-3 text-gray-900 font-medium"
+              >
+                <span>{t('nav.facial_care')}</span>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isMobileFacialOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isMobileFacialOpen && (
+                <div className="pb-3 pl-4 space-y-1">
+                  {facialServices.map((service) => (
+                    <button
+                      key={service._id}
+                      onClick={() => {
+                        handleServiceClick(service.title);
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-gray-600 hover:text-[#B8860B] py-2 text-sm"
+                    >
+                      {service.title}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Other Links */}

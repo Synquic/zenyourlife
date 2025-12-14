@@ -94,11 +94,25 @@ const Footer = () => {
       </section>
 
       {/* Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-12">
-          <div className="col-span-2 sm:col-span-1">
-            <h3 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">zenyourlife.be</h3>
-            <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        {/* About Section - Full width on mobile */}
+        <div className="mb-8 sm:mb-0 sm:hidden">
+          <h3 className="text-xl font-semibold mb-3">zenyourlife.be</h3>
+          <p className="text-gray-400 text-sm leading-relaxed mb-4">
+            This is the little note about products and this little note.
+            This place like website (it's also still place like note) is
+            currently under slight updates.
+          </p>
+          <button className="text-yellow-400 hover:text-yellow-300 text-sm">
+            {t('footer.see_about')} →
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+          {/* About - Hidden on mobile, shown on larger screens */}
+          <div className="hidden sm:block">
+            <h3 className="text-xl font-semibold mb-4">zenyourlife.be</h3>
+            <p className="text-gray-400 text-sm leading-relaxed mb-4">
               This is the little note about products and this little note.
               This place like website (it's also still place like note) is
               currently under slight updates.
@@ -108,70 +122,75 @@ const Footer = () => {
             </button>
           </div>
 
+          {/* Services */}
           <div>
-            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{t('footer.services')}</h4>
-            <ul className="space-y-1.5 sm:space-y-2 text-gray-400 text-xs sm:text-sm">
-              <li><a href="#" className="hover:text-white">{t('nav.massage')}</a></li>
-              <li><a href="#" className="hover:text-white">{t('nav.facial_care')}</a></li>
-              <li><a href="#" className="hover:text-white">{t('nav.pmu')}</a></li>
-              <li><a href="#" className="hover:text-white">Transport</a></li>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.services')}</h4>
+            <ul className="space-y-2.5 text-gray-400 text-sm">
+              <li><a href="#" className="hover:text-white transition-colors">{t('nav.massage')}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t('nav.facial_care')}</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">{t('nav.pmu')}</a></li>
+              
             </ul>
           </div>
 
+          {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{t('contact.title')}</h4>
-            <ul className="space-y-2 sm:space-y-3 text-gray-400 text-xs sm:text-sm">
-              <li className="flex items-start">
-                <Phone className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
+            <h4 className="font-semibold mb-4 text-base">{t('contact.title')}</h4>
+            <ul className="space-y-3 text-gray-400 text-sm">
+              <li className="flex items-center">
+                <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
                 <span>0476 66 71 15</span>
               </li>
-              <li className="flex items-start">
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
-                <a href="mailto:info@zenyourlife.be" className="break-all hover:text-white transition-colors">info@zenyourlife.be</a>
+              <li className="flex items-center">
+                <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                <a href="mailto:info@zenyourlife.be" className="hover:text-white transition-colors">info@zenyourlife.be</a>
               </li>
-              <li className="flex items-start">
-                <span className="text-[10px] sm:text-xs mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0 font-medium">BTW:</span>
+              <li className="flex items-center">
+                <span className="text-xs mr-2 flex-shrink-0 font-medium">BTW:</span>
                 <span>BE0899912649</span>
               </li>
-              <li className="flex items-start">
-                <Shield className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
-                <Link to="/privacy-policy" className="hover:text-white transition-colors">
-                  {t('footer.privacy')}
-                </Link>
-              </li>
-              <li className="flex items-start">
-                <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
-                <Link to="/dpa" className="hover:text-white transition-colors">
-                  DPA
-                </Link>
-              </li>
-              <li className="flex items-start">
-                <Scale className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
-                <Link to="/terms-and-conditions" className="hover:text-white transition-colors">
-                  {t('footer.terms')}
-                </Link>
-              </li>
-              <li className="flex items-start">
-                <Cookie className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 mt-0.5 sm:mt-1 flex-shrink-0" />
-                <Link to="/cookie-policy" className="hover:text-white transition-colors">
-                  {t('footer.cookies')}
-                </Link>
-              </li>
             </ul>
+
+            {/* Legal Links */}
+            <div className="mt-4 pt-4 border-t border-gray-700">
+              <ul className="space-y-2.5 text-gray-400 text-sm">
+                <li className="flex items-center">
+                  <Shield className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <Link to="/privacy-policy" className="hover:text-white transition-colors">
+                    {t('footer.privacy')}
+                  </Link>
+                </li>
+                <li className="flex items-center">
+                  <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <Link to="/dpa" className="hover:text-white transition-colors">
+                    DPA
+                  </Link>
+                </li>
+                <li className="flex items-center">
+                  <Scale className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <Link to="/terms-and-conditions" className="hover:text-white transition-colors">
+                    {t('footer.terms')}
+                  </Link>
+                </li>
+                <li className="flex items-center">
+                  <Cookie className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <Link to="/cookie-policy" className="hover:text-white transition-colors">
+                    {t('footer.cookies')}
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
+          {/* Address */}
           <div>
-            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{t('contact.address')}</h4>
-            <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">
-              <MapPin className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1.5 sm:mr-2" />
-              Schapenbaan 45<br />1731 Relegem
-            </p>
-            <div className="flex flex-wrap gap-1 sm:gap-2 mt-3 sm:mt-4">
-              <span className="text-gray-400 text-xs sm:text-sm">{t('nav.language')}:</span>
-              <button onClick={() => changeLanguage('en')} className="text-white hover:text-yellow-400 text-xs sm:text-sm">En</button>
-              <button onClick={() => changeLanguage('fr')} className="text-gray-400 hover:text-white text-xs sm:text-sm">Fr</button>
-              <button onClick={() => changeLanguage('de')} className="text-gray-400 hover:text-white text-xs sm:text-sm">De</button>
-              <button onClick={() => changeLanguage('nl')} className="text-gray-400 hover:text-white text-xs sm:text-sm">Nl</button>
+            <h4 className="font-semibold mb-4 text-base">{t('contact.address')}</h4>
+            <div className="flex items-start text-gray-400 text-sm">
+              <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+              <div>
+                <p>Schapenbaan 45</p>
+                <p>1731 Relegem</p>
+              </div>
             </div>
           </div>
         </div>

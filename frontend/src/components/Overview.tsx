@@ -9,7 +9,7 @@ const Overview = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 bg-yellow-50 relative overflow-hidden -mt-10">
+    <section id="overview" className="py-20 bg-yellow-50 relative overflow-hidden -mt-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Rainbow Dot Glow Above Heading */}
