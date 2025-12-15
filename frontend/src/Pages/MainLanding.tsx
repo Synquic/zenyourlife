@@ -37,7 +37,7 @@ const MainLanding = () => {
                 className="h-6 w-6 sm:h-8 sm:w-8 object-contain"
               />
               <span className="text-sm sm:text-xl font-semibold text-gray-800">
-                zenyourlife.be
+                ZENYOURLIFE.BE
               </span>
             </div>
 

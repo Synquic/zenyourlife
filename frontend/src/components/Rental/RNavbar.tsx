@@ -48,7 +48,7 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
     className="h-7 w-7 object-contain"
   />
   <span className="text-xl font-semibold text-gray-800">
-    zenyourlife.be
+    ZENYOURLIFE.BE
   </span>
 </Link>
 

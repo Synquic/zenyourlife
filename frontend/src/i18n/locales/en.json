@@ -38,6 +38,7 @@
     "partners": "1000+ Partners",
     "treatments_offered": "Treatments Offered",
     "certified_therapists": "Certified Therapists",
+    "years_experience": "Years of Experience",
     "satisfied_clients": "Satisfied Clients",
     "unique_wellness": "Unique Wellness",
     "exclusive_services": "Exclusive services for ultimate relaxation",
@@ -332,11 +333,16 @@
       "book_now": "Book Now",
       "see_about": "See About",
       "services": "Services",
+      "apartments": "Apartments",
+      "booking": "Booking",
+      "lanzarote_experience": "Lanzarote Experience",
+      "faqs": "FAQs",
       "contact_us": "Contact Us",
       "location": "Location",
       "languages": "Languages",
       "privacy_policy": "Privacy Policy",
-      "all_rights": "All rights reserved"
+      "all_rights": "All rights reserved",
+      "about_description": "Discover your perfect escape in Lanzarote. Our handpicked rental properties offer stunning views, modern amenities, and the authentic island experience you deserve."
     },
     "banner": {
       "contact": "Contact",

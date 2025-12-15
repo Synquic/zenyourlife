@@ -48,13 +48,13 @@ const Navbar = () => {
   const { t, i18n } = useTranslation();
 
   // Get current language code in uppercase
-  const currentLang = i18n.language?.toUpperCase().substring(0, 2) || 'EN';
+  const currentLang = i18n.language?.toUpperCase().substring(0, 2) || "EN";
 
   const languages = [
-    { code: 'EN', lang: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'NL', lang: 'nl', name: 'Nederlands', flag: '🇳🇱' },
-    { code: 'FR', lang: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'DE', lang: 'de', name: 'Deutsch', flag: '🇩🇪' }
+    { code: "EN", lang: "en", name: "English", flag: "🇬🇧" },
+    { code: "NL", lang: "nl", name: "Nederlands", flag: "🇳🇱" },
+    { code: "FR", lang: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "DE", lang: "de", name: "Deutsch", flag: "🇩🇪" },
   ];
 
   // Change language handler
@@ -67,52 +67,63 @@ const Navbar = () => {
   React.useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/services`)
+        const response = await fetch(`${API_BASE_URL}/services`);
         const data = await response.json();
         if (data.success) {
           setServices(data.data);
         }
       } catch (error) {
-        console.error('Error fetching services:', error);
+        console.error("Error fetching services:", error);
       }
     };
     fetchServices();
   }, []);
 
   // Filter services by category dynamically
-  const massageServices = services.filter(s =>
-    s.category?.toLowerCase() === 'massage' ||
-    s.category?.toLowerCase() === 'therapy'
+  const massageServices = services.filter(
+    (s) =>
+      s.category?.toLowerCase() === "massage" ||
+      s.category?.toLowerCase() === "therapy"
   );
 
-  const facialServices = services.filter(s =>
-    s.category?.toLowerCase() === 'facial' ||
-    s.category?.toLowerCase() === 'facial care'
+  const facialServices = services.filter(
+    (s) =>
+      s.category?.toLowerCase() === "facial" ||
+      s.category?.toLowerCase() === "facial care"
   );
 
   // Handle service click - navigate to ParticularService page
   const handleServiceClick = (menuItemName: string) => {
-    console.log('handleServiceClick - menuItemName:', menuItemName);
-    console.log('handleServiceClick - available services:', services.map(s => s.title));
-
-    // Find matching service by title (case-insensitive partial match)
-    const matchedService = services.find(s =>
-      s.title.toLowerCase().includes(menuItemName.toLowerCase()) ||
-      menuItemName.toLowerCase().includes(s.title.toLowerCase())
+    console.log("handleServiceClick - menuItemName:", menuItemName);
+    console.log(
+      "handleServiceClick - available services:",
+      services.map((s) => s.title)
     );
 
-    console.log('handleServiceClick - matchedService:', matchedService);
+    // Find matching service by title (case-insensitive partial match)
+    const matchedService = services.find(
+      (s) =>
+        s.title.toLowerCase().includes(menuItemName.toLowerCase()) ||
+        menuItemName.toLowerCase().includes(s.title.toLowerCase())
+    );
+
+    console.log("handleServiceClick - matchedService:", matchedService);
 
     if (matchedService) {
-      const serviceIndex = services.findIndex(s => s._id === matchedService._id);
-      console.log('Navigating to service with benefits:', matchedService.benefits);
+      const serviceIndex = services.findIndex(
+        (s) => s._id === matchedService._id
+      );
+      console.log(
+        "Navigating to service with benefits:",
+        matchedService.benefits
+      );
       navigate(`/service/${matchedService._id}`, {
-        state: { service: matchedService, imageIndex: serviceIndex % 9 }
+        state: { service: matchedService, imageIndex: serviceIndex % 9 },
       });
     } else {
-      console.log('No match found, redirecting to /services');
+      console.log("No match found, redirecting to /services");
       // If no exact match, go to services page
-      navigate('/services');
+      navigate("/services");
     }
 
     // Close dropdowns
@@ -123,35 +134,43 @@ const Navbar = () => {
   // Close dropdown when clicking outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (langDropdownRef.current && !langDropdownRef.current.contains(event.target as Node)) {
+      if (
+        langDropdownRef.current &&
+        !langDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsLangOpen(false);
       }
-      if (facialDropdownRef.current && !facialDropdownRef.current.contains(event.target as Node)) {
+      if (
+        facialDropdownRef.current &&
+        !facialDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsFacialOpen(false);
       }
-      if (massageDropdownRef.current && !massageDropdownRef.current.contains(event.target as Node)) {
+      if (
+        massageDropdownRef.current &&
+        !massageDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsMassageOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   return (
     <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-<Link to="/" className="flex items-center gap-2">
-  <img
-    src={znlogo}
-    alt="ZenYouth Logo"
-    className="h-7 w-7 object-contain"
-  />
-  <span className="text-xl font-medium text-gray-800">
-    zenyourlife.be
-  </span>
-</Link>
-
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src={znlogo}
+              alt="ZenYouth Logo"
+              className="h-7 w-7 object-contain"
+            />
+            <span className="text-xl font-medium text-gray-800">
+              ZENYOURLIFE.BE
+            </span>
+          </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
             {/* Massage Dropdown */}
@@ -163,8 +182,12 @@ const Navbar = () => {
                 }}
                 className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
               >
-                {t('nav.massage')}
-                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isMassageOpen ? 'rotate-180' : ''}`} />
+                {t("nav.massage")}
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    isMassageOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {/* Simple Dropdown Menu */}
@@ -176,14 +199,18 @@ const Navbar = () => {
                         key={service._id}
                         onClick={() => handleServiceClick(service.title)}
                         className={`block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#FFFBEA] hover:text-[#B8860B] transition-colors ${
-                          index !== massageServices.length - 1 ? 'border-b border-gray-50' : ''
+                          index !== massageServices.length - 1
+                            ? "border-b border-gray-50"
+                            : ""
                         }`}
                       >
                         {service.title}
                       </button>
                     ))
                   ) : (
-                    <div className="px-4 py-3 text-sm text-gray-500">Loading...</div>
+                    <div className="px-4 py-3 text-sm text-gray-500">
+                      Loading...
+                    </div>
                   )}
                 </div>
               )}
@@ -198,8 +225,12 @@ const Navbar = () => {
                 }}
                 className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
               >
-                {t('nav.facial_care')}
-                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isFacialOpen ? 'rotate-180' : ''}`} />
+                {t("nav.facial_care")}
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    isFacialOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {/* Simple Dropdown Menu */}
@@ -211,14 +242,18 @@ const Navbar = () => {
                         key={service._id}
                         onClick={() => handleServiceClick(service.title)}
                         className={`block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#FFFBEA] hover:text-[#B8860B] transition-colors ${
-                          index !== facialServices.length - 1 ? 'border-b border-gray-50' : ''
+                          index !== facialServices.length - 1
+                            ? "border-b border-gray-50"
+                            : ""
                         }`}
                       >
                         {service.title}
                       </button>
                     ))
                   ) : (
-                    <div className="px-4 py-3 text-sm text-gray-500">Loading...</div>
+                    <div className="px-4 py-3 text-sm text-gray-500">
+                      Loading...
+                    </div>
                   )}
                 </div>
               )}
@@ -227,14 +262,14 @@ const Navbar = () => {
               to="/pmu"
               className="text-gray-700 font-medium hover:text-gray-900"
             >
-              {t('nav.pmu')}
+              {t("nav.pmu")}
             </Link>
-           
+
             <a
               href="/contact"
               className="text-gray-700 font-medium hover:text-gray-900"
             >
-              {t('nav.contact')}
+              {t("nav.contact")}
             </a>
 
             {/* Premium Language Dropdown */}
@@ -244,7 +279,11 @@ const Navbar = () => {
                 className="flex items-center gap-2 text-gray-700 font-semibold hover:text-gray-900 transition"
               >
                 <span>{currentLang}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    isLangOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
 
               {/* Dropdown Card */}
@@ -255,13 +294,19 @@ const Navbar = () => {
                       key={lang.code}
                       onClick={() => changeLanguage(lang.lang)}
                       className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-[#FFFBEA] transition-colors ${
-                        currentLang === lang.code ? 'bg-[#FFFBEA] border-l-4 border-[#B8860B]' : ''
+                        currentLang === lang.code
+                          ? "bg-[#FFFBEA] border-l-4 border-[#B8860B]"
+                          : ""
                       }`}
                     >
                       <span className="text-2xl">{lang.flag}</span>
                       <div className="flex flex-col items-start">
-                        <span className="text-sm font-semibold text-gray-900">{lang.code}</span>
-                        <span className="text-xs text-gray-600">{lang.name}</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {lang.code}
+                        </span>
+                        <span className="text-xs text-gray-600">
+                          {lang.name}
+                        </span>
                       </div>
                       {currentLang === lang.code && (
                         <svg
@@ -285,8 +330,11 @@ const Navbar = () => {
             </div>
           </div>
 
-          <button onClick={()=>navigate('/contact')} className="hidden md:block bg-[#d4af37]  text-white px-6 py-2 rounded-full hover:bg-yellow-500 transition">
-            {t('nav.contact')}
+          <button
+            onClick={() => navigate("/contact")}
+            className="hidden md:block bg-[#d4af37]  text-white px-6 py-2 rounded-full hover:bg-yellow-500 transition"
+          >
+            {t("nav.contact")}
           </button>
 
           <button
@@ -308,8 +356,12 @@ const Navbar = () => {
                 onClick={() => setIsMobileMassageOpen(!isMobileMassageOpen)}
                 className="w-full flex items-center justify-between py-3 text-gray-900 font-medium"
               >
-                <span>{t('nav.massage')}</span>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isMobileMassageOpen ? 'rotate-180' : ''}`} />
+                <span>{t("nav.massage")}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                    isMobileMassageOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
               {isMobileMassageOpen && (
                 <div className="pb-3 pl-4 space-y-1">
@@ -335,8 +387,12 @@ const Navbar = () => {
                 onClick={() => setIsMobileFacialOpen(!isMobileFacialOpen)}
                 className="w-full flex items-center justify-between py-3 text-gray-900 font-medium"
               >
-                <span>{t('nav.facial_care')}</span>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isMobileFacialOpen ? 'rotate-180' : ''}`} />
+                <span>{t("nav.facial_care")}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                    isMobileFacialOpen ? "rotate-180" : ""
+                  }`}
+                />
               </button>
               {isMobileFacialOpen && (
                 <div className="pb-3 pl-4 space-y-1">
@@ -362,14 +418,14 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 font-medium hover:text-gray-900 py-2"
             >
-              {t('nav.pmu')}
+              {t("nav.pmu")}
             </Link>
 
             <a
               href="#"
               className="block text-gray-700 font-medium hover:text-gray-900 py-2"
             >
-              {t('nav.transport')}
+              {t("nav.transport")}
             </a>
 
             <Link
@@ -377,12 +433,12 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 font-medium hover:text-gray-900 py-2"
             >
-              {t('nav.contact')}
+              {t("nav.contact")}
             </Link>
 
             {/* Language Selector for Mobile */}
             <div className="py-2 border-t border-gray-100 mt-2">
-              <p className="text-xs text-gray-500 mb-2">{t('nav.language')}</p>
+              <p className="text-xs text-gray-500 mb-2">{t("nav.language")}</p>
               <div className="flex flex-wrap gap-2">
                 {languages.map((lang) => (
                   <button
@@ -393,8 +449,8 @@ const Navbar = () => {
                     }}
                     className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm ${
                       currentLang === lang.code
-                        ? 'bg-[#B8860B] text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? "bg-[#B8860B] text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     <span>{lang.flag}</span>
@@ -407,12 +463,12 @@ const Navbar = () => {
             {/* Contact Button for Mobile */}
             <button
               onClick={() => {
-                navigate('/contact');
+                navigate("/contact");
                 setIsMenuOpen(false);
               }}
               className="w-full bg-[#d4af37] text-white px-6 py-3 rounded-full hover:bg-yellow-500 transition mt-4"
             >
-              {t('nav.contact')}
+              {t("nav.contact")}
             </button>
           </div>
         </div>

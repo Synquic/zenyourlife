@@ -17,7 +17,7 @@ import { ArrowRight } from 'lucide-react'
 import Expert from '../components/Expert'
 import Testimonial from '../components/Testimonial'
 import Footer from '../components/Footer'
-import { API_BASE_URL } from "../config/api";
+import { API_BASE_URL, getImageUrl } from "../config/api";
 
 // Image array for cycling through service images (m1 to m9)
 const serviceImages = [m1, m2, m3, m4, m5, m6, m7, m8, m9]
@@ -123,16 +123,18 @@ const Servicepage = () => {
     fetchData();
   }, [currentLang]);
 
-  // Get image source - prefer imageUrl, fallback to local image
+  // Get image source - prefer imageUrl from server, fallback to local image
   const getServiceImage = (service: Service, index: number) => {
-    if (service.imageUrl) return service.imageUrl;
+    const serverUrl = getImageUrl(service.imageUrl);
+    if (serverUrl) return serverUrl;
     if (service.image && defaultImages[service.image]) return defaultImages[service.image];
     return serviceImages[index % serviceImages.length];
   };
 
   // Get hero background image
   const getHeroImage = () => {
-    if (pageContent?.hero?.backgroundImageUrl) return pageContent.hero.backgroundImageUrl;
+    const serverUrl = getImageUrl(pageContent?.hero?.backgroundImageUrl);
+    if (serverUrl) return serverUrl;
     if (pageContent?.hero?.backgroundImage && defaultImages[pageContent.hero.backgroundImage]) {
       return defaultImages[pageContent.hero.backgroundImage];
     }

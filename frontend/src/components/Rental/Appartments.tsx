@@ -5,7 +5,7 @@ import blueArrow from "../../assets/bluearrow.png";
 import { useTranslation } from "react-i18next";
 import RBooking from './RBooking';
 
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, getImageUrl } from '../../config/api';
 
 // Map image names to imported images
 const imageMap: { [key: string]: string } = {
@@ -46,9 +46,10 @@ interface CardProps {
 }
 
 const Card = ({ property, t, onBookNow }: CardProps) => {
-  // Get image source - prefer imageUrl, fallback to mapped image
+  // Get image source - prefer imageUrl from server, fallback to mapped image
   const getImageSrc = () => {
-    if (property.imageUrl) return property.imageUrl;
+    const serverUrl = getImageUrl(property.imageUrl);
+    if (serverUrl) return serverUrl;
     if (property.image && imageMap[property.image]) return imageMap[property.image];
     return apat1; // Default fallback
   };
@@ -115,15 +116,22 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
 
         {property.amenities && property.amenities.length > 0 && (
           <div className="mt-3 sm:mt-4">
-            <h3 className="font-semibold text-sm sm:text-base">{t('rental.apartments.amenities')}</h3>
-            <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-              {property.amenities.map((amenity, index) => (
-                <span key={index}>
-                  {amenity}
-                  {index < property.amenities.length - 1 && <br />}
+            <h3 className="font-semibold text-sm sm:text-base mb-2">{t('rental.apartments.amenities')}</h3>
+            <div className="flex flex-wrap gap-2">
+              {property.amenities.slice(0, 4).map((amenity, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs"
+                >
+                  ✓ {amenity}
                 </span>
               ))}
-            </p>
+              {property.amenities.length > 4 && (
+                <span className="inline-flex items-center text-blue-600 text-xs font-medium">
+                  +{property.amenities.length - 4} more
+                </span>
+              )}
+            </div>
           </div>
         )}
 
@@ -177,7 +185,7 @@ const Apartment = () => {
     {
       _id: '1',
       name: 'Lanzarote',
-      description: 'Modern oceanfront villa with infinity pool.',
+      description: 'Modern oceanfront villa ',
       price: 350,
       currency: '€',
       priceUnit: 'per night',

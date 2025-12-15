@@ -70,9 +70,10 @@ const propertySchema = new mongoose.Schema({
     title: { type: String, default: 'Cleanliness' },
     description: { type: String, default: 'Professionally cleaned and sanitized before every stay.' }
   },
-  amenities: [{
-    type: String
-  }],
+  amenities: {
+    type: [String],
+    default: []
+  },
   hostName: {
     type: String,
     default: ''

@@ -3,6 +3,21 @@
 
 export const API_BASE_URL = 'https://zenyourlife.synquic.in/api';
 
-// For development, you can override this by setting VITE_API_URL in your .env file
-// Example .env file:
-// VITE_API_URL=http://localhost:5000/api
+// Server base URL (without /api) for serving static files like images
+export const SERVER_BASE_URL = 'https://zenyourlife.synquic.in';
+
+// Helper function to get full image URL from backend paths
+export const getImageUrl = (imagePath: string | undefined): string | null => {
+  if (!imagePath) return null;
+  // If already a full URL, return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // If relative path, prepend server base URL
+  if (imagePath.startsWith('/')) {
+    return `${SERVER_BASE_URL}${imagePath}`;
+  }
+  // For paths without leading slash
+  return `${SERVER_BASE_URL}/${imagePath}`;
+};
+

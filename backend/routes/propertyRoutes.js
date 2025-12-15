@@ -27,7 +27,7 @@ const getTranslatedProperty = (property, lang) => {
       title: translation.cleanliness?.title || propertyObj.cleanliness?.title,
       description: translation.cleanliness?.description || propertyObj.cleanliness?.description
     },
-    amenities: translation.amenities?.length > 0 ? translation.amenities : propertyObj.amenities
+    amenities: translation.amenities?.length > 0 ? translation.amenities : (propertyObj.amenities || [])
   };
 };
 

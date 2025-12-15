@@ -38,6 +38,7 @@
     "partners": "1000+ Partnern",
     "treatments_offered": "Angebotene Behandlungen",
     "certified_therapists": "Zertifizierte Therapeuten",
+    "years_experience": "Jahre Erfahrung",
     "satisfied_clients": "Zufriedene Kunden",
     "unique_wellness": "Einzigartiges Wellness",
     "exclusive_services": "Exklusive Dienstleistungen für ultimative Entspannung",
@@ -332,11 +333,16 @@
       "book_now": "Jetzt Buchen",
       "see_about": "Über Uns Sehen",
       "services": "Dienstleistungen",
+      "apartments": "Wohnungen",
+      "booking": "Buchung",
+      "lanzarote_experience": "Lanzarote Erlebnis",
+      "faqs": "Häufige Fragen",
       "contact_us": "Kontaktieren Sie Uns",
       "location": "Standort",
       "languages": "Sprachen",
       "privacy_policy": "Datenschutzrichtlinie",
-      "all_rights": "Alle Rechte vorbehalten"
+      "all_rights": "Alle Rechte vorbehalten",
+      "about_description": "Entdecken Sie Ihren perfekten Rückzugsort auf Lanzarote. Unsere handverlesenen Mietobjekte bieten atemberaubende Aussichten, moderne Annehmlichkeiten und das authentische Inselerlebnis, das Sie verdienen."
     },
     "banner": {
       "contact": "Kontakt",

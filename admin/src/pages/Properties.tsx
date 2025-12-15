@@ -1111,6 +1111,39 @@ const Properties = () => {
                   </button>
                 </div>
 
+                {/* Quick Add Suggested Amenities */}
+                <div className="space-y-2">
+                  <p className="text-[10px] sm:text-xs text-slate-500">Quick add:</p>
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                    {[
+                      'The entire place is yours',
+                      '100 m² size',
+                      'Private bathroom',
+                      'Balcony',
+                      'Hot tub',
+                      'Ocean view',
+                      'Free WiFi',
+                      'Kitchen',
+                      'Terrace',
+                      'Washing machine',
+                      'Air conditioning',
+                      'Pool',
+                      'Garden',
+                      'BBQ area',
+                      'Parking included'
+                    ].filter(a => !formData.amenities.includes(a)).slice(0, 8).map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, amenities: [...formData.amenities, suggestion] })}
+                        className="px-2 sm:px-2.5 py-1 sm:py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] sm:text-xs hover:border-[#DFB13B] hover:text-[#B8922D] transition-all"
+                      >
+                        + {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {formData.amenities.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {formData.amenities.map((amenity, idx) => (

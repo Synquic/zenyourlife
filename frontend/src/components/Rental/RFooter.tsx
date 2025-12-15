@@ -205,11 +205,9 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-12">
           <div>
-            <h3 className="text-xl font-semibold mb-4">zenyourlife.be</h3>
+            <h3 className="text-xl font-semibold mb-4">ZENYOURLIFE.BE</h3>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 w-62">
-              This is the little note about products and this little note.
-              This place like website (it's also still place like note) is
-              currently under slight updates.
+              {t('rental.footer.about_description')}
             </p>
             <button className="text-yellow-400 hover:text-yellow-300">
               {t('rental.footer.see_about')} →
@@ -219,10 +217,10 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
           <div>
             <h4 className="font-semibold mb-4">{t('rental.footer.services')}</h4>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-white">{t('nav.massage')}</a></li>
-              <li><a href="#" className="hover:text-white">{t('nav.facial_care')}</a></li>
-              <li><a href="#" className="hover:text-white">{t('nav.pmu')}</a></li>
-              <li><a href="#" className="hover:text-white">{t('nav.transport')}</a></li>
+              <li><a href="#apartments" onClick={(e) => { e.preventDefault(); document.getElementById('apartments')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.apartments')}</a></li>
+              <li><button onClick={handleBookNow} className="hover:text-white cursor-pointer">{t('rental.footer.booking')}</button></li>
+              <li><a href="#experience" onClick={(e) => { e.preventDefault(); document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.lanzarote_experience')}</a></li>
+              <li><a href="#faqs" onClick={(e) => { e.preventDefault(); document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.faqs')}</a></li>
             </ul>
           </div>
 
@@ -280,7 +278,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
             <h4 className="font-semibold mb-4">{t('rental.footer.location')}</h4>
             <p className="text-gray-400 text-sm mb-4">
               <MapPin className="w-4 h-4 inline mr-2" />
-              Wellness center city, Villas 3<br />© Web - contact
+              Lanzarote, Spain
             </p>
             {/* <div className="flex space-x-2 mt-4">
               <span className="text-gray-400 text-sm">{t('rental.footer.languages')}:</span>

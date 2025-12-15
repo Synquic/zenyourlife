@@ -38,6 +38,7 @@
     "partners": "1000+ Partenaires",
     "treatments_offered": "Soins Proposés",
     "certified_therapists": "Thérapeutes Certifiés",
+    "years_experience": "Années d'Expérience",
     "satisfied_clients": "Clients Satisfaits",
     "unique_wellness": "Bien-être Unique",
     "exclusive_services": "Services exclusifs pour une relaxation ultime",
@@ -332,11 +333,16 @@
       "book_now": "Réserver",
       "see_about": "Voir À Propos",
       "services": "Services",
+      "apartments": "Appartements",
+      "booking": "Réservation",
+      "lanzarote_experience": "Expérience Lanzarote",
+      "faqs": "FAQ",
       "contact_us": "Contactez-Nous",
       "location": "Emplacement",
       "languages": "Langues",
       "privacy_policy": "Politique de Confidentialité",
-      "all_rights": "Tous droits réservés"
+      "all_rights": "Tous droits réservés",
+      "about_description": "Découvrez votre évasion parfaite à Lanzarote. Nos propriétés de location soigneusement sélectionnées offrent des vues imprenables, des équipements modernes et l'expérience authentique de l'île que vous méritez."
     },
     "banner": {
       "contact": "Contact",

@@ -3,7 +3,7 @@ import { X, SlidersHorizontal, Users, BedDouble, ParkingCircle } from 'lucide-re
 import Apat1 from '../../assets/Apat1.png';
 import Apat2 from '../../assets/Apat2.png';
 import RBookingDate from './RBookingDate';
-import { API_BASE_URL } from "../../config/api";
+import { API_BASE_URL, getImageUrl } from "../../config/api";
 
 // Image mapping for property images
 const imageMap: { [key: string]: string } = {
@@ -36,7 +36,8 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
 
   // Helper function to get image source - prefer imageUrl from backend, fallback to mapped image
   const getImageSrc = (property: Property): string => {
-    if (property.imageUrl) return property.imageUrl;
+    const serverUrl = getImageUrl(property.imageUrl);
+    if (serverUrl) return serverUrl;
     if (property.image && imageMap[property.image]) return imageMap[property.image];
     return Apat1; // Default fallback
   };

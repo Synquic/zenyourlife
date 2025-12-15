@@ -38,6 +38,7 @@
     "partners": "1000+ Partners",
     "treatments_offered": "Behandelingen Aangeboden",
     "certified_therapists": "Gecertificeerde Therapeuten",
+    "years_experience": "Jaar Ervaring",
     "satisfied_clients": "Tevreden Klanten",
     "unique_wellness": "Unieke Wellness",
     "exclusive_services": "Exclusieve diensten voor ultieme ontspanning",
@@ -332,11 +333,16 @@
       "book_now": "Boek Nu",
       "see_about": "Bekijk Over Ons",
       "services": "Diensten",
+      "apartments": "Appartementen",
+      "booking": "Reservering",
+      "lanzarote_experience": "Lanzarote Ervaring",
+      "faqs": "Veelgestelde Vragen",
       "contact_us": "Contacteer Ons",
       "location": "Locatie",
       "languages": "Talen",
       "privacy_policy": "Privacybeleid",
-      "all_rights": "Alle rechten voorbehouden"
+      "all_rights": "Alle rechten voorbehouden",
+      "about_description": "Ontdek uw perfecte ontsnapping op Lanzarote. Onze zorgvuldig geselecteerde huurwoningen bieden prachtig uitzicht, moderne voorzieningen en de authentieke eilandervaring die u verdient."
     },
     "banner": {
       "contact": "Contact",
