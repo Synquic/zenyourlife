@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import apat1 from "../../assets/Apat1.png";
 import apat2 from "../../assets/Apat2.png";
 import blueArrow from "../../assets/bluearrow.png";
@@ -46,6 +47,8 @@ interface CardProps {
 }
 
 const Card = ({ property, t, onBookNow }: CardProps) => {
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
+
   // Get image source - prefer imageUrl from server, fallback to mapped image
   const getImageSrc = () => {
     const serverUrl = getImageUrl(property.imageUrl);
@@ -55,27 +58,27 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
   };
 
   return (
-    <div className="w-full bg-white/60 backdrop-blur-md border border-white/40 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-start">
+    <div className="w-full bg-white/60 backdrop-blur-md border border-white/40 rounded-xl sm:rounded-2xl shadow-lg p-5 sm:p-8 flex flex-col lg:flex-row gap-5 sm:gap-8 items-stretch">
       {/* LEFT — Image */}
-      <div className="w-full md:w-1/3">
+      <div className="w-full lg:w-[280px] flex-shrink-0">
         <img
           src={getImageSrc()}
           alt={property.name}
-          className="w-full h-40 sm:h-48 md:h-56 object-cover rounded-lg sm:rounded-xl"
+          className="w-full h-48 sm:h-52 lg:h-full lg:min-h-[220px] object-cover rounded-lg sm:rounded-xl"
         />
       </div>
 
       {/* MIDDLE — Text & Icons */}
-      <div className="flex flex-col justify-between w-full md:w-1/3">
+      <div className="flex flex-col justify-between flex-1 min-w-0">
         <div>
-          <h2 className="text-lg sm:text-xl font-semibold">{property.name}</h2>
-          <p className="text-gray-600 text-xs sm:text-sm mt-1">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{property.name}</h2>
+          <p className="text-gray-600 text-xs sm:text-sm mt-2 leading-relaxed line-clamp-3">
             {property.description}
           </p>
         </div>
 
         {/* Icons Row */}
-        <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3 text-gray-700 text-sm">
+        <div className="mt-4 sm:mt-5 space-y-2.5 text-gray-700 text-sm">
           <div className="flex items-center gap-2 sm:gap-3">
             <span>👥</span> <span>{property.guests} {t('rental.apartments.guests')}</span>
           </div>
@@ -90,58 +93,72 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
         </div>
 
         {property.hostName && (
-          <p className="text-blue-600 font-medium text-xs sm:text-sm mt-3 sm:mt-4 cursor-pointer">
+          <p className="text-blue-600 font-medium text-xs sm:text-sm mt-4 cursor-pointer">
             {t('rental.apartments.meet_host')} →
           </p>
         )}
       </div>
 
       {/* RIGHT — Price + Rules */}
-      <div className="w-full md:w-1/3 flex flex-col justify-between">
-        <div className="flex items-end gap-2">
-          <h2 className="text-2xl sm:text-3xl font-bold text-blue-600">
-            {property.currency}{property.price}
-          </h2>
-          <span className="text-gray-500 text-xs sm:text-sm">{property.priceUnit}</span>
+      <div className="w-full lg:w-[280px] flex-shrink-0 flex flex-col justify-between lg:pl-4 lg:border-l lg:border-gray-200/50">
+        <div>
+          <div className="flex items-end gap-2">
+            <h2 className="text-2xl sm:text-3xl font-bold text-blue-600">
+              {property.currency}{property.price}
+            </h2>
+            <span className="text-gray-500 text-xs sm:text-sm pb-1">{property.priceUnit}</span>
+          </div>
+
+          {property.cleanliness && property.cleanliness.title && (
+            <div className="mt-4 sm:mt-5">
+              <h3 className="font-semibold text-sm sm:text-base text-gray-900">{property.cleanliness.title}</h3>
+              <p className="text-gray-600 text-xs sm:text-sm mt-1 leading-relaxed">
+                {property.cleanliness.description}
+              </p>
+            </div>
+          )}
+
+          {property.amenities && property.amenities.length > 0 && (
+            <div className="mt-4 sm:mt-5">
+              <h3 className="font-semibold text-sm sm:text-base mb-2 text-gray-900">{t('rental.apartments.amenities')}</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {(showAllAmenities ? property.amenities : property.amenities.slice(0, 4)).map((amenity, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-[11px]"
+                  >
+                    ✓ {amenity}
+                  </span>
+                ))}
+                {property.amenities.length > 4 && (
+                  <button
+                    onClick={() => setShowAllAmenities(!showAllAmenities)}
+                    className="inline-flex items-center text-blue-600 text-[11px] font-medium hover:text-blue-800 cursor-pointer transition-colors"
+                  >
+                    {showAllAmenities ? 'Show less' : `+${property.amenities.length - 4} more`}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {property.cleanliness && property.cleanliness.title && (
-          <div className="mt-3 sm:mt-4">
-            <h3 className="font-semibold text-sm sm:text-base">{property.cleanliness.title}</h3>
-            <p className="text-gray-600 text-xs sm:text-sm">
-              {property.cleanliness.description}
-            </p>
-          </div>
-        )}
-
-        {property.amenities && property.amenities.length > 0 && (
-          <div className="mt-3 sm:mt-4">
-            <h3 className="font-semibold text-sm sm:text-base mb-2">{t('rental.apartments.amenities')}</h3>
-            <div className="flex flex-wrap gap-2">
-              {property.amenities.slice(0, 4).map((amenity, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-full text-xs"
-                >
-                  ✓ {amenity}
-                </span>
-              ))}
-              {property.amenities.length > 4 && (
-                <span className="inline-flex items-center text-blue-600 text-xs font-medium">
-                  +{property.amenities.length - 4} more
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-
-        <button
-          onClick={onBookNow}
-          className="mt-4 sm:mt-6 flex items-center justify-center gap-2 bg-white/30 backdrop-blur-md border-2 border-blue-600 text-blue-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md hover:bg-white/50 transition-all w-fit font-medium text-sm"
-        >
-          {t('rental.apartments.book_now')}
-          <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
-        </button>
+        <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-3">
+          <Link
+            to={`/particular-property/${property._id}`}
+            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl shadow-md hover:bg-blue-700 transition-all font-medium text-sm"
+          >
+            {t('rental.apartments.view_more')}
+            <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5 brightness-0 invert" />
+          </Link>
+          <button
+            onClick={onBookNow}
+            className="flex items-center justify-center gap-2 bg-white/30 backdrop-blur-md border-2 border-blue-600 text-blue-600 px-4 py-2.5 rounded-xl shadow-md hover:bg-white/50 transition-all font-medium text-sm"
+          >
+            {t('rental.apartments.book_now')}
+            <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );

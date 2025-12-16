@@ -24,8 +24,8 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date(today.getFullYear(), today.getMonth(), 1));
-  const checkInTime = '10:30';
-  const checkOutTime = '10:00';
+  const checkInTime = '10:30 AM';
+  const checkOutTime = '10:00 PM';
 
   // Generate week days for quick selection (current week)
   const generateWeekDays = () => {
@@ -154,7 +154,7 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     <div className="bg-white w-full relative">
       {/* Header */}
       <div className="px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Appointment Booking</h2>
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Check Availability</h2>
         {onClose && (
           <button
             onClick={onClose}

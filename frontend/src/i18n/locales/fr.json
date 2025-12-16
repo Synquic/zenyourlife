@@ -194,15 +194,19 @@
     "first_name": "Votre Prénom",
     "last_name": "Votre Nom",
     "email": "Votre Adresse E-mail",
+    "phone": "Numéro de Téléphone",
     "gender": "Genre",
     "select_gender": "Sélectionner le genre",
     "male": "Homme",
     "female": "Femme",
     "other": "Autre",
     "special_requests": "Demandes Spéciales",
+    "message": "Message",
     "message_placeholder": "Demandes spéciales ou notes...",
+    "reminder": "Préférence de Rappel",
     "fill_required": "Veuillez remplir tous les champs obligatoires",
-    "submit_form": "Soumettre le Formulaire"
+    "submit_form": "Soumettre le Formulaire",
+    "submitting": "Envoi en cours..."
   },
   "footer": {
     "description": "Découvrez l'art de la relaxation et du rajeunissement chez Zen Your Life.",
@@ -276,7 +280,7 @@
   "rental": {
     "nav": {
       "overview": "Aperçu",
-      "apartments": "Appartements",
+      "apartments": "Séjours",
       "booking": "Réservation",
       "lanzarote_experience": "Expérience Lanzarote",
       "faqs": "FAQ",
@@ -360,7 +364,55 @@
       "meet_host": "Rencontrer l'Hôte",
       "amenities": "Équipements",
       "book_now": "Réserver",
+      "view_more": "Voir Plus",
       "no_properties": "Aucune propriété disponible pour le moment."
+    },
+    "property_overview": {
+      "label": "Aperçu",
+      "title": "Aperçu",
+      "description1": "Une villa lumineuse et aérée surplombant le littoral, avec terrasse privée, cuisine entièrement équipée et intérieurs minimalistes inspirés du paysage volcanique de Lanzarote. Conçue pour des matins tranquilles, des soirées détendues et des voyageurs qui apprécient le confort paisible.",
+      "description2": "Parfait pour les couples, les télétravailleurs, les petites familles ou toute personne ayant besoin d'une pause loin du bruit.",
+      "highlights": "Points forts",
+      "highlight1": "Terrasse privée avec vue panoramique sur l'océan",
+      "highlight2": "Salon ouvert avec lumière naturelle",
+      "highlight3": "Cuisine entièrement équipée (cafetière incluse — les priorités, n'est-ce pas ?)",
+      "highlight4": "Wi-Fi haut débit pour le travail ou le streaming",
+      "highlight5": "Chambre aérée avec lit queen et linge de qualité",
+      "highlight6": "5 minutes à pied de la plage la plus proche",
+      "highlight7": "Court trajet vers les restaurants, cafés et sites culturels",
+      "highlight8": "Quartier résidentiel calme — zéro chaos touristique",
+      "private_terrace": "Terrasse privée",
+      "private_terrace_desc": "Terrasse privée avec vue panoramique sur l'océan",
+      "airy_bedroom": "Chambre aérée",
+      "airy_bedroom_desc": "Chambre aérée avec lit queen et linge de qualité",
+      "living_room": "Salon ouvert",
+      "living_room_desc": "Salon ouvert avec lumière naturelle",
+      "kitchen": "Cuisine équipée",
+      "kitchen_desc": "Cuisine entièrement équipée (cafetière incluse — les priorités, n'est-ce pas ?)"
+    },
+    "amenities_list": {
+      "wifi": "Wi-Fi haut débit",
+      "washing": "Machine à laver",
+      "parking": "Parking gratuit",
+      "tv": "Smart TV",
+      "linens": "Linge de lit et serviettes frais",
+      "safe": "Quartier sûr",
+      "coffee": "Cafetière",
+      "outdoor": "Coin salon extérieur",
+      "checkin": "Arrivée autonome"
+    },
+    "location": {
+      "label": "Services",
+      "title": "Emplacement",
+      "description": "Située sur la côte est paisible de Lanzarote, la villa vous donne un accès immédiat aux plages, sentiers volcaniques et lieux locaux sans affluence touristique.",
+      "place1": "Playa del Reducto",
+      "place2": "Sites de César Manrique",
+      "place3": "Ville d'Arrecife"
+    },
+    "questions": {
+      "title": "Vous avez encore des questions?",
+      "description": "Vous ne trouvez pas la réponse que vous cherchez? Dites-nous ce dont vous avez besoin – nous vous orienterons sans va-et-vient.",
+      "button": "Contactez-nous"
     },
     "contact": {
       "badge": "Contact",

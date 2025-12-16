@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Search, Plus, Send, CheckCircle, XCircle, Loader2, Calendar, User, Clock, Mail, Phone, MapPin, X, Save, Sparkles, CalendarCheck, MessageSquare, FileText, Menu, Trash2 } from 'lucide-react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Search, Plus, Send, CheckCircle, XCircle, Loader2, Calendar, User, Clock, Mail, Phone, MapPin, X, Save, Sparkles, CalendarCheck, MessageSquare, FileText, Menu, Trash2, Filter, ChevronDown, PanelLeftClose, PanelRightClose, GripVertical } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 interface ServiceOption {
@@ -35,6 +35,8 @@ interface BookingData {
 import { API_BASE_URL } from '../config/api'
 const API_URL = API_BASE_URL
 
+type FilterPeriod = 'all' | 'day' | 'week' | 'month' | 'year'
+
 const countryNames: { [key: string]: string } = {
   'BE': 'Belgium',
   'US': 'United States',
@@ -59,6 +61,22 @@ const MassageBooking = () => {
 
   const [showNewBookingModal, setShowNewBookingModal] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null)
+  const [showCancelConfirm, setShowCancelConfirm] = useState<string | null>(null)
+  const [showMessageModal, setShowMessageModal] = useState(false)
+  const [messageType, setMessageType] = useState<'email' | 'sms'>('email')
+  const [messageContent, setMessageContent] = useState('')
+  const [messageSubject, setMessageSubject] = useState('')
+  const [sendingMessage, setSendingMessage] = useState(false)
+  const [messageStatus, setMessageStatus] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('all')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const filterDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Panel resize and collapse states
+  const [leftPanelWidth, setLeftPanelWidth] = useState(420)
+  const [activePanel, setActivePanel] = useState<'both' | 'left' | 'right'>('both')
+  const [isResizing, setIsResizing] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
   const [services, setServices] = useState<ServiceOption[]>([])
   const [savingBooking, setSavingBooking] = useState(false)
   const [deleting, setDeleting] = useState(false)
@@ -75,6 +93,39 @@ const MassageBooking = () => {
     specialRequests: '',
     message: ''
   })
+
+  const filterOptions: { value: FilterPeriod; label: string }[] = [
+    { value: 'all', label: 'All Time' },
+    { value: 'day', label: 'Last 24 Hours' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last Year' }
+  ]
+
+  // Filter bookings based on selected period
+  const getFilteredByPeriod = (data: BookingData[]) => {
+    const now = new Date()
+    let startDate: Date
+
+    switch (filterPeriod) {
+      case 'day':
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        break
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        break
+      case 'month':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        break
+      case 'year':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+        break
+      default:
+        return data
+    }
+
+    return data.filter(booking => new Date(booking.appointmentDate) >= startDate)
+  }
 
   const fetchBookings = async () => {
     try {
@@ -169,6 +220,59 @@ const MassageBooking = () => {
     setShowNewBookingModal(true)
   }
 
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Handle panel resizing
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    setIsResizing(true)
+  }, [])
+
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isResizing || !containerRef.current) return
+
+    const containerRect = containerRef.current.getBoundingClientRect()
+    const newWidth = e.clientX - containerRect.left
+
+    // Set min and max widths
+    const minLeftWidth = 280  // Minimum left panel width
+    const minRightWidth = 550 // Minimum right panel width to preserve layout
+    const maxLeftWidth = containerRect.width - minRightWidth
+
+    setLeftPanelWidth(Math.min(Math.max(newWidth, minLeftWidth), maxLeftWidth))
+  }, [isResizing])
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false)
+  }, [])
+
+  // Add mouse event listeners for resizing
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+  }, [isResizing, handleMouseMove, handleMouseUp])
+
   useEffect(() => {
     fetchBookings()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,6 +323,54 @@ const MassageBooking = () => {
     }
   }
 
+  const openMessageModal = () => {
+    setMessageType('email')
+    setMessageContent('')
+    setMessageSubject('')
+    setMessageStatus(null)
+    setShowMessageModal(true)
+  }
+
+  const sendMessage = async () => {
+    if (!selectedBooking || !messageContent.trim()) return
+
+    try {
+      setSendingMessage(true)
+      setMessageStatus(null)
+      const response = await fetch(`${API_URL}/messages/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: messageType,
+          to: messageType === 'email' ? selectedBooking.email : selectedBooking.phoneNumber,
+          subject: messageSubject || `Message from Zen Your Life`,
+          message: messageContent,
+          customerName: `${selectedBooking.firstName} ${selectedBooking.lastName}`,
+          country: selectedBooking.country
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setMessageStatus({ type: 'success', text: `${messageType === 'email' ? 'Email' : 'SMS'} sent successfully!` })
+        setMessageContent('')
+        setMessageSubject('')
+        // Auto close after 2 seconds
+        setTimeout(() => {
+          setShowMessageModal(false)
+          setMessageStatus(null)
+        }, 2000)
+      } else {
+        setMessageStatus({ type: 'error', text: data.message || 'Failed to send message' })
+      }
+    } catch {
+      setMessageStatus({ type: 'error', text: 'Failed to send message. Please try again.' })
+    } finally {
+      setSendingMessage(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
@@ -243,7 +395,10 @@ const MassageBooking = () => {
     }
   }
 
-  const filteredBookings = bookings.filter(booking => {
+  // Apply period filter first, then status and search filters
+  const periodFilteredBookings = getFilteredByPeriod(bookings)
+
+  const filteredBookings = periodFilteredBookings.filter(booking => {
     const statusMatch = statusFilter === 'all' || booking.status === statusFilter
     const searchMatch = searchQuery === '' ||
       `${booking.firstName} ${booking.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -253,12 +408,12 @@ const MassageBooking = () => {
     return statusMatch && searchMatch
   })
 
-  // Stats
+  // Stats based on period filtered bookings
   const stats = {
-    total: bookings.length,
-    pending: bookings.filter(b => b.status === 'pending').length,
-    confirmed: bookings.filter(b => b.status === 'confirmed').length,
-    completed: bookings.filter(b => b.status === 'completed').length
+    total: periodFilteredBookings.length,
+    pending: periodFilteredBookings.filter(b => b.status === 'pending').length,
+    confirmed: periodFilteredBookings.filter(b => b.status === 'confirmed').length,
+    completed: periodFilteredBookings.filter(b => b.status === 'completed').length
   }
 
   if (loading) {
@@ -304,7 +459,7 @@ const MassageBooking = () => {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5 relative z-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu button */}
@@ -319,21 +474,77 @@ const MassageBooking = () => {
                 <p className="text-slate-500 text-xs sm:text-sm mt-0.5 hidden sm:block">Manage massage and wellness bookings</p>
               </div>
             </div>
-            <button
-              onClick={openNewBookingModal}
-              className="flex items-center gap-2 bg-[#DFB13B] text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:bg-[#C9A032] transition font-medium shadow-sm shadow-[#DFB13B]/20 text-sm sm:text-base"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">New Appointment</span>
-              <span className="sm:hidden">New</span>
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Filter Dropdown */}
+              <div className="relative" ref={filterDropdownRef}>
+                <button
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center gap-2 px-3 py-2 sm:py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors text-sm font-medium text-slate-700"
+                >
+                  <Filter className="w-4 h-4" />
+                  <span className="hidden sm:inline">{filterOptions.find(opt => opt.value === filterPeriod)?.label}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isFilterOpen && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden w-48 z-[100]">
+                    {filterOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setFilterPeriod(option.value)
+                          setIsFilterOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
+                          filterPeriod === option.value
+                            ? 'bg-[#DFB13B]/10 text-[#DFB13B] font-semibold'
+                            : 'text-slate-700'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={openNewBookingModal}
+                className="flex items-center gap-2 bg-[#DFB13B] text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:bg-[#C9A032] transition font-medium shadow-sm shadow-[#DFB13B]/20 text-sm sm:text-base"
+              >
+                <Plus className="w-4 h-4" />
+                <span className="hidden sm:inline">New Appointment</span>
+                <span className="sm:hidden">New</span>
+              </button>
+            </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden" ref={containerRef}>
           {/* Left Panel */}
-          <div className="w-[420px] border-r border-slate-200 flex flex-col bg-white">
+          <div
+            className={`border-r border-slate-200 flex flex-col bg-white transition-all duration-300 ${
+              activePanel === 'right' ? 'w-0 overflow-hidden' : activePanel === 'left' ? 'flex-1' : ''
+            }`}
+            style={{
+              width: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : `${leftPanelWidth}px`,
+              minWidth: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : '280px'
+            }}
+          >
+            {/* Panel header with toggle */}
+            {activePanel !== 'right' && (
+              <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50">
+                <span className="text-xs font-medium text-slate-500">Appointments List</span>
+                <button
+                  onClick={() => setActivePanel(activePanel === 'left' ? 'both' : 'left')}
+                  className={`p-1.5 rounded-lg transition-colors ${activePanel === 'left' ? 'bg-[#DFB13B] text-white' : 'hover:bg-slate-200 text-slate-500'}`}
+                  title={activePanel === 'left' ? 'Show both panels' : 'Expand to full width'}
+                >
+                  <PanelLeftClose className="w-4 h-4" />
+                </button>
+              </div>
+            )}
             {/* Search & Filter */}
             <div className="p-4 space-y-3 border-b border-slate-100">
               <div className="relative">
@@ -439,8 +650,51 @@ const MassageBooking = () => {
             </div>
           </div>
 
+          {/* Resizer Handle */}
+          {activePanel === 'both' && (
+            <div
+              className="w-1 bg-slate-200 hover:bg-[#DFB13B] cursor-col-resize transition-colors relative group flex-shrink-0"
+              onMouseDown={handleMouseDown}
+            >
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-slate-300 group-hover:bg-[#DFB13B] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <GripVertical className="w-3 h-3 text-white" />
+              </div>
+            </div>
+          )}
+
+          {/* Collapsed Left Panel Button */}
+          {activePanel === 'right' && (
+            <button
+              onClick={() => setActivePanel('both')}
+              className="w-10 bg-white border-r border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+              title="Show appointments list"
+            >
+              <PanelRightClose className="w-4 h-4 text-slate-500" />
+            </button>
+          )}
+
           {/* Right Panel - Details */}
-          <div className="flex-1 overflow-y-auto p-6 bg-slate-50" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div
+            className={`flex-1 flex flex-col bg-slate-50 transition-all duration-300 ${
+              activePanel === 'left' ? 'w-0 overflow-hidden' : ''
+            }`}
+            style={{
+              display: activePanel === 'left' ? 'none' : 'flex'
+            }}
+          >
+            {/* Right panel header with toggle */}
+            <div className="flex items-center justify-between px-6 py-2 border-b border-slate-200 bg-white">
+              <span className="text-xs font-medium text-slate-500">Booking Details</span>
+              <button
+                onClick={() => setActivePanel(activePanel === 'right' ? 'both' : 'right')}
+                className={`p-1.5 rounded-lg transition-colors ${activePanel === 'right' ? 'bg-[#DFB13B] text-white' : 'hover:bg-slate-100 text-slate-500'}`}
+                title={activePanel === 'right' ? 'Show both panels' : 'Expand to full width'}
+              >
+                <PanelRightClose className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {selectedBooking ? (
               <div className="max-w-3xl mx-auto space-y-6">
                 {/* Booking Header Card */}
@@ -514,17 +768,19 @@ const MassageBooking = () => {
                       Mark Complete
                     </button>
                   )}
-                  <button className="flex items-center gap-2 bg-amber-500 text-white px-5 py-2.5 rounded-xl hover:bg-amber-600 transition font-medium shadow-sm">
+                  <button
+                    onClick={openMessageModal}
+                    className="flex items-center gap-2 bg-amber-500 text-white px-5 py-2.5 rounded-xl hover:bg-amber-600 transition font-medium shadow-sm"
+                  >
                     <Send className="w-4 h-4" />
                     Send Message
                   </button>
                   {selectedBooking.status !== 'cancelled' && selectedBooking.status !== 'completed' && (
                     <button
-                      onClick={() => updateBookingStatus(selectedBooking._id, 'cancelled')}
-                      disabled={actionLoading === 'cancelled'}
-                      className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl hover:bg-red-100 transition font-medium border border-red-200 disabled:opacity-50"
+                      onClick={() => setShowCancelConfirm(selectedBooking._id)}
+                      className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl hover:bg-red-100 transition font-medium border border-red-200"
                     >
-                      {actionLoading === 'cancelled' ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+                      <XCircle className="w-4 h-4" />
                       Cancel
                     </button>
                   )}
@@ -679,7 +935,19 @@ const MassageBooking = () => {
                 <p className="text-sm text-slate-400 mt-1">Choose an appointment from the list to view details</p>
               </div>
             )}
+            </div>
           </div>
+
+          {/* Collapsed Right Panel Button */}
+          {activePanel === 'left' && (
+            <button
+              onClick={() => setActivePanel('both')}
+              className="w-10 bg-white border-l border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+              title="Show booking details"
+            >
+              <PanelLeftClose className="w-4 h-4 text-slate-500" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -955,6 +1223,210 @@ const MassageBooking = () => {
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowCancelConfirm(null)}>
+          <div
+            className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <XCircle className="w-8 h-8 text-amber-500" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Cancel Appointment?</h3>
+              <p className="text-slate-500 text-sm mb-6">
+                Are you sure you want to cancel this appointment? The customer will be notified about the cancellation.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowCancelConfirm(null)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition font-medium"
+                >
+                  No, Keep It
+                </button>
+                <button
+                  onClick={async () => {
+                    await updateBookingStatus(showCancelConfirm, 'cancelled')
+                    setShowCancelConfirm(null)
+                  }}
+                  disabled={actionLoading === 'cancelled'}
+                  className="flex-1 px-4 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {actionLoading === 'cancelled' ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Cancelling...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-4 h-4" />
+                      Yes, Cancel
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Message Modal */}
+      {showMessageModal && selectedBooking && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowMessageModal(false)}>
+          <div
+            className="bg-white rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4 text-white">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">Send Message</h2>
+                  <p className="text-white/70 text-sm">Contact {selectedBooking.firstName} {selectedBooking.lastName}</p>
+                </div>
+                <button
+                  onClick={() => setShowMessageModal(false)}
+                  className="p-2 hover:bg-white/10 rounded-lg transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Status Notification */}
+            {messageStatus && (
+              <div className={`px-6 py-3 flex items-center gap-3 ${
+                messageStatus.type === 'success'
+                  ? 'bg-emerald-50 text-emerald-700 border-b border-emerald-100'
+                  : 'bg-red-50 text-red-700 border-b border-red-100'
+              }`}>
+                {messageStatus.type === 'success' ? (
+                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-500" />
+                )}
+                <span className="text-sm font-medium">{messageStatus.text}</span>
+              </div>
+            )}
+
+            {/* Horizontal Layout */}
+            <div className="flex">
+              {/* Left Side - Contact Info & Type Selection */}
+              <div className="w-64 bg-slate-50 p-5 border-r border-slate-200 space-y-4">
+                {/* Customer Contact Info */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Customer Contact</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Mail className="w-4 h-4 text-slate-400" />
+                      <span className="text-slate-600 truncate text-xs">{selectedBooking.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone className="w-4 h-4 text-slate-400" />
+                      <span className="text-slate-600 text-xs">{selectedBooking.phoneNumber}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Message Type Selection */}
+                <div>
+                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Send via</h3>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setMessageType('email')}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        messageType === 'email'
+                          ? 'bg-amber-500 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300'
+                      }`}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Email
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMessageType('sms')}
+                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                        messageType === 'sms'
+                          ? 'bg-amber-500 text-white shadow-sm'
+                          : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300'
+                      }`}
+                    >
+                      <Phone className="w-4 h-4" />
+                      SMS
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side - Message Content */}
+              <div className="flex-1 p-5 space-y-4">
+                {/* Email Subject (only for email) */}
+                {messageType === 'email' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Subject</label>
+                    <input
+                      type="text"
+                      value={messageSubject}
+                      onChange={(e) => setMessageSubject(e.target.value)}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm"
+                      placeholder="Enter email subject..."
+                    />
+                  </div>
+                )}
+
+                {/* Message Content */}
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Message</label>
+                  <textarea
+                    value={messageContent}
+                    onChange={(e) => setMessageContent(e.target.value)}
+                    className={`w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm resize-none ${
+                      messageType === 'email' ? 'h-28' : 'h-36'
+                    }`}
+                    placeholder={messageType === 'email' ? 'Type your email message here...' : 'Type your SMS message here...'}
+                  />
+                  {messageType === 'sms' && (
+                    <p className="text-xs text-slate-400 mt-1">
+                      {messageContent.length}/160 characters
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-1">
+                  <button
+                    onClick={() => setShowMessageModal(false)}
+                    className="px-5 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition font-medium text-sm"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={sendMessage}
+                    disabled={sendingMessage || !messageContent.trim()}
+                    className="flex-1 px-5 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm text-sm"
+                  >
+                    {sendingMessage ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send {messageType === 'email' ? 'Email' : 'SMS'}
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

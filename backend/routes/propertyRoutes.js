@@ -293,7 +293,7 @@ router.post('/', async (req, res) => {
   try {
     const {
       name, description, price, currency, priceUnit,
-      guests, bedrooms, parking, image, imageUrl,
+      guests, bedrooms, parking, image, imageUrl, galleryImages,
       cleanliness, amenities, hostName, displayOrder
     } = req.body;
 
@@ -312,6 +312,7 @@ router.post('/', async (req, res) => {
       parking,
       image,
       imageUrl,
+      galleryImages: galleryImages || [],
       cleanliness,
       amenities,
       hostName,
@@ -339,6 +340,9 @@ router.post('/', async (req, res) => {
 // PUT - Update property - Auto-translates content to FR/DE/NL
 router.put('/:id', async (req, res) => {
   try {
+    // Log received data for debugging
+    console.log('[Property Update] Received galleryImages:', req.body.galleryImages);
+
     // Check if translatable fields are being updated
     const translatableFields = ['name', 'description', 'priceUnit', 'parking', 'cleanliness', 'amenities'];
     const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
@@ -351,6 +355,8 @@ router.put('/:id', async (req, res) => {
       const translations = await autoTranslateProperty(req.body);
       updateData.translations = translations;
     }
+
+    console.log('[Property Update] updateData being saved:', JSON.stringify(updateData, null, 2));
 
     const property = await Property.findByIdAndUpdate(
       req.params.id,
@@ -366,6 +372,7 @@ router.put('/:id', async (req, res) => {
     }
 
     console.log('✅ Property updated:', property.name);
+    console.log('✅ Saved galleryImages:', property.galleryImages);
 
     res.status(200).json({
       success: true,

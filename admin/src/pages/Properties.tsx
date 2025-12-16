@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
-import { API_BASE_URL } from '../config/api'
+import { API_BASE_URL, getImageUrl } from '../config/api'
 
 // Available images for selection with colors
 const availableImages = [
@@ -29,6 +29,7 @@ interface PropertyData {
   parking: string
   image: string
   imageUrl?: string
+  galleryImages?: string[]
   cleanliness: {
     title: string
     description: string
@@ -71,6 +72,7 @@ const Properties = () => {
   const [isDragging, setIsDragging] = useState(false)
   const [imageUrlInput, setImageUrlInput] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const galleryFileInputRef = useRef<HTMLInputElement>(null)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -83,6 +85,7 @@ const Properties = () => {
     parking: '',
     image: 'Apat1.png',
     imageUrl: '',
+    galleryImages: [] as string[],
     cleanliness: {
       title: 'Cleanliness',
       description: ''
@@ -130,6 +133,10 @@ const Properties = () => {
     e.preventDefault()
     setSaving(true)
 
+    // Debug: Log what we're sending
+    console.log('[Admin] Submitting formData:', formData)
+    console.log('[Admin] Gallery Images being sent:', formData.galleryImages)
+
     try {
       const url = editingProperty
         ? `${API_BASE_URL}/properties/${editingProperty._id}`
@@ -142,6 +149,8 @@ const Properties = () => {
       })
 
       const data = await response.json()
+      console.log('[Admin] Response from server:', data)
+      console.log('[Admin] Saved galleryImages:', data.data?.galleryImages)
       if (data.success) {
         fetchProperties()
         closeModal()
@@ -222,6 +231,7 @@ const Properties = () => {
       parking: property.parking,
       image: property.image,
       imageUrl: property.imageUrl || '',
+      galleryImages: property.galleryImages || [],
       cleanliness: property.cleanliness || { title: 'Cleanliness', description: '' },
       amenities: property.amenities || [],
       hostName: property.hostName || '',
@@ -244,6 +254,7 @@ const Properties = () => {
       parking: '',
       image: 'Apat1.png',
       imageUrl: '',
+      galleryImages: [],
       cleanliness: { title: 'Cleanliness', description: '' },
       amenities: [],
       hostName: '',
@@ -332,6 +343,50 @@ const Properties = () => {
   // Remove custom image
   const removeCustomImage = () => {
     setFormData({ ...formData, imageUrl: '' })
+  }
+
+  // Handle gallery image upload
+  const handleGalleryImageUpload = useCallback(async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file')
+      return
+    }
+
+    setUploadingImage(true)
+    const formDataUpload = new FormData()
+    formDataUpload.append('image', file)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: 'POST',
+        body: formDataUpload
+      })
+      const data = await response.json()
+      if (data.success && data.data?.url) {
+        setFormData(prev => ({
+          ...prev,
+          galleryImages: [...prev.galleryImages, data.data.url]
+        }))
+      } else {
+        alert('Failed to upload image: ' + (data.message || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Error uploading gallery image:', error)
+      alert('Failed to upload image')
+    } finally {
+      setUploadingImage(false)
+    }
+  }, [])
+
+  // Remove gallery image
+  const removeGalleryImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      galleryImages: prev.galleryImages.filter((_, i) => i !== index)
+    }))
   }
 
   // Filter and search properties
@@ -601,7 +656,7 @@ const Properties = () => {
                     <div className="relative h-36 sm:h-44 overflow-hidden">
                       {property.imageUrl ? (
                         <img
-                          src={property.imageUrl}
+                          src={getImageUrl(property.imageUrl) || ''}
                           alt={property.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
@@ -701,7 +756,7 @@ const Properties = () => {
                     <div className="relative w-full sm:w-48 md:w-56 h-32 sm:h-40 flex-shrink-0">
                       {property.imageUrl ? (
                         <img
-                          src={property.imageUrl}
+                          src={getImageUrl(property.imageUrl) || ''}
                           alt={property.name}
                           className="w-full h-full object-cover"
                         />
@@ -967,7 +1022,7 @@ const Properties = () => {
                   <div className="relative">
                     <div className="relative h-32 sm:h-40 rounded-xl sm:rounded-2xl overflow-hidden border-2 border-indigo-500">
                       <img
-                        src={formData.imageUrl}
+                        src={getImageUrl(formData.imageUrl) || ''}
                         alt="Custom property image"
                         className="w-full h-full object-cover"
                       />
@@ -1084,6 +1139,71 @@ const Properties = () => {
                     </div>
                   </>
                 )}
+              </div>
+
+              {/* Gallery Images */}
+              <div className="space-y-3 sm:space-y-4 bg-slate-50/50 rounded-xl p-3 sm:p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+                    <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#DFB13B]" />
+                    Gallery Images (Side Images)
+                  </div>
+                  {formData.galleryImages.length > 0 && (
+                    <span className="text-xs bg-[#DFB13B] text-white px-2 py-0.5 rounded-full">
+                      {formData.galleryImages.length} image{formData.galleryImages.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500">Add additional images for the property gallery. These will appear alongside the main image.</p>
+
+                {/* Gallery Images Preview */}
+                {formData.galleryImages.length > 0 && (
+                  <div>
+                    <p className="text-xs text-green-600 font-medium mb-2">Current Gallery Images:</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+                    {formData.galleryImages.map((img, index) => (
+                      <div key={index} className="relative h-24 sm:h-28 rounded-xl overflow-hidden border-2 border-slate-200">
+                        <img
+                          src={getImageUrl(img) || ''}
+                          alt={`Gallery image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <div className="absolute bottom-2 left-2 px-2 py-0.5 bg-slate-800/80 text-white text-[10px] rounded font-medium">
+                          Image {index + 1}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryImage(index)}
+                          className="absolute top-1.5 right-1.5 p-1 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Add Gallery Image Button */}
+                <div
+                  onClick={() => galleryFileInputRef.current?.click()}
+                  className="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center cursor-pointer hover:border-[#DFB13B]/50 hover:bg-slate-50 transition-all"
+                >
+                  <input
+                    ref={galleryFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleGalleryImageUpload(e.target.files)}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-[#FFEEC3]/30 flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-[#DFB13B]" />
+                    </div>
+                    <p className="text-xs font-medium text-slate-600">Add Gallery Image</p>
+                  </div>
+                </div>
               </div>
 
               {/* Amenities */}

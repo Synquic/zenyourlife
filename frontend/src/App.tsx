@@ -18,6 +18,7 @@ import CookiePolicy from "./Pages/CookiePolicy";
 import Contact from "./Pages/Contact";
 import RPrivacy from "./Pages/RentalPages/RPrivacy";
 import RContact from "./components/Rental/RContact";
+import ParticularProperty from "./Pages/RentalPages/ParticularProperty";
 
 const App = () => {
   
@@ -43,6 +44,7 @@ const App = () => {
         <Route path="/rprivacy" element={<RPrivacy />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/rcontact" element={<RContact />} />
+         <Route path="/particular-property/:id" element={<ParticularProperty />} />
       </Routes>
     </>
   );

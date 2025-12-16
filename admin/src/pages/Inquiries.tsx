@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
-import { Search, Mail, Phone, Calendar, User, Clock, MessageSquare, Trash2, Eye, CheckCircle, AlertCircle, Archive, Loader2, X, Menu } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, Mail, Phone, Calendar, User, Clock, MessageSquare, Trash2, Eye, CheckCircle, AlertCircle, Archive, Loader2, X, Menu, Filter, ChevronDown } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
+
+type FilterPeriod = 'all' | 'day' | 'week' | 'month' | 'year'
 
 interface InquiryData {
   _id: string
@@ -28,6 +30,29 @@ const Inquiries = () => {
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('all')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const filterDropdownRef = useRef<HTMLDivElement>(null)
+
+  const filterOptions: { value: FilterPeriod; label: string }[] = [
+    { value: 'all', label: 'All Time' },
+    { value: 'day', label: 'Last 24 Hours' },
+    { value: 'week', label: 'Last Week' },
+    { value: 'month', label: 'Last Month' },
+    { value: 'year', label: 'Last Year' }
+  ]
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   const fetchInquiries = async () => {
     try {
@@ -94,7 +119,31 @@ const Inquiries = () => {
     }
   }
 
-  const filteredInquiries = inquiries.filter(inquiry => {
+  const getFilteredByPeriod = (data: InquiryData[]) => {
+    const now = new Date()
+    let startDate: Date
+
+    switch (filterPeriod) {
+      case 'day':
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        break
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        break
+      case 'month':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        break
+      case 'year':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+        break
+      default:
+        return data
+    }
+
+    return data.filter(inquiry => new Date(inquiry.createdAt) >= startDate)
+  }
+
+  const filteredInquiries = getFilteredByPeriod(inquiries).filter(inquiry => {
     const matchesStatus = statusFilter === 'all' || inquiry.status === statusFilter
     const matchesSearch =
       inquiry.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,6 +226,39 @@ const Inquiries = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 pr-4 py-2 w-64 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]"
                 />
+              </div>
+
+              {/* Time Period Filter */}
+              <div className="relative" ref={filterDropdownRef}>
+                <button
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium text-gray-700"
+                >
+                  <Filter className="w-4 h-4" />
+                  <span className="hidden sm:inline">{filterOptions.find(opt => opt.value === filterPeriod)?.label}</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isFilterOpen && (
+                  <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden w-48 z-[100]">
+                    {filterOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setFilterPeriod(option.value)
+                          setIsFilterOpen(false)
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
+                          filterPeriod === option.value
+                            ? 'bg-[#DFB13B]/10 text-[#DFB13B] font-semibold'
+                            : 'text-gray-700'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

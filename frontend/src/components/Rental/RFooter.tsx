@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import bluearrow from '../../assets/bluearrow.png';
+import znlogo from '../../assets/znlogo.png';
 import RBooking from './RBooking';
 import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from '../../config/api';
@@ -205,7 +206,10 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-12">
           <div>
-            <h3 className="text-xl font-semibold mb-4">ZENYOURLIFE.BE</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <img src={znlogo} alt="ZenYourLife Logo" className="h-7 w-7 object-contain" />
+              <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
+            </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 w-62">
               {t('rental.footer.about_description')}
             </p>

@@ -172,7 +172,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
     <div className="bg-white w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
-        <h2 className="text-lg sm:text-2xl font-normal text-gray-900">Appointment Booking</h2>
+        <h2 className="text-lg sm:text-2xl font-normal text-gray-900">Check Availability</h2>
         {onClose && (
           <button
             onClick={onClose}
@@ -250,13 +250,29 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                   value={formData.countryCode}
                   onChange={handleInputChange}
                   className="px-2 sm:px-3 py-3 sm:py-3.5 bg-gray-50 rounded-lg text-xs sm:text-sm focus:bg-white focus:border-gray-200 focus:outline-none border border-transparent flex items-center gap-2"
-                  style={{ width: '80px' }}
+                  style={{ width: '115px' }}
                 >
                   <option value="+32">🇧🇪 +32</option>
                   <option value="+33">🇫🇷 +33</option>
                   <option value="+49">🇩🇪 +49</option>
                   <option value="+31">🇳🇱 +31</option>
                   <option value="+44">🇬🇧 +44</option>
+                  <option value="+91">🇮🇳 +91</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+34">🇪🇸 +34</option>
+                  <option value="+39">🇮🇹 +39</option>
+                  <option value="+41">🇨🇭 +41</option>
+                  <option value="+43">🇦🇹 +43</option>
+                  <option value="+45">🇩🇰 +45</option>
+                  <option value="+46">🇸🇪 +46</option>
+                  <option value="+47">🇳🇴 +47</option>
+                  <option value="+48">🇵🇱 +48</option>
+                  <option value="+351">🇵🇹 +351</option>
+                  <option value="+352">🇱🇺 +352</option>
+                  <option value="+61">🇦🇺 +61</option>
+                  <option value="+81">🇯🇵 +81</option>
+                  <option value="+86">🇨🇳 +86</option>
+                  <option value="+971">🇦🇪 +971</option>
                 </select>
                 <input
                   type="tel"
@@ -273,10 +289,10 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
               </div>
             </div>
 
-            {/* Account Type */}
+            {/* Gender */}
             <div>
               <label className="block text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2 font-medium">
-                Account Type <span className="text-red-500">*</span>
+                Gender <span className="text-red-500">*</span>
               </label>
               <select
                 name="accountType"

@@ -91,7 +91,8 @@ router.post('/image', upload.single('image'), (req, res) => {
       });
     }
 
-    const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    // Return relative path - frontend will construct full URL based on environment
+    const imageUrl = `/uploads/${req.file.filename}`;
 
     res.status(200).json({
       success: true,
@@ -120,8 +121,9 @@ router.post('/images', upload.array('images', 4), (req, res) => {
       });
     }
 
+    // Return relative paths - frontend will construct full URLs based on environment
     const uploadedImages = req.files.map(file => ({
-      url: `http://localhost:5000/uploads/${file.filename}`,
+      url: `/uploads/${file.filename}`,
       filename: file.filename
     }));
 

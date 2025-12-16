@@ -194,15 +194,19 @@
     "first_name": "Uw Voornaam",
     "last_name": "Uw Achternaam",
     "email": "Uw E-mailadres",
+    "phone": "Telefoonnummer",
     "gender": "Geslacht",
     "select_gender": "Selecteer geslacht",
     "male": "Man",
     "female": "Vrouw",
     "other": "Anders",
     "special_requests": "Speciale Verzoeken",
+    "message": "Bericht",
     "message_placeholder": "Speciale verzoeken of opmerkingen...",
+    "reminder": "Herinnering Voorkeur",
     "fill_required": "Vul alstublieft alle verplichte velden in",
-    "submit_form": "Formulier Versturen"
+    "submit_form": "Formulier Versturen",
+    "submitting": "Verzenden..."
   },
   "footer": {
     "description": "Ervaar de kunst van ontspanning en verjonging bij Zen Your Life.",
@@ -276,7 +280,7 @@
   "rental": {
     "nav": {
       "overview": "Overzicht",
-      "apartments": "Appartementen",
+      "apartments": "Verblijven",
       "booking": "Reserveren",
       "lanzarote_experience": "Lanzarote Ervaring",
       "faqs": "Veelgestelde Vragen",
@@ -360,7 +364,55 @@
       "meet_host": "Ontmoet de Gastheer",
       "amenities": "Voorzieningen",
       "book_now": "Boek Nu",
+      "view_more": "Meer Bekijken",
       "no_properties": "Momenteel geen accommodaties beschikbaar."
+    },
+    "property_overview": {
+      "label": "Overzicht",
+      "title": "Overzicht",
+      "description1": "Een lichte, luchtige villa met uitzicht op de kustlijn, compleet met privéterras, volledig uitgeruste keuken en minimalistische interieurs geïnspireerd door het vulkanische landschap van Lanzarote. Ontworpen voor rustige ochtenden, ontspannen avonden en reizigers die stille comfort waarderen.",
+      "description2": "Perfect voor koppels, thuiswerkers, kleine gezinnen of iedereen die een pauze nodig heeft van de drukte.",
+      "highlights": "Hoogtepunten",
+      "highlight1": "Privéterras met panoramisch zeezicht",
+      "highlight2": "Open woonkamer met natuurlijk licht",
+      "highlight3": "Volledig uitgeruste keuken (koffiezetapparaat inbegrepen — prioriteiten, toch?)",
+      "highlight4": "Snelle Wi-Fi voor werk of streaming",
+      "highlight5": "Luchtige slaapkamer met queensize bed en kwaliteitslinnen",
+      "highlight6": "5 minuten lopen naar het dichtstbijzijnde strand",
+      "highlight7": "Korte rit naar restaurants, cafés en culturele bezienswaardigheden",
+      "highlight8": "Rustige woonwijk — geen resortchaos",
+      "private_terrace": "Privéterras",
+      "private_terrace_desc": "Privéterras met panoramisch zeezicht",
+      "airy_bedroom": "Luchtige slaapkamer",
+      "airy_bedroom_desc": "Luchtige slaapkamer met queensize bed en kwaliteitslinnen",
+      "living_room": "Open woonkamer",
+      "living_room_desc": "Open woonkamer met natuurlijk licht",
+      "kitchen": "Volledig uitgeruste keuken",
+      "kitchen_desc": "Volledig uitgeruste keuken (koffiezetapparaat inbegrepen — prioriteiten, toch?)"
+    },
+    "amenities_list": {
+      "wifi": "Snelle Wi-Fi",
+      "washing": "Wasmachine",
+      "parking": "Gratis parkeren",
+      "tv": "Smart TV",
+      "linens": "Vers beddengoed en handdoeken",
+      "safe": "Veilige buurt",
+      "coffee": "Koffiezetapparaat",
+      "outdoor": "Buitenzitplaats",
+      "checkin": "Zelf inchecken"
+    },
+    "location": {
+      "label": "Diensten",
+      "title": "Locatie",
+      "description": "Gelegen aan de rustige oostkust van Lanzarote, geeft de villa u direct toegang tot stranden, vulkaanpaden en lokale plekken zonder toeristendrukte.",
+      "place1": "Playa del Reducto",
+      "place2": "César Manrique bezienswaardigheden",
+      "place3": "Arrecife stad"
+    },
+    "questions": {
+      "title": "Heeft u nog vragen?",
+      "description": "Vindt u niet het antwoord dat u zoekt? Vertel ons wat u nodig heeft – wij wijzen u de juiste richting zonder heen-en-weer.",
+      "button": "Neem Contact Op"
     },
     "contact": {
       "badge": "Contact",

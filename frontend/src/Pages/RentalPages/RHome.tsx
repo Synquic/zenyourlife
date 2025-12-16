@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import RNavbar from '../../components/Rental/RNavbar'
 import RHeroSection from '../../components/Rental/RHeroSection'
 import Overview from '../../components/Rental/Overview'
@@ -11,7 +12,19 @@ import RFooter from '../../components/Rental/RFooter'
 import RContact from '../../components/Rental/RContact'
 
 const RHome = () => {
+  const location = useLocation();
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
+  // Scroll to section when navigating with hash
+  useEffect(() => {
+    if (location.hash) {
+      const sectionId = location.hash.replace('#', '');
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [location.hash]);
 
   // Disable background scroll when modal is open
   useEffect(() => {

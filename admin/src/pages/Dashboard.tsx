@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Sparkles, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, ArrowRight, AlertCircle, Activity, Zap, BarChart3, Eye, Menu } from 'lucide-react'
+import { Sparkles, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, ArrowRight, AlertCircle, Activity, Zap, BarChart3, Eye, Menu, Filter, ChevronDown } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
+
+type FilterPeriod = 'all' | 'day' | 'week' | 'month' | 'year'
 
 interface Appointment {
   _id: string
@@ -30,12 +32,62 @@ const Dashboard = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('all')
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const filterDropdownRef = useRef<HTMLDivElement>(null)
   const [stats, setStats] = useState<DashboardStats>({
     upcomingBookings: 0,
     pendingBookings: 0,
     totalBookings: 0,
     confirmedRate: 0
   })
+
+  const filterOptions: { value: FilterPeriod; label: string }[] = [
+    { value: 'all', label: 'All Time' },
+    { value: 'day', label: 'Last 24 Hours' },
+    { value: 'week', label: 'Last 7 Days' },
+    { value: 'month', label: 'Last 30 Days' },
+    { value: 'year', label: 'Last Year' }
+  ]
+
+  // Filter appointments based on selected period
+  const getFilteredAppointments = (data: Appointment[]) => {
+    const now = new Date()
+    let startDate: Date
+
+    switch (filterPeriod) {
+      case 'day':
+        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        break
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        break
+      case 'month':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        break
+      case 'year':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000)
+        break
+      default:
+        return data
+    }
+
+    return data.filter(apt => new Date(apt.appointmentDate) >= startDate)
+  }
+
+  const filteredAppointments = getFilteredAppointments(appointments)
+
+  // Close filter dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterDropdownRef.current && !filterDropdownRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +98,6 @@ const Dashboard = () => {
         const enrollmentsData = await enrollmentsRes.json()
 
         if (enrollmentsData.success) setAppointments(enrollmentsData.data)
-        calculateStats(enrollmentsData.data || [])
       } catch (err) {
         setError('Error connecting to server')
         console.error('Error fetching data:', err)
@@ -56,6 +107,12 @@ const Dashboard = () => {
     }
     fetchData()
   }, [])
+
+  // Recalculate stats when filter changes
+  useEffect(() => {
+    calculateStats(filteredAppointments)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterPeriod, appointments])
 
   const calculateStats = (appointmentsData: Appointment[]) => {
     const now = new Date()
@@ -80,7 +137,7 @@ const Dashboard = () => {
     })
   }
 
-  const recentMassageBookings = appointments.slice(0, 6).map(apt => ({
+  const recentMassageBookings = filteredAppointments.slice(0, 6).map(apt => ({
     id: apt._id,
     name: `${apt.firstName} ${apt.lastName}`,
     date: new Date(apt.appointmentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -97,7 +154,7 @@ const Dashboard = () => {
     for (let i = 5; i >= 0; i--) {
       const monthIndex = (currentMonth - i + 12) % 12
       const monthName = months[monthIndex]
-      const massageCount = appointments.filter(apt => new Date(apt.appointmentDate).getMonth() === monthIndex).length
+      const massageCount = filteredAppointments.filter(apt => new Date(apt.appointmentDate).getMonth() === monthIndex).length
       last6Months.push({ month: monthName, massage: massageCount })
     }
     return last6Months
@@ -124,7 +181,7 @@ const Dashboard = () => {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 relative z-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu button */}
@@ -145,6 +202,38 @@ const Dashboard = () => {
               </div>
             </div>
 
+            {/* Filter Dropdown */}
+            <div className="relative" ref={filterDropdownRef}>
+              <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-sm font-medium text-slate-700"
+              >
+                <Filter className="w-4 h-4" />
+                <span className="hidden sm:inline">{filterOptions.find(opt => opt.value === filterPeriod)?.label}</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isFilterOpen && (
+                <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-visible w-48 z-[100]">
+                  {filterOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => {
+                        setFilterPeriod(option.value)
+                        setIsFilterOpen(false)
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
+                        filterPeriod === option.value
+                          ? 'bg-[#DFB13B]/10 text-[#DFB13B] font-semibold'
+                          : 'text-slate-700'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

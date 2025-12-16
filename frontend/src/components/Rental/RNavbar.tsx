@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Menu, X, ChevronDown } from "lucide-react";
 import znlogo from "../../assets/znlogo.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 interface RNavbarProps {
@@ -11,12 +11,28 @@ interface RNavbarProps {
 
 const RNavbar = ({ onContactClick }: RNavbarProps) => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLangOpen, setIsLangOpen] = React.useState(false);
   const langDropdownRef = React.useRef<HTMLDivElement>(null);
 
   // Get current language directly from i18n (syncs with localStorage)
   const currentLang = i18n.language?.toUpperCase().substring(0, 2) || 'EN';
+
+  // Check if we're on the RHome page
+  const isHomePage = location.pathname === '/rhome' || location.pathname === '/rhome/';
+
+  // Handle navigation to sections
+  const handleSectionClick = (sectionId: string) => {
+    if (isHomePage) {
+      // If on home page, scroll to section
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If on another page, navigate to home with hash
+      navigate(`/rhome#${sectionId}`);
+    }
+  };
 
 
   const languages = [
@@ -54,56 +70,36 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
 
 
           <div className="hidden md:flex space-x-8">
-            <a
-              href="#hero"
-               onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            <button
+              onClick={() => handleSectionClick('hero')}
               className="text-gray-700 font-semibold hover:text-gray-900"
             >
               {t('rental.nav.overview')}
-            </a>
-            <a
-              href="#apartments"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('apartments')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            </button>
+            <button
+              onClick={() => handleSectionClick('apartments')}
               className="text-gray-700 font-semibold hover:text-gray-900 cursor-pointer"
             >
               {t('rental.nav.apartments')}
-            </a>
-            <a
-              href="#booking"
-               onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            </button>
+            <button
+              onClick={() => handleSectionClick('booking')}
               className="text-gray-700 font-semibold hover:text-gray-900"
             >
               {t('rental.nav.booking')}
-            </a>
-            <a
-              href="#service"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('service')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            </button>
+            <button
+              onClick={() => handleSectionClick('service')}
               className="text-gray-700 font-semibold hover:text-gray-900"
             >
               {t('rental.nav.lanzarote_experience')}
-            </a>
-            <a
-              href="#faq"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+            </button>
+            <button
+              onClick={() => handleSectionClick('faq')}
               className="text-gray-700 font-semibold hover:text-gray-900"
             >
               {t('rental.nav.faqs')}
-            </a>
+            </button>
 
             {/* Premium Language Dropdown */}
             <div className="relative" ref={langDropdownRef}>
@@ -173,61 +169,51 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg max-h-[80vh] overflow-y-auto">
           <div className="px-4 py-4 space-y-3">
-            <a
-              href="#hero"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('hero')?.scrollIntoView({ behavior: 'smooth' });
+            <button
+              onClick={() => {
+                handleSectionClick('hero');
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('rental.nav.overview')}
-            </a>
-            <a
-              href="#apartments"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('apartments')?.scrollIntoView({ behavior: 'smooth' });
+            </button>
+            <button
+              onClick={() => {
+                handleSectionClick('apartments');
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('rental.nav.apartments')}
-            </a>
-            <a
-              href="#booking"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+            </button>
+            <button
+              onClick={() => {
+                handleSectionClick('booking');
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('rental.nav.booking')}
-            </a>
-            <a
-              href="#service"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('service')?.scrollIntoView({ behavior: 'smooth' });
+            </button>
+            <button
+              onClick={() => {
+                handleSectionClick('service');
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('rental.nav.lanzarote_experience')}
-            </a>
-            <a
-              href="#faq"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
+            </button>
+            <button
+              onClick={() => {
+                handleSectionClick('faq');
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('rental.nav.faqs')}
-            </a>
+            </button>
 
             {/* Language Selector for Mobile */}
             <div className="py-2 border-t border-gray-100 mt-2">

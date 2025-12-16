@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import primaryMaster from '../assets/Master Primary Button (4).png';
 import Booking from './Booking';
+import znlogo from '../assets/znlogo.png';
 
 const Footer = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -111,7 +112,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
           {/* About - Hidden on mobile, shown on larger screens */}
           <div className="hidden sm:block">
-            <h3 className="text-xl font-semibold mb-4">zenyourlife.be</h3>
+                        <div className="flex items-center gap-2 mb-4">
+              <img src={znlogo} alt="ZenYourLife Logo" className="h-7 w-7 object-contain" />
+              <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
+            </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
               This is the little note about products and this little note.
               This place like website (it's also still place like note) is
@@ -126,10 +130,9 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">{t('footer.services')}</h4>
             <ul className="space-y-2.5 text-gray-400 text-sm">
-              <li><a href="#" className="hover:text-white transition-colors">{t('nav.massage')}</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">{t('nav.facial_care')}</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">{t('nav.pmu')}</a></li>
-              
+              <li><Link to="/Servicepage?category=massage" className="hover:text-white transition-colors">{t('nav.massage')}</Link></li>
+              <li><Link to="/Servicepage?category=facial" className="hover:text-white transition-colors">{t('nav.facial_care')}</Link></li>
+              <li><Link to="/pmu" className="hover:text-white transition-colors">{t('nav.pmu')}</Link></li>
             </ul>
           </div>
 

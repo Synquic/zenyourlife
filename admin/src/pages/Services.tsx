@@ -1,527 +1,684 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Search, Bell, Plus, Edit2, Trash2, X, Save, Loader2, Sparkles, Clock, DollarSign, Filter, ChevronDown, Eye, EyeOff, LayoutGrid, List, Heart, Users, FileText, Image, Upload, Menu } from 'lucide-react'
-import Sidebar from '../components/Sidebar'
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Search,
+  Bell,
+  Plus,
+  Edit2,
+  Trash2,
+  X,
+  Save,
+  Loader2,
+  Sparkles,
+  Clock,
+  Euro,
+  Filter,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  LayoutGrid,
+  List,
+  Heart,
+  Users,
+  FileText,
+  Image,
+  Upload,
+  Menu,
+} from "lucide-react";
+import Sidebar from "../components/Sidebar";
 
-import { API_BASE_URL } from '../config/api'
+import { API_BASE_URL } from "../config/api";
 
 // Import massage images
-import m1 from '../assets/m1.png'
-import m2 from '../assets/m2.png'
-import m3 from '../assets/m3.png'
-import m4 from '../assets/m4.png'
-import m5 from '../assets/m5.png'
-import m6 from '../assets/m6.png'
-import m7 from '../assets/m7.png'
-import m8 from '../assets/m8.png'
-import m9 from '../assets/m9.png'
+import m1 from "../assets/m1.png";
+import m2 from "../assets/m2.png";
+import m3 from "../assets/m3.png";
+import m4 from "../assets/m4.png";
+import m5 from "../assets/m5.png";
+import m6 from "../assets/m6.png";
+import m7 from "../assets/m7.png";
+import m8 from "../assets/m8.png";
+import m9 from "../assets/m9.png";
 
 // Image mapping
 const imageMap: { [key: string]: string } = {
-  'm1.png': m1,
-  'm2.png': m2,
-  'm3.png': m3,
-  'm4.png': m4,
-  'm5.png': m5,
-  'm6.png': m6,
-  'm7.png': m7,
-  'm8.png': m8,
-  'm9.png': m9,
-}
+  "m1.png": m1,
+  "m2.png": m2,
+  "m3.png": m3,
+  "m4.png": m4,
+  "m5.png": m5,
+  "m6.png": m6,
+  "m7.png": m7,
+  "m8.png": m8,
+  "m9.png": m9,
+};
 
 // Available images for selection with colors
 const availableImages = [
-  { name: 'm1.png', label: 'Massage 1', color: 'from-rose-400 to-rose-600', src: m1 },
-  { name: 'm2.png', label: 'Massage 2', color: 'from-violet-400 to-violet-600', src: m2 },
-  { name: 'm3.png', label: 'Massage 3', color: 'from-blue-400 to-blue-600', src: m3 },
-  { name: 'm4.png', label: 'Massage 4', color: 'from-cyan-400 to-cyan-600', src: m4 },
-  { name: 'm5.png', label: 'Massage 5', color: 'from-emerald-400 to-emerald-600', src: m5 },
-  { name: 'm6.png', label: 'Massage 6', color: 'from-amber-400 to-amber-600', src: m6 },
-  { name: 'm7.png', label: 'Massage 7', color: 'from-orange-400 to-orange-600', src: m7 },
-  { name: 'm8.png', label: 'Massage 8', color: 'from-pink-400 to-pink-600', src: m8 },
-  { name: 'm9.png', label: 'Massage 9', color: 'from-indigo-400 to-indigo-600', src: m9 },
-]
+  {
+    name: "m1.png",
+    label: "Massage 1",
+    color: "from-rose-400 to-rose-600",
+    src: m1,
+  },
+  {
+    name: "m2.png",
+    label: "Massage 2",
+    color: "from-violet-400 to-violet-600",
+    src: m2,
+  },
+  {
+    name: "m3.png",
+    label: "Massage 3",
+    color: "from-blue-400 to-blue-600",
+    src: m3,
+  },
+  {
+    name: "m4.png",
+    label: "Massage 4",
+    color: "from-cyan-400 to-cyan-600",
+    src: m4,
+  },
+  {
+    name: "m5.png",
+    label: "Massage 5",
+    color: "from-emerald-400 to-emerald-600",
+    src: m5,
+  },
+  {
+    name: "m6.png",
+    label: "Massage 6",
+    color: "from-amber-400 to-amber-600",
+    src: m6,
+  },
+  {
+    name: "m7.png",
+    label: "Massage 7",
+    color: "from-orange-400 to-orange-600",
+    src: m7,
+  },
+  {
+    name: "m8.png",
+    label: "Massage 8",
+    color: "from-pink-400 to-pink-600",
+    src: m8,
+  },
+  {
+    name: "m9.png",
+    label: "Massage 9",
+    color: "from-indigo-400 to-indigo-600",
+    src: m9,
+  },
+];
 
 // Category configurations
 const categories = [
-  { value: 'massage', label: 'Massage', color: 'from-blue-400 to-blue-600', bgLight: 'bg-blue-50', textColor: 'text-blue-600' },
-  { value: 'facial', label: 'Facial', color: 'from-pink-400 to-pink-600', bgLight: 'bg-pink-50', textColor: 'text-pink-600' },
-  { value: 'pmu', label: 'PMU', color: 'from-purple-400 to-purple-600', bgLight: 'bg-purple-50', textColor: 'text-purple-600' },
-  { value: 'therapy', label: 'Therapy', color: 'from-emerald-400 to-emerald-600', bgLight: 'bg-emerald-50', textColor: 'text-emerald-600' },
-]
+  {
+    value: "massage",
+    label: "Massage",
+    color: "from-blue-400 to-blue-600",
+    bgLight: "bg-blue-50",
+    textColor: "text-blue-600",
+  },
+  {
+    value: "facial",
+    label: "Facial",
+    color: "from-pink-400 to-pink-600",
+    bgLight: "bg-pink-50",
+    textColor: "text-pink-600",
+  },
+  {
+    value: "pmu",
+    label: "PMU",
+    color: "from-purple-400 to-purple-600",
+    bgLight: "bg-purple-50",
+    textColor: "text-purple-600",
+  },
+  {
+    value: "therapy",
+    label: "Therapy",
+    color: "from-emerald-400 to-emerald-600",
+    bgLight: "bg-emerald-50",
+    textColor: "text-emerald-600",
+  },
+];
 
 interface ContentSection {
-  title: string
-  description: string
+  title: string;
+  description: string;
 }
 
 interface ServiceBenefit {
-  description: string
+  description: string;
 }
 
 interface ServiceTargetAudience {
-  description: string
+  description: string;
 }
 
 interface ServiceImage {
-  url: string
-  caption: string
+  url: string;
+  caption: string;
 }
 
 interface Service {
-  _id: string
-  title: string
-  description: string
-  category: string
-  duration: number
-  price: number
-  image: string
-  imageUrl?: string
-  isActive: boolean
-  displayOrder: number
-  contentSections?: ContentSection[]
-  benefits?: ServiceBenefit[]
-  targetAudience?: ServiceTargetAudience[]
-  serviceImages?: ServiceImage[]
+  _id: string;
+  title: string;
+  description: string;
+  category: string;
+  duration: number;
+  price: number;
+  image: string;
+  imageUrl?: string;
+  isActive: boolean;
+  displayOrder: number;
+  contentSections?: ContentSection[];
+  benefits?: ServiceBenefit[];
+  targetAudience?: ServiceTargetAudience[];
+  serviceImages?: ServiceImage[];
 }
 
 interface ServiceFormData {
-  title: string
-  description: string
-  category: string
-  duration: number
-  price: number
-  image: string
-  imageUrl: string
-  isActive: boolean
-  contentSections: ContentSection[]
-  benefits: ServiceBenefit[]
-  targetAudience: ServiceTargetAudience[]
-  serviceImages: ServiceImage[]
+  title: string;
+  description: string;
+  category: string;
+  duration: number;
+  price: number;
+  image: string;
+  imageUrl: string;
+  isActive: boolean;
+  contentSections: ContentSection[];
+  benefits: ServiceBenefit[];
+  targetAudience: ServiceTargetAudience[];
+  serviceImages: ServiceImage[];
 }
 
 interface BenefitItem {
-  _id?: string
-  description: string
+  _id?: string;
+  description: string;
 }
 
 interface TargetAudienceItem {
-  _id?: string
-  description: string
+  _id?: string;
+  description: string;
 }
 
 interface ServicePageContent {
-  _id?: string
-  benefits: BenefitItem[]
-  targetAudience: TargetAudienceItem[]
-  benefitsTitle: string
-  targetAudienceTitle: string
+  _id?: string;
+  benefits: BenefitItem[];
+  targetAudience: TargetAudienceItem[];
+  benefitsTitle: string;
+  targetAudienceTitle: string;
 }
 
 const initialFormData: ServiceFormData = {
-  title: '',
-  description: '',
-  category: 'massage',
+  title: "",
+  description: "",
+  category: "massage",
   duration: 60,
   price: 0,
-  image: 'm1.png',
-  imageUrl: '',
+  image: "m1.png",
+  imageUrl: "",
   isActive: true,
   contentSections: [],
   benefits: [],
   targetAudience: [],
-  serviceImages: []
-}
+  serviceImages: [],
+};
 
 const Services = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [services, setServices] = useState<Service[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [showModal, setShowModal] = useState(false)
-  const [editingService, setEditingService] = useState<Service | null>(null)
-  const [formData, setFormData] = useState<ServiceFormData>(initialFormData)
-  const [saving, setSaving] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterCategory, setFilterCategory] = useState<string>('all')
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [formData, setFormData] = useState<ServiceFormData>(initialFormData);
+  const [saving, setSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   // Service Page Content state (Benefits & Target Audience)
-  const [servicePageContent, setServicePageContent] = useState<ServicePageContent>({
-    benefits: [],
-    targetAudience: [],
-    benefitsTitle: "Benefits You'll Feel",
-    targetAudienceTitle: "Who It's For"
-  })
-  const [_loadingContent, _setLoadingContent] = useState(true)
-  const [_savingContent, _setSavingContent] = useState(false)
-  const [newBenefit, setNewBenefit] = useState('')
-  const [newTargetAudience, setNewTargetAudience] = useState('')
-  const [_editingBenefitIndex, _setEditingBenefitIndex] = useState<number | null>(null)
-  const [_editingTargetIndex, _setEditingTargetIndex] = useState<number | null>(null)
-  const [editBenefitText, setEditBenefitText] = useState('')
-  const [editTargetText, setEditTargetText] = useState('')
+  const [servicePageContent, setServicePageContent] =
+    useState<ServicePageContent>({
+      benefits: [],
+      targetAudience: [],
+      benefitsTitle: "Benefits You'll Feel",
+      targetAudienceTitle: "Who It's For",
+    });
+  const [_loadingContent, _setLoadingContent] = useState(true);
+  const [_savingContent, _setSavingContent] = useState(false);
+  const [newBenefit, setNewBenefit] = useState("");
+  const [newTargetAudience, setNewTargetAudience] = useState("");
+  const [_editingBenefitIndex, _setEditingBenefitIndex] = useState<
+    number | null
+  >(null);
+  const [_editingTargetIndex, _setEditingTargetIndex] = useState<number | null>(
+    null
+  );
+  const [editBenefitText, setEditBenefitText] = useState("");
+  const [editTargetText, setEditTargetText] = useState("");
 
   // Per-service benefits/targetAudience state (for modal)
-  const [newServiceBenefit, setNewServiceBenefit] = useState('')
-  const [newServiceTarget, setNewServiceTarget] = useState('')
+  const [newServiceBenefit, setNewServiceBenefit] = useState("");
+  const [newServiceTarget, setNewServiceTarget] = useState("");
 
   // Inline editing for service benefits/targetAudience
-  const [editingServiceBenefitIndex, setEditingServiceBenefitIndex] = useState<number | null>(null)
-  const [editingServiceTargetIndex, setEditingServiceTargetIndex] = useState<number | null>(null)
-  const [editServiceBenefitText, setEditServiceBenefitText] = useState('')
-  const [editServiceTargetText, setEditServiceTargetText] = useState('')
+  const [editingServiceBenefitIndex, setEditingServiceBenefitIndex] = useState<
+    number | null
+  >(null);
+  const [editingServiceTargetIndex, setEditingServiceTargetIndex] = useState<
+    number | null
+  >(null);
+  const [editServiceBenefitText, setEditServiceBenefitText] = useState("");
+  const [editServiceTargetText, setEditServiceTargetText] = useState("");
 
   // Content sections state (for detailed content like "Energy points: ...")
-  const [newContentSectionTitle, setNewContentSectionTitle] = useState('')
-  const [newContentSectionDesc, setNewContentSectionDesc] = useState('')
-  const [editingContentSectionIndex, setEditingContentSectionIndex] = useState<number | null>(null)
-  const [editContentSectionTitle, setEditContentSectionTitle] = useState('')
-  const [editContentSectionDesc, setEditContentSectionDesc] = useState('')
+  const [newContentSectionTitle, setNewContentSectionTitle] = useState("");
+  const [newContentSectionDesc, setNewContentSectionDesc] = useState("");
+  const [editingContentSectionIndex, setEditingContentSectionIndex] = useState<
+    number | null
+  >(null);
+  const [editContentSectionTitle, setEditContentSectionTitle] = useState("");
+  const [editContentSectionDesc, setEditContentSectionDesc] = useState("");
 
   // Service images state (gallery images for service page - max 4)
-  const [uploadingImage, setUploadingImage] = useState(false)
-  const [isDragging, setIsDragging] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [imageUrlInput, setImageUrlInput] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imageUrlInput, setImageUrlInput] = useState("");
 
   // Fetch services and content
   useEffect(() => {
-    fetchServices()
-    fetchServicePageContent()
-  }, [])
+    fetchServices();
+    fetchServicePageContent();
+  }, []);
 
   const fetchServices = async () => {
     try {
-      setLoading(true)
-      const response = await fetch(`${API_BASE_URL}/services`)
-      const data = await response.json()
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/services`);
+      const data = await response.json();
 
       if (data.success) {
-        setServices(data.data)
+        setServices(data.data);
       } else {
-        setError('Failed to fetch services')
+        setError("Failed to fetch services");
       }
     } catch (err) {
-      setError('Error connecting to server')
-      console.error('Error fetching services:', err)
+      setError("Error connecting to server");
+      console.error("Error fetching services:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchServicePageContent = async () => {
     try {
-      _setLoadingContent(true)
-      const response = await fetch(`${API_BASE_URL}/service-page-content`)
-      const data = await response.json()
+      _setLoadingContent(true);
+      const response = await fetch(`${API_BASE_URL}/service-page-content`);
+      const data = await response.json();
 
       if (data.success) {
-        setServicePageContent(data.data)
+        setServicePageContent(data.data);
       }
     } catch (err) {
-      console.error('Error fetching service page content:', err)
+      console.error("Error fetching service page content:", err);
     } finally {
-      _setLoadingContent(false)
+      _setLoadingContent(false);
     }
-  }
+  };
 
   const _saveServicePageContent = async () => {
     try {
-      _setSavingContent(true)
+      _setSavingContent(true);
       const response = await fetch(`${API_BASE_URL}/service-page-content`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(servicePageContent)
-      })
-      const data = await response.json()
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(servicePageContent),
+      });
+      const data = await response.json();
 
       if (data.success) {
-        setServicePageContent(data.data)
-        alert('Content saved successfully!')
+        setServicePageContent(data.data);
+        alert("Content saved successfully!");
       } else {
-        alert('Failed to save content: ' + (data.message || 'Unknown error'))
+        alert("Failed to save content: " + (data.message || "Unknown error"));
       }
     } catch (err) {
-      console.error('Error saving service page content:', err)
-      alert('Error saving content. Please check console for details.')
+      console.error("Error saving service page content:", err);
+      alert("Error saving content. Please check console for details.");
     } finally {
-      _setSavingContent(false)
+      _setSavingContent(false);
     }
-  }
+  };
 
   // Add new benefit
   const _handleAddBenefit = () => {
-    if (!newBenefit.trim()) return
+    if (!newBenefit.trim()) return;
     const updatedContent = {
       ...servicePageContent,
-      benefits: [...servicePageContent.benefits, { description: newBenefit.trim() }]
-    }
-    setServicePageContent(updatedContent)
-    setNewBenefit('')
-  }
+      benefits: [
+        ...servicePageContent.benefits,
+        { description: newBenefit.trim() },
+      ],
+    };
+    setServicePageContent(updatedContent);
+    setNewBenefit("");
+  };
 
   // Remove benefit
   const _handleRemoveBenefit = (index: number) => {
-    const updatedBenefits = servicePageContent.benefits.filter((_, i) => i !== index)
-    setServicePageContent({ ...servicePageContent, benefits: updatedBenefits })
-  }
+    const updatedBenefits = servicePageContent.benefits.filter(
+      (_, i) => i !== index
+    );
+    setServicePageContent({ ...servicePageContent, benefits: updatedBenefits });
+  };
 
   // Start editing benefit
   const _handleStartEditBenefit = (index: number) => {
-    _setEditingBenefitIndex(index)
-    setEditBenefitText(servicePageContent.benefits[index].description)
-  }
+    _setEditingBenefitIndex(index);
+    setEditBenefitText(servicePageContent.benefits[index].description);
+  };
 
   // Save edited benefit
   const _handleSaveEditBenefit = (index: number) => {
-    if (!editBenefitText.trim()) return
-    const updatedBenefits = [...servicePageContent.benefits]
-    updatedBenefits[index] = { ...updatedBenefits[index], description: editBenefitText.trim() }
-    setServicePageContent({ ...servicePageContent, benefits: updatedBenefits })
-    _setEditingBenefitIndex(null)
-    setEditBenefitText('')
-  }
+    if (!editBenefitText.trim()) return;
+    const updatedBenefits = [...servicePageContent.benefits];
+    updatedBenefits[index] = {
+      ...updatedBenefits[index],
+      description: editBenefitText.trim(),
+    };
+    setServicePageContent({ ...servicePageContent, benefits: updatedBenefits });
+    _setEditingBenefitIndex(null);
+    setEditBenefitText("");
+  };
 
   // Add new target audience
   const _handleAddTargetAudience = () => {
-    if (!newTargetAudience.trim()) return
+    if (!newTargetAudience.trim()) return;
     const updatedContent = {
       ...servicePageContent,
-      targetAudience: [...servicePageContent.targetAudience, { description: newTargetAudience.trim() }]
-    }
-    setServicePageContent(updatedContent)
-    setNewTargetAudience('')
-  }
+      targetAudience: [
+        ...servicePageContent.targetAudience,
+        { description: newTargetAudience.trim() },
+      ],
+    };
+    setServicePageContent(updatedContent);
+    setNewTargetAudience("");
+  };
 
   // Remove target audience
   const _handleRemoveTargetAudience = (index: number) => {
-    const updatedTargetAudience = servicePageContent.targetAudience.filter((_, i) => i !== index)
-    setServicePageContent({ ...servicePageContent, targetAudience: updatedTargetAudience })
-  }
+    const updatedTargetAudience = servicePageContent.targetAudience.filter(
+      (_, i) => i !== index
+    );
+    setServicePageContent({
+      ...servicePageContent,
+      targetAudience: updatedTargetAudience,
+    });
+  };
 
   // Start editing target audience
   const _handleStartEditTarget = (index: number) => {
-    _setEditingTargetIndex(index)
-    setEditTargetText(servicePageContent.targetAudience[index].description)
-  }
+    _setEditingTargetIndex(index);
+    setEditTargetText(servicePageContent.targetAudience[index].description);
+  };
 
   // Save edited target audience
   const _handleSaveEditTarget = (index: number) => {
-    if (!editTargetText.trim()) return
-    const updatedTargetAudience = [...servicePageContent.targetAudience]
-    updatedTargetAudience[index] = { ...updatedTargetAudience[index], description: editTargetText.trim() }
-    setServicePageContent({ ...servicePageContent, targetAudience: updatedTargetAudience })
-    _setEditingTargetIndex(null)
-    setEditTargetText('')
-  }
+    if (!editTargetText.trim()) return;
+    const updatedTargetAudience = [...servicePageContent.targetAudience];
+    updatedTargetAudience[index] = {
+      ...updatedTargetAudience[index],
+      description: editTargetText.trim(),
+    };
+    setServicePageContent({
+      ...servicePageContent,
+      targetAudience: updatedTargetAudience,
+    });
+    _setEditingTargetIndex(null);
+    setEditTargetText("");
+  };
 
   // Per-service benefit handlers (for modal form)
   const handleAddServiceBenefit = () => {
-    if (!newServiceBenefit.trim()) return
+    if (!newServiceBenefit.trim()) return;
     setFormData({
       ...formData,
-      benefits: [...formData.benefits, { description: newServiceBenefit.trim() }]
-    })
-    setNewServiceBenefit('')
-  }
+      benefits: [
+        ...formData.benefits,
+        { description: newServiceBenefit.trim() },
+      ],
+    });
+    setNewServiceBenefit("");
+  };
 
   const handleRemoveServiceBenefit = (index: number) => {
     setFormData({
       ...formData,
-      benefits: formData.benefits.filter((_, i) => i !== index)
-    })
-  }
+      benefits: formData.benefits.filter((_, i) => i !== index),
+    });
+  };
 
   // Per-service target audience handlers (for modal form)
   const handleAddServiceTarget = () => {
-    if (!newServiceTarget.trim()) return
+    if (!newServiceTarget.trim()) return;
     setFormData({
       ...formData,
-      targetAudience: [...formData.targetAudience, { description: newServiceTarget.trim() }]
-    })
-    setNewServiceTarget('')
-  }
+      targetAudience: [
+        ...formData.targetAudience,
+        { description: newServiceTarget.trim() },
+      ],
+    });
+    setNewServiceTarget("");
+  };
 
   const handleRemoveServiceTarget = (index: number) => {
     setFormData({
       ...formData,
-      targetAudience: formData.targetAudience.filter((_, i) => i !== index)
-    })
-  }
+      targetAudience: formData.targetAudience.filter((_, i) => i !== index),
+    });
+  };
 
   // Start editing service benefit
   const handleStartEditServiceBenefit = (index: number) => {
-    setEditingServiceBenefitIndex(index)
-    setEditServiceBenefitText(formData.benefits[index].description)
-  }
+    setEditingServiceBenefitIndex(index);
+    setEditServiceBenefitText(formData.benefits[index].description);
+  };
 
   // Save edited service benefit
   const handleSaveEditServiceBenefit = (index: number) => {
-    if (!editServiceBenefitText.trim()) return
-    const updatedBenefits = [...formData.benefits]
-    updatedBenefits[index] = { ...updatedBenefits[index], description: editServiceBenefitText.trim() }
-    setFormData({ ...formData, benefits: updatedBenefits })
-    setEditingServiceBenefitIndex(null)
-    setEditServiceBenefitText('')
-  }
+    if (!editServiceBenefitText.trim()) return;
+    const updatedBenefits = [...formData.benefits];
+    updatedBenefits[index] = {
+      ...updatedBenefits[index],
+      description: editServiceBenefitText.trim(),
+    };
+    setFormData({ ...formData, benefits: updatedBenefits });
+    setEditingServiceBenefitIndex(null);
+    setEditServiceBenefitText("");
+  };
 
   // Start editing service target audience
   const handleStartEditServiceTarget = (index: number) => {
-    setEditingServiceTargetIndex(index)
-    setEditServiceTargetText(formData.targetAudience[index].description)
-  }
+    setEditingServiceTargetIndex(index);
+    setEditServiceTargetText(formData.targetAudience[index].description);
+  };
 
   // Save edited service target audience
   const handleSaveEditServiceTarget = (index: number) => {
-    if (!editServiceTargetText.trim()) return
-    const updatedTargetAudience = [...formData.targetAudience]
-    updatedTargetAudience[index] = { ...updatedTargetAudience[index], description: editServiceTargetText.trim() }
-    setFormData({ ...formData, targetAudience: updatedTargetAudience })
-    setEditingServiceTargetIndex(null)
-    setEditServiceTargetText('')
-  }
+    if (!editServiceTargetText.trim()) return;
+    const updatedTargetAudience = [...formData.targetAudience];
+    updatedTargetAudience[index] = {
+      ...updatedTargetAudience[index],
+      description: editServiceTargetText.trim(),
+    };
+    setFormData({ ...formData, targetAudience: updatedTargetAudience });
+    setEditingServiceTargetIndex(null);
+    setEditServiceTargetText("");
+  };
 
   // Content section handlers
   const handleAddContentSection = () => {
-    if (!newContentSectionTitle.trim() || !newContentSectionDesc.trim()) return
+    if (!newContentSectionTitle.trim() || !newContentSectionDesc.trim()) return;
     setFormData({
       ...formData,
-      contentSections: [...formData.contentSections, { title: newContentSectionTitle.trim(), description: newContentSectionDesc.trim() }]
-    })
-    setNewContentSectionTitle('')
-    setNewContentSectionDesc('')
-  }
+      contentSections: [
+        ...formData.contentSections,
+        {
+          title: newContentSectionTitle.trim(),
+          description: newContentSectionDesc.trim(),
+        },
+      ],
+    });
+    setNewContentSectionTitle("");
+    setNewContentSectionDesc("");
+  };
 
   const handleRemoveContentSection = (index: number) => {
     setFormData({
       ...formData,
-      contentSections: formData.contentSections.filter((_, i) => i !== index)
-    })
-  }
+      contentSections: formData.contentSections.filter((_, i) => i !== index),
+    });
+  };
 
   const handleStartEditContentSection = (index: number) => {
-    setEditingContentSectionIndex(index)
-    setEditContentSectionTitle(formData.contentSections[index].title)
-    setEditContentSectionDesc(formData.contentSections[index].description)
-  }
+    setEditingContentSectionIndex(index);
+    setEditContentSectionTitle(formData.contentSections[index].title);
+    setEditContentSectionDesc(formData.contentSections[index].description);
+  };
 
   const handleSaveEditContentSection = (index: number) => {
-    if (!editContentSectionTitle.trim() || !editContentSectionDesc.trim()) return
-    const updated = [...formData.contentSections]
-    updated[index] = { title: editContentSectionTitle.trim(), description: editContentSectionDesc.trim() }
-    setFormData({ ...formData, contentSections: updated })
-    setEditingContentSectionIndex(null)
-    setEditContentSectionTitle('')
-    setEditContentSectionDesc('')
-  }
+    if (!editContentSectionTitle.trim() || !editContentSectionDesc.trim())
+      return;
+    const updated = [...formData.contentSections];
+    updated[index] = {
+      title: editContentSectionTitle.trim(),
+      description: editContentSectionDesc.trim(),
+    };
+    setFormData({ ...formData, contentSections: updated });
+    setEditingContentSectionIndex(null);
+    setEditContentSectionTitle("");
+    setEditContentSectionDesc("");
+  };
 
   // Service images handlers - drag & drop upload (max 4 images)
-  const handleImageUpload = useCallback(async (files: FileList | null) => {
-    if (!files || files.length === 0) return
+  const handleImageUpload = useCallback(
+    async (files: FileList | null) => {
+      if (!files || files.length === 0) return;
 
-    // Check max 4 images limit
-    const remainingSlots = 4 - formData.serviceImages.length
-    if (remainingSlots <= 0) {
-      alert('Maximum 4 images allowed per service')
-      return
-    }
+      // Check max 4 images limit
+      const remainingSlots = 4 - formData.serviceImages.length;
+      if (remainingSlots <= 0) {
+        alert("Maximum 4 images allowed per service");
+        return;
+      }
 
-    const filesToUpload = Array.from(files).slice(0, remainingSlots)
-    setUploadingImage(true)
+      const filesToUpload = Array.from(files).slice(0, remainingSlots);
+      setUploadingImage(true);
 
-    try {
-      const uploadPromises = filesToUpload.map(async (file) => {
-        const formDataUpload = new FormData()
-        formDataUpload.append('image', file)
+      try {
+        const uploadPromises = filesToUpload.map(async (file) => {
+          const formDataUpload = new FormData();
+          formDataUpload.append("image", file);
 
-        const response = await fetch(`${API_BASE_URL}/upload/image`, {
-          method: 'POST',
-          body: formDataUpload
-        })
+          const response = await fetch(`${API_BASE_URL}/upload/image`, {
+            method: "POST",
+            body: formDataUpload,
+          });
 
-        const data = await response.json()
-        if (data.success) {
-          return { url: data.data.url, caption: '' }
-        }
-        throw new Error(data.message || 'Upload failed')
-      })
+          const data = await response.json();
+          if (data.success) {
+            return { url: data.data.url, caption: "" };
+          }
+          throw new Error(data.message || "Upload failed");
+        });
 
-      const uploadedImages = await Promise.all(uploadPromises)
-      setFormData(prev => ({
-        ...prev,
-        serviceImages: [...prev.serviceImages, ...uploadedImages]
-      }))
-    } catch (error) {
-      console.error('Error uploading images:', error)
-      alert('Error uploading images. Please try again.')
-    } finally {
-      setUploadingImage(false)
-    }
-  }, [formData.serviceImages.length])
+        const uploadedImages = await Promise.all(uploadPromises);
+        setFormData((prev) => ({
+          ...prev,
+          serviceImages: [...prev.serviceImages, ...uploadedImages],
+        }));
+      } catch (error) {
+        console.error("Error uploading images:", error);
+        alert("Error uploading images. Please try again.");
+      } finally {
+        setUploadingImage(false);
+      }
+    },
+    [formData.serviceImages.length]
+  );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(true)
-  }, [])
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-  }, [])
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    setIsDragging(false)
-    handleImageUpload(e.dataTransfer.files)
-  }, [handleImageUpload])
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      handleImageUpload(e.dataTransfer.files);
+    },
+    [handleImageUpload]
+  );
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleImageUpload(e.target.files)
+    handleImageUpload(e.target.files);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleRemoveServiceImage = (index: number) => {
     setFormData({
       ...formData,
-      serviceImages: formData.serviceImages.filter((_, i) => i !== index)
-    })
-  }
+      serviceImages: formData.serviceImages.filter((_, i) => i !== index),
+    });
+  };
 
   // Add image via URL
   const handleAddImageUrl = () => {
-    if (!imageUrlInput.trim()) return
+    if (!imageUrlInput.trim()) return;
     if (formData.serviceImages.length >= 4) {
-      alert('Maximum 4 images allowed per service')
-      return
+      alert("Maximum 4 images allowed per service");
+      return;
     }
     setFormData({
       ...formData,
-      serviceImages: [...formData.serviceImages, { url: imageUrlInput.trim(), caption: '' }]
-    })
-    setImageUrlInput('')
-  }
+      serviceImages: [
+        ...formData.serviceImages,
+        { url: imageUrlInput.trim(), caption: "" },
+      ],
+    });
+    setImageUrlInput("");
+  };
 
   // Open modal for adding new service
   const handleAddNew = () => {
-    setEditingService(null)
-    setFormData(initialFormData)
-    setNewServiceBenefit('')
-    setNewServiceTarget('')
-    setNewContentSectionTitle('')
-    setNewContentSectionDesc('')
-    setEditingServiceBenefitIndex(null)
-    setEditingServiceTargetIndex(null)
-    setEditServiceBenefitText('')
-    setEditServiceTargetText('')
-    setShowModal(true)
-  }
+    setEditingService(null);
+    setFormData(initialFormData);
+    setNewServiceBenefit("");
+    setNewServiceTarget("");
+    setNewContentSectionTitle("");
+    setNewContentSectionDesc("");
+    setEditingServiceBenefitIndex(null);
+    setEditingServiceTargetIndex(null);
+    setEditServiceBenefitText("");
+    setEditServiceTargetText("");
+    setShowModal(true);
+  };
 
   // Open modal for editing service
   const handleEdit = (service: Service) => {
-    setEditingService(service)
+    setEditingService(service);
     setFormData({
       title: service.title,
       description: service.description,
@@ -529,143 +686,148 @@ const Services = () => {
       duration: service.duration,
       price: service.price,
       image: service.image,
-      imageUrl: service.imageUrl || '',
+      imageUrl: service.imageUrl || "",
       isActive: service.isActive,
       contentSections: service.contentSections || [],
       benefits: service.benefits || [],
       targetAudience: service.targetAudience || [],
-      serviceImages: service.serviceImages || []
-    })
-    setNewServiceBenefit('')
-    setNewServiceTarget('')
-    setNewContentSectionTitle('')
-    setNewContentSectionDesc('')
-    setEditingServiceBenefitIndex(null)
-    setEditingServiceTargetIndex(null)
-    setEditingContentSectionIndex(null)
-    setEditServiceBenefitText('')
-    setEditServiceTargetText('')
-    setEditContentSectionTitle('')
-    setEditContentSectionDesc('')
-    setShowModal(true)
-  }
+      serviceImages: service.serviceImages || [],
+    });
+    setNewServiceBenefit("");
+    setNewServiceTarget("");
+    setNewContentSectionTitle("");
+    setNewContentSectionDesc("");
+    setEditingServiceBenefitIndex(null);
+    setEditingServiceTargetIndex(null);
+    setEditingContentSectionIndex(null);
+    setEditServiceBenefitText("");
+    setEditServiceTargetText("");
+    setEditContentSectionTitle("");
+    setEditContentSectionDesc("");
+    setShowModal(true);
+  };
 
   // Save service (create or update)
   const handleSave = async () => {
     if (!formData.title.trim() || !formData.description.trim()) {
-      alert('Please fill in all required fields')
-      return
+      alert("Please fill in all required fields");
+      return;
     }
 
     try {
-      setSaving(true)
+      setSaving(true);
       const url = editingService
         ? `${API_BASE_URL}/services/${editingService._id}`
-        : `${API_BASE_URL}/services`
+        : `${API_BASE_URL}/services`;
 
-      const method = editingService ? 'PUT' : 'POST'
+      const method = editingService ? "PUT" : "POST";
 
       // Debug: Log what's being sent
-      console.log('Saving service with data:', formData)
-      console.log('serviceImages being sent:', formData.serviceImages)
+      console.log("Saving service with data:", formData);
+      console.log("serviceImages being sent:", formData.serviceImages);
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
-      })
+        body: JSON.stringify(formData),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
-        setShowModal(false)
-        fetchServices()
-        setFormData(initialFormData)
-        setEditingService(null)
+        setShowModal(false);
+        fetchServices();
+        setFormData(initialFormData);
+        setEditingService(null);
       } else {
-        alert(data.message || 'Failed to save service')
+        alert(data.message || "Failed to save service");
       }
     } catch (err) {
-      console.error('Error saving service:', err)
-      alert('Error saving service')
+      console.error("Error saving service:", err);
+      alert("Error saving service");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   // Delete service
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this service?')) {
-      return
+    if (!window.confirm("Are you sure you want to delete this service?")) {
+      return;
     }
 
     try {
       const response = await fetch(`${API_BASE_URL}/services/${id}`, {
-        method: 'DELETE'
-      })
+        method: "DELETE",
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
-        fetchServices()
+        fetchServices();
       } else {
-        alert(data.message || 'Failed to delete service')
+        alert(data.message || "Failed to delete service");
       }
     } catch (err) {
-      console.error('Error deleting service:', err)
-      alert('Error deleting service')
+      console.error("Error deleting service:", err);
+      alert("Error deleting service");
     }
-  }
+  };
 
   // Toggle active status
   const handleToggleStatus = async (service: Service) => {
     try {
       const response = await fetch(`${API_BASE_URL}/services/${service._id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...service, isActive: !service.isActive })
-      })
+        body: JSON.stringify({ ...service, isActive: !service.isActive }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
-        fetchServices()
+        fetchServices();
       }
     } catch (err) {
-      console.error('Error toggling status:', err)
+      console.error("Error toggling status:", err);
     }
-  }
+  };
 
   // Filter services
-  const filteredServices = services.filter(service => {
-    const matchesSearch = service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredServices = services.filter((service) => {
+    const matchesSearch =
+      service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesCategory = filterCategory === 'all' || service.category === filterCategory
+    const matchesCategory =
+      filterCategory === "all" || service.category === filterCategory;
 
-    return matchesSearch && matchesCategory
-  })
+    return matchesSearch && matchesCategory;
+  });
 
   // Get category config
   const getCategoryConfig = (category: string) => {
-    return categories.find(c => c.value === category) || categories[0]
-  }
+    return categories.find((c) => c.value === category) || categories[0];
+  };
 
   // Get image source
   const getImageSrc = (image: string) => {
-    return imageMap[image] || m1
-  }
+    return imageMap[image] || m1;
+  };
 
   // Stats
-  const totalServices = services.length
-  const activeServices = services.filter(s => s.isActive).length
-  const avgPrice = services.length > 0
-    ? (services.reduce((acc, s) => acc + s.price, 0) / services.length).toFixed(0)
-    : '0'
+  const totalServices = services.length;
+  const activeServices = services.filter((s) => s.isActive).length;
+  const avgPrice =
+    services.length > 0
+      ? (
+          services.reduce((acc, s) => acc + s.price, 0) / services.length
+        ).toFixed(0)
+      : "0";
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -688,7 +850,9 @@ const Services = () => {
                 <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
                   Services
                 </h1>
-                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 hidden sm:block">Manage your wellness services and pricing</p>
+                <p className="text-xs sm:text-sm text-slate-500 mt-0.5 hidden sm:block">
+                  Manage your wellness services and pricing
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
@@ -704,10 +868,7 @@ const Services = () => {
                 />
               </div>
               {/* Notification */}
-              <button className="p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative flex-shrink-0">
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+
               {/* Profile */}
               <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20 flex-shrink-0">
                 A
@@ -723,8 +884,12 @@ const Services = () => {
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-500">Total Services</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{totalServices}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">
+                    Total Services
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">
+                    {totalServices}
+                  </p>
                 </div>
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -734,8 +899,12 @@ const Services = () => {
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-500">Active Services</p>
-                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">{activeServices}</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">
+                    Active Services
+                  </p>
+                  <p className="text-2xl sm:text-3xl font-bold text-slate-800 mt-1">
+                    {activeServices}
+                  </p>
                 </div>
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-[#DFB13B] via-[#DFB13B] to-[#FFEEC3] rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
                   <Eye className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
@@ -745,13 +914,17 @@ const Services = () => {
             <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm shadow-slate-200/50 border border-slate-100">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-500">Avg. Price</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-500">
+                    Avg. Price
+                  </p>
                   <div className="flex items-center gap-1 mt-1">
-                    <p className="text-2xl sm:text-3xl font-bold text-slate-800">${avgPrice}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-slate-800">
+                      €{avgPrice}
+                    </p>
                   </div>
                 </div>
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <DollarSign className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                  <Euro className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
               </div>
             </div>
@@ -781,16 +954,29 @@ const Services = () => {
                   className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-slate-200 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:border-slate-300 transition"
                 >
                   <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">{filterCategory === 'all' ? 'All' : getCategoryConfig(filterCategory).label}</span>
-                  <span className="xs:hidden">{filterCategory === 'all' ? 'All' : getCategoryConfig(filterCategory).label.slice(0, 3)}</span>
+                  <span className="hidden xs:inline">
+                    {filterCategory === "all"
+                      ? "All"
+                      : getCategoryConfig(filterCategory).label}
+                  </span>
+                  <span className="xs:hidden">
+                    {filterCategory === "all"
+                      ? "All"
+                      : getCategoryConfig(filterCategory).label.slice(0, 3)}
+                  </span>
                   <ChevronDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 {showFilterDropdown && (
                   <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-slate-100 py-2 min-w-[160px] z-20">
                     <button
-                      onClick={() => { setFilterCategory('all'); setShowFilterDropdown(false) }}
+                      onClick={() => {
+                        setFilterCategory("all");
+                        setShowFilterDropdown(false);
+                      }}
                       className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition ${
-                        filterCategory === 'all' ? 'text-[#B8922D] font-medium bg-[#FFEEC3]/30' : 'text-slate-600'
+                        filterCategory === "all"
+                          ? "text-[#B8922D] font-medium bg-[#FFEEC3]/30"
+                          : "text-slate-600"
                       }`}
                     >
                       All Categories
@@ -798,12 +984,19 @@ const Services = () => {
                     {categories.map((cat) => (
                       <button
                         key={cat.value}
-                        onClick={() => { setFilterCategory(cat.value); setShowFilterDropdown(false) }}
+                        onClick={() => {
+                          setFilterCategory(cat.value);
+                          setShowFilterDropdown(false);
+                        }}
                         className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-50 transition flex items-center gap-2 ${
-                          filterCategory === cat.value ? 'text-[#B8922D] font-medium bg-[#FFEEC3]/30' : 'text-slate-600'
+                          filterCategory === cat.value
+                            ? "text-[#B8922D] font-medium bg-[#FFEEC3]/30"
+                            : "text-slate-600"
                         }`}
                       >
-                        <span className={`w-2 h-2 rounded-full bg-gradient-to-r ${cat.color}`}></span>
+                        <span
+                          className={`w-2 h-2 rounded-full bg-gradient-to-r ${cat.color}`}
+                        ></span>
                         {cat.label}
                       </button>
                     ))}
@@ -814,14 +1007,22 @@ const Services = () => {
               {/* View Toggle */}
               <div className="flex items-center bg-white border border-slate-200 rounded-lg sm:rounded-xl p-0.5 sm:p-1">
                 <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${viewMode === 'grid' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
+                  onClick={() => setViewMode("grid")}
+                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${
+                    viewMode === "grid"
+                      ? "bg-[#FFEEC3]/30 text-[#B8922D]"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
                 >
                   <LayoutGrid className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${viewMode === 'list' ? 'bg-[#FFEEC3]/30 text-[#B8922D]' : 'text-slate-400 hover:text-slate-600'}`}
+                  onClick={() => setViewMode("list")}
+                  className={`p-1.5 sm:p-2 rounded-md sm:rounded-lg transition ${
+                    viewMode === "list"
+                      ? "bg-[#FFEEC3]/30 text-[#B8922D]"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
                 >
                   <List className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
@@ -857,7 +1058,9 @@ const Services = () => {
               </div>
               <div>
                 <p className="font-medium">Connection Error</p>
-                <p className="text-sm text-red-500">{error}. Please make sure the backend server is running.</p>
+                <p className="text-sm text-red-500">
+                  {error}. Please make sure the backend server is running.
+                </p>
               </div>
             </div>
           )}
@@ -868,8 +1071,12 @@ const Services = () => {
               <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Sparkles className="w-10 h-10 text-slate-400" />
               </div>
-              <h3 className="text-lg font-semibold text-slate-800 mb-2">No services found</h3>
-              <p className="text-slate-500 mb-6">Get started by adding your first service</p>
+              <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                No services found
+              </h3>
+              <p className="text-slate-500 mb-6">
+                Get started by adding your first service
+              </p>
               <button
                 onClick={handleAddNew}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition"
@@ -881,241 +1088,297 @@ const Services = () => {
           )}
 
           {/* Services Grid */}
-          {!loading && !error && filteredServices.length > 0 && viewMode === 'grid' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredServices.map((service, index) => {
-                const catConfig = getCategoryConfig(service.category)
-                return (
-                  <div
-                    key={service._id}
-                    className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    {/* Image */}
-                    <div className="h-36 relative overflow-hidden">
-                      <img
-                        src={service.imageUrl || getImageSrc(service.image)}
-                        alt={service.title}
-                        className="w-full h-full object-cover"
-                      />
-
-                      {/* Category Badge */}
-                      <div className="absolute top-3 left-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
-                          {catConfig.label}
-                        </span>
-                      </div>
-
-                      {/* Status Badge */}
-                      <button
-                        onClick={() => handleToggleStatus(service)}
-                        className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold transition ${
-                          service.isActive
-                            ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                            : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                        }`}
-                      >
-                        {service.isActive ? 'Active' : 'Inactive'}
-                      </button>
-
-                      {/* Inactive Overlay */}
-                      {!service.isActive && (
-                        <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-                          <EyeOff className="w-8 h-8 text-white/70" />
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content */}
-                    <div className="p-5">
-                      <h3 className="font-semibold text-slate-800 mb-1 truncate">{service.title}</h3>
-                      <p className="text-sm text-slate-500 mb-4 line-clamp-2">{service.description}</p>
-
-                      {/* Price & Duration */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-1.5 text-slate-500">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm">{service.duration} mins</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xl font-bold text-[#B8922D]">${service.price}</span>
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
-                        <button
-                          onClick={() => handleEdit(service)}
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                          Edit
-                        </button>
-                        <div className="w-px h-6 bg-slate-200"></div>
-                        <button
-                          onClick={() => handleDelete(service._id)}
-                          className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition text-sm font-medium"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Services List View */}
-          {!loading && !error && filteredServices.length > 0 && viewMode === 'list' && (
-            <>
-              {/* Desktop Table View */}
-              <div className="hidden md:block bg-white rounded-2xl border border-slate-100 overflow-hidden">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-slate-50/50">
-                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Service</th>
-                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Category</th>
-                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Duration</th>
-                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Price</th>
-                      <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">Status</th>
-                      <th className="text-right py-4 px-6 text-sm font-semibold text-slate-600">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredServices.map((service) => {
-                      const catConfig = getCategoryConfig(service.category)
-                      return (
-                        <tr key={service._id} className="border-t border-slate-100 hover:bg-slate-50/50 transition">
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
-                                <img
-                                  src={service.imageUrl || getImageSrc(service.image)}
-                                  alt={service.title}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div>
-                                <p className="font-medium text-slate-800">{service.title}</p>
-                                <p className="text-xs text-slate-500 truncate max-w-[200px]">{service.description}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-6">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
-                              {catConfig.label}
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 text-sm text-slate-600">{service.duration} mins</td>
-                          <td className="py-4 px-6">
-                            <span className="font-semibold text-[#B8922D]">${service.price}</span>
-                          </td>
-                          <td className="py-4 px-6">
-                            <button
-                              onClick={() => handleToggleStatus(service)}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                                service.isActive
-                                  ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                                  : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                              }`}
-                            >
-                              {service.isActive ? 'Active' : 'Inactive'}
-                            </button>
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center justify-end gap-2">
-                              <button
-                                onClick={() => handleEdit(service)}
-                                className="p-2 text-slate-500 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition"
-                              >
-                                <Edit2 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(service._id)}
-                                className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Mobile Card View */}
-              <div className="md:hidden space-y-3">
-                {filteredServices.map((service) => {
-                  const catConfig = getCategoryConfig(service.category)
+          {!loading &&
+            !error &&
+            filteredServices.length > 0 &&
+            viewMode === "grid" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredServices.map((service, index) => {
+                  const catConfig = getCategoryConfig(service.category);
                   return (
-                    <div key={service._id} className="bg-white rounded-xl border border-slate-100 p-4">
-                      <div className="flex items-start gap-3">
-                        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
-                          <img
-                            src={service.imageUrl || getImageSrc(service.image)}
-                            alt={service.title}
-                            className="w-full h-full object-cover"
-                          />
+                    <div
+                      key={service._id}
+                      className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      {/* Image */}
+                      <div className="h-36 relative overflow-hidden">
+                        <img
+                          src={service.imageUrl || getImageSrc(service.image)}
+                          alt={service.title}
+                          className="w-full h-full object-cover"
+                        />
+
+                        {/* Category Badge */}
+                        <div className="absolute top-3 left-3">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}
+                          >
+                            {catConfig.label}
+                          </span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0">
-                              <p className="font-medium text-slate-800 truncate">{service.title}</p>
-                              <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">{service.description}</p>
-                            </div>
-                            <button
-                              onClick={() => handleToggleStatus(service)}
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition flex-shrink-0 ${
-                                service.isActive
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-slate-100 text-slate-500'
-                              }`}
-                            >
-                              {service.isActive ? 'Active' : 'Inactive'}
-                            </button>
+
+                        {/* Status Badge */}
+                        <button
+                          onClick={() => handleToggleStatus(service)}
+                          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold transition ${
+                            service.isActive
+                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                              : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                          }`}
+                        >
+                          {service.isActive ? "Active" : "Inactive"}
+                        </button>
+
+                        {/* Inactive Overlay */}
+                        {!service.isActive && (
+                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
+                            <EyeOff className="w-8 h-8 text-white/70" />
                           </div>
-                          <div className="flex items-center gap-3 mt-2">
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}>
-                              {catConfig.label}
-                            </span>
-                            <span className="text-xs text-slate-500 flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {service.duration}m
-                            </span>
-                            <span className="font-semibold text-sm text-[#B8922D]">${service.price}</span>
-                          </div>
-                        </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
-                        <button
-                          onClick={() => handleEdit(service)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition text-xs font-medium"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                          Edit
-                        </button>
-                        <div className="w-px h-5 bg-slate-200"></div>
-                        <button
-                          onClick={() => handleDelete(service._id)}
-                          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition text-xs font-medium"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                          Delete
-                        </button>
+
+                      {/* Content */}
+                      <div className="p-5">
+                        <h3 className="font-semibold text-slate-800 mb-1 truncate">
+                          {service.title}
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-4 line-clamp-2">
+                          {service.description}
+                        </p>
+
+                        {/* Price & Duration */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-1.5 text-slate-500">
+                            <Clock className="w-4 h-4" />
+                            <span className="text-sm">
+                              {service.duration} mins
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-xl font-bold text-[#B8922D]">
+                              €{service.price}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                          <button
+                            onClick={() => handleEdit(service)}
+                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                            Edit
+                          </button>
+                          <div className="w-px h-6 bg-slate-200"></div>
+                          <button
+                            onClick={() => handleDelete(service._id)}
+                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition text-sm font-medium"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  )
+                  );
                 })}
               </div>
-            </>
-          )}
+            )}
+
+          {/* Services List View */}
+          {!loading &&
+            !error &&
+            filteredServices.length > 0 &&
+            viewMode === "list" && (
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block bg-white rounded-2xl border border-slate-100 overflow-hidden">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-slate-50/50">
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">
+                          Service
+                        </th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">
+                          Category
+                        </th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">
+                          Duration
+                        </th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">
+                          Price
+                        </th>
+                        <th className="text-left py-4 px-6 text-sm font-semibold text-slate-600">
+                          Status
+                        </th>
+                        <th className="text-right py-4 px-6 text-sm font-semibold text-slate-600">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredServices.map((service) => {
+                        const catConfig = getCategoryConfig(service.category);
+                        return (
+                          <tr
+                            key={service._id}
+                            className="border-t border-slate-100 hover:bg-slate-50/50 transition"
+                          >
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+                                  <img
+                                    src={
+                                      service.imageUrl ||
+                                      getImageSrc(service.image)
+                                    }
+                                    alt={service.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <p className="font-medium text-slate-800">
+                                    {service.title}
+                                  </p>
+                                  <p className="text-xs text-slate-500 truncate max-w-[200px]">
+                                    {service.description}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}
+                              >
+                                {catConfig.label}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 text-sm text-slate-600">
+                              {service.duration} mins
+                            </td>
+                            <td className="py-4 px-6">
+                              <span className="font-semibold text-[#B8922D]">
+                                €{service.price}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6">
+                              <button
+                                onClick={() => handleToggleStatus(service)}
+                                className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                                  service.isActive
+                                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                }`}
+                              >
+                                {service.isActive ? "Active" : "Inactive"}
+                              </button>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => handleEdit(service)}
+                                  className="p-2 text-slate-500 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(service._id)}
+                                  className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {filteredServices.map((service) => {
+                    const catConfig = getCategoryConfig(service.category);
+                    return (
+                      <div
+                        key={service._id}
+                        className="bg-white rounded-xl border border-slate-100 p-4"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
+                            <img
+                              src={
+                                service.imageUrl || getImageSrc(service.image)
+                              }
+                              alt={service.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="font-medium text-slate-800 truncate">
+                                  {service.title}
+                                </p>
+                                <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
+                                  {service.description}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => handleToggleStatus(service)}
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition flex-shrink-0 ${
+                                  service.isActive
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-slate-100 text-slate-500"
+                                }`}
+                              >
+                                {service.isActive ? "Active" : "Inactive"}
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-3 mt-2">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}
+                              >
+                                {catConfig.label}
+                              </span>
+                              <span className="text-xs text-slate-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {service.duration}m
+                              </span>
+                              <span className="font-semibold text-sm text-[#B8922D]">
+                                €{service.price}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                          <button
+                            onClick={() => handleEdit(service)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-lg transition text-xs font-medium"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                            Edit
+                          </button>
+                          <div className="w-px h-5 bg-slate-200"></div>
+                          <button
+                            onClick={() => handleDelete(service._id)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition text-xs font-medium"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
           {/* Service Detail Page Content Section */}
-
         </main>
       </div>
 
@@ -1133,14 +1396,20 @@ const Services = () => {
               </button>
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
-                  {editingService ? <Edit2 className="w-5 h-5 sm:w-7 sm:h-7 text-white" /> : <Plus className="w-5 h-5 sm:w-7 sm:h-7 text-white" />}
+                  {editingService ? (
+                    <Edit2 className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                  ) : (
+                    <Plus className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-xl font-bold text-white">
-                    {editingService ? 'Edit Service' : 'Add New Service'}
+                    {editingService ? "Edit Service" : "Add New Service"}
                   </h2>
                   <p className="text-[#FFEEC3] text-xs sm:text-sm mt-0.5 truncate">
-                    {editingService ? 'Update service details' : 'Create a new wellness service'}
+                    {editingService
+                      ? "Update service details"
+                      : "Create a new wellness service"}
                   </p>
                 </div>
               </div>
@@ -1156,7 +1425,9 @@ const Services = () => {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   placeholder="e.g., Swedish Massage"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                 />
@@ -1169,7 +1440,9 @@ const Services = () => {
                 </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Describe the service..."
                   rows={3}
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none text-sm sm:text-base"
@@ -1184,11 +1457,15 @@ const Services = () => {
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
                     className="w-full px-2 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none appearance-none cursor-pointer text-sm sm:text-base"
                   >
-                    {categories.map(cat => (
-                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -1201,7 +1478,12 @@ const Services = () => {
                     <input
                       type="number"
                       value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 0 })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          duration: parseInt(e.target.value) || 0,
+                        })
+                      }
                       min="0"
                       className="w-full pl-8 sm:pl-11 pr-2 sm:pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                     />
@@ -1215,11 +1497,16 @@ const Services = () => {
                   Price
                 </label>
                 <div className="relative">
-                  <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2" />
+                  <Euro className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                    value={formData.price || ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        price: e.target.value === '' ? 0 : parseFloat(e.target.value),
+                      })
+                    }
                     min="0"
                     step="0.01"
                     className="w-full pl-8 sm:pl-11 pr-2 sm:pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none text-sm sm:text-base"
@@ -1237,11 +1524,13 @@ const Services = () => {
                     <button
                       key={img.name}
                       type="button"
-                      onClick={() => setFormData({ ...formData, image: img.name })}
+                      onClick={() =>
+                        setFormData({ ...formData, image: img.name })
+                      }
                       className={`relative p-1.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all ${
                         formData.image === img.name
-                          ? 'bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20'
-                          : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
+                          ? "bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20"
+                          : "bg-slate-50 border-2 border-transparent hover:border-slate-200"
                       }`}
                     >
                       <div className="h-10 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden mb-1 sm:mb-2">
@@ -1251,11 +1540,23 @@ const Services = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="text-[10px] sm:text-xs text-slate-500 text-center truncate">{img.label}</p>
+                      <p className="text-[10px] sm:text-xs text-slate-500 text-center truncate">
+                        {img.label}
+                      </p>
                       {formData.image === img.name && (
                         <div className="absolute top-1 right-1 sm:top-2 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
-                          <svg className="w-2 h-2 sm:w-3 sm:h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-2 h-2 sm:w-3 sm:h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         </div>
                       )}
@@ -1267,12 +1568,15 @@ const Services = () => {
               {/* Custom Image URL */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
-                  Custom Image URL <span className="font-normal text-slate-400">(Optional)</span>
+                  Custom Image URL{" "}
+                  <span className="font-normal text-slate-400">(Optional)</span>
                 </label>
                 <input
                   type="url"
                   value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
                   placeholder="https://example.com/image.jpg"
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
                 />
@@ -1284,19 +1588,27 @@ const Services = () => {
               {/* Active Status */}
               <div className="flex items-center justify-between p-3 sm:p-4 bg-slate-50 rounded-xl gap-3">
                 <div className="min-w-0">
-                  <p className="font-semibold text-slate-700 text-sm sm:text-base">Visibility</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Show this service to customers</p>
+                  <p className="font-semibold text-slate-700 text-sm sm:text-base">
+                    Visibility
+                  </p>
+                  <p className="text-xs sm:text-sm text-slate-500">
+                    Show this service to customers
+                  </p>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
+                  onClick={() =>
+                    setFormData({ ...formData, isActive: !formData.isActive })
+                  }
                   className={`relative w-12 h-7 sm:w-14 sm:h-8 rounded-full transition-colors flex-shrink-0 ${
-                    formData.isActive ? 'bg-[#DFB13B]' : 'bg-slate-300'
+                    formData.isActive ? "bg-[#DFB13B]" : "bg-slate-300"
                   }`}
                 >
                   <div
                     className={`absolute top-1 w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full shadow transition-transform ${
-                      formData.isActive ? 'translate-x-6 sm:translate-x-7' : 'translate-x-1'
+                      formData.isActive
+                        ? "translate-x-6 sm:translate-x-7"
+                        : "translate-x-1"
                     }`}
                   />
                 </button>
@@ -1307,7 +1619,10 @@ const Services = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <FileText className="w-5 h-5 text-amber-500" />
                   <label className="text-sm font-semibold text-slate-700">
-                    Content Sections <span className="font-normal text-slate-400">(Detailed descriptions with titles)</span>
+                    Content Sections{" "}
+                    <span className="font-normal text-slate-400">
+                      (Detailed descriptions with titles)
+                    </span>
                   </label>
                 </div>
 
@@ -1341,20 +1656,27 @@ const Services = () => {
                 {/* Content sections list */}
                 <div className="space-y-3 max-h-[250px] overflow-y-auto">
                   {formData.contentSections.map((section, index) => (
-                    <div key={index} className="p-4 bg-amber-50 rounded-xl group">
+                    <div
+                      key={index}
+                      className="p-4 bg-amber-50 rounded-xl group"
+                    >
                       {editingContentSectionIndex === index ? (
                         <div className="space-y-2">
                           <input
                             type="text"
                             value={editContentSectionTitle}
-                            onChange={(e) => setEditContentSectionTitle(e.target.value)}
+                            onChange={(e) =>
+                              setEditContentSectionTitle(e.target.value)
+                            }
                             className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium outline-none focus:ring-2 focus:ring-amber-500/20"
                             placeholder="Section title"
                             autoFocus
                           />
                           <textarea
                             value={editContentSectionDesc}
-                            onChange={(e) => setEditContentSectionDesc(e.target.value)}
+                            onChange={(e) =>
+                              setEditContentSectionDesc(e.target.value)
+                            }
                             className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-amber-500/20 resize-none"
                             rows={3}
                             placeholder="Section description"
@@ -1362,7 +1684,9 @@ const Services = () => {
                           <div className="flex gap-2">
                             <button
                               type="button"
-                              onClick={() => handleSaveEditContentSection(index)}
+                              onClick={() =>
+                                handleSaveEditContentSection(index)
+                              }
                               className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1"
                             >
                               <Save className="w-3 h-3" />
@@ -1370,7 +1694,11 @@ const Services = () => {
                             </button>
                             <button
                               type="button"
-                              onClick={() => { setEditingContentSectionIndex(null); setEditContentSectionTitle(''); setEditContentSectionDesc(''); }}
+                              onClick={() => {
+                                setEditingContentSectionIndex(null);
+                                setEditContentSectionTitle("");
+                                setEditContentSectionDesc("");
+                              }}
                               className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition"
                             >
                               Cancel
@@ -1381,20 +1709,28 @@ const Services = () => {
                         <>
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-amber-700 mb-1">{section.title}</h4>
-                              <p className="text-sm text-slate-600 whitespace-pre-wrap">{section.description}</p>
+                              <h4 className="font-semibold text-amber-700 mb-1">
+                                {section.title}
+                              </h4>
+                              <p className="text-sm text-slate-600 whitespace-pre-wrap">
+                                {section.description}
+                              </p>
                             </div>
                             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
                               <button
                                 type="button"
-                                onClick={() => handleStartEditContentSection(index)}
+                                onClick={() =>
+                                  handleStartEditContentSection(index)
+                                }
                                 className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                               >
                                 <Edit2 className="w-3.5 h-3.5" />
                               </button>
                               <button
                                 type="button"
-                                onClick={() => handleRemoveContentSection(index)}
+                                onClick={() =>
+                                  handleRemoveContentSection(index)
+                                }
                                 className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -1406,7 +1742,11 @@ const Services = () => {
                     </div>
                   ))}
                   {formData.contentSections.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center py-3">No content sections added. Add detailed descriptions for this service (e.g., "Energy points", "Self-healing of the body").</p>
+                    <p className="text-xs text-slate-400 text-center py-3">
+                      No content sections added. Add detailed descriptions for
+                      this service (e.g., "Energy points", "Self-healing of the
+                      body").
+                    </p>
                   )}
                 </div>
               </div>
@@ -1416,7 +1756,10 @@ const Services = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Heart className="w-5 h-5 text-rose-500" />
                   <label className="text-sm font-semibold text-slate-700">
-                    Service Benefits <span className="font-normal text-slate-400">(Unique to this service)</span>
+                    Service Benefits{" "}
+                    <span className="font-normal text-slate-400">
+                      (Unique to this service)
+                    </span>
                   </label>
                 </div>
 
@@ -1428,7 +1771,10 @@ const Services = () => {
                     onChange={(e) => setNewServiceBenefit(e.target.value)}
                     placeholder="Add a benefit for this service..."
                     className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 focus:bg-white transition-all outline-none text-sm"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddServiceBenefit())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleAddServiceBenefit())
+                    }
                   />
                   <button
                     type="button"
@@ -1442,13 +1788,18 @@ const Services = () => {
                 {/* Benefits list */}
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {formData.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-rose-50 rounded-lg group">
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 p-3 bg-rose-50 rounded-lg group"
+                    >
                       <div className="w-1.5 h-1.5 bg-rose-500 rounded-full mt-2 shrink-0"></div>
                       {editingServiceBenefitIndex === index ? (
                         <div className="flex-1 flex flex-col gap-2">
                           <textarea
                             value={editServiceBenefitText}
-                            onChange={(e) => setEditServiceBenefitText(e.target.value)}
+                            onChange={(e) =>
+                              setEditServiceBenefitText(e.target.value)
+                            }
                             className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-500/20 resize-none"
                             rows={3}
                             autoFocus
@@ -1456,7 +1807,9 @@ const Services = () => {
                           <div className="flex gap-2">
                             <button
                               type="button"
-                              onClick={() => handleSaveEditServiceBenefit(index)}
+                              onClick={() =>
+                                handleSaveEditServiceBenefit(index)
+                              }
                               className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1"
                             >
                               <Save className="w-3 h-3" />
@@ -1464,7 +1817,10 @@ const Services = () => {
                             </button>
                             <button
                               type="button"
-                              onClick={() => { setEditingServiceBenefitIndex(null); setEditServiceBenefitText(''); }}
+                              onClick={() => {
+                                setEditingServiceBenefitIndex(null);
+                                setEditServiceBenefitText("");
+                              }}
                               className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition"
                             >
                               Cancel
@@ -1473,11 +1829,15 @@ const Services = () => {
                         </div>
                       ) : (
                         <>
-                          <p className="flex-1 text-sm text-slate-600 whitespace-pre-wrap">{benefit.description}</p>
+                          <p className="flex-1 text-sm text-slate-600 whitespace-pre-wrap">
+                            {benefit.description}
+                          </p>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
                             <button
                               type="button"
-                              onClick={() => handleStartEditServiceBenefit(index)}
+                              onClick={() =>
+                                handleStartEditServiceBenefit(index)
+                              }
                               className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
@@ -1495,7 +1855,9 @@ const Services = () => {
                     </div>
                   ))}
                   {formData.benefits.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center py-3">No benefits added. Add benefits specific to this service.</p>
+                    <p className="text-xs text-slate-400 text-center py-3">
+                      No benefits added. Add benefits specific to this service.
+                    </p>
                   )}
                 </div>
               </div>
@@ -1505,7 +1867,10 @@ const Services = () => {
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="w-5 h-5 text-blue-500" />
                   <label className="text-sm font-semibold text-slate-700">
-                    Who It's For <span className="font-normal text-slate-400">(Target audience for this service)</span>
+                    Who It's For{" "}
+                    <span className="font-normal text-slate-400">
+                      (Target audience for this service)
+                    </span>
                   </label>
                 </div>
 
@@ -1517,7 +1882,10 @@ const Services = () => {
                     onChange={(e) => setNewServiceTarget(e.target.value)}
                     placeholder="Add target audience for this service..."
                     className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:bg-white transition-all outline-none text-sm"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddServiceTarget())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" &&
+                      (e.preventDefault(), handleAddServiceTarget())
+                    }
                   />
                   <button
                     type="button"
@@ -1531,13 +1899,18 @@ const Services = () => {
                 {/* Target audience list */}
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
                   {formData.targetAudience.map((target, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg group">
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg group"
+                    >
                       <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0"></div>
                       {editingServiceTargetIndex === index ? (
                         <div className="flex-1 flex flex-col gap-2">
                           <textarea
                             value={editServiceTargetText}
-                            onChange={(e) => setEditServiceTargetText(e.target.value)}
+                            onChange={(e) =>
+                              setEditServiceTargetText(e.target.value)
+                            }
                             className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
                             rows={2}
                             autoFocus
@@ -1553,7 +1926,10 @@ const Services = () => {
                             </button>
                             <button
                               type="button"
-                              onClick={() => { setEditingServiceTargetIndex(null); setEditServiceTargetText(''); }}
+                              onClick={() => {
+                                setEditingServiceTargetIndex(null);
+                                setEditServiceTargetText("");
+                              }}
                               className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition"
                             >
                               Cancel
@@ -1562,11 +1938,15 @@ const Services = () => {
                         </div>
                       ) : (
                         <>
-                          <p className="flex-1 text-sm text-slate-600">{target.description}</p>
+                          <p className="flex-1 text-sm text-slate-600">
+                            {target.description}
+                          </p>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
                             <button
                               type="button"
-                              onClick={() => handleStartEditServiceTarget(index)}
+                              onClick={() =>
+                                handleStartEditServiceTarget(index)
+                              }
                               className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
@@ -1584,7 +1964,9 @@ const Services = () => {
                     </div>
                   ))}
                   {formData.targetAudience.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center py-3">No target audience added. Specify who this service is for.</p>
+                    <p className="text-xs text-slate-400 text-center py-3">
+                      No target audience added. Specify who this service is for.
+                    </p>
                   )}
                 </div>
               </div>
@@ -1595,10 +1977,15 @@ const Services = () => {
                   <div className="flex items-center gap-2">
                     <Image className="w-5 h-5 text-[#DFB13B]" />
                     <label className="text-sm font-semibold text-slate-700">
-                      Service Gallery <span className="font-normal text-slate-400">(Max 4 images)</span>
+                      Service Gallery{" "}
+                      <span className="font-normal text-slate-400">
+                        (Max 4 images)
+                      </span>
                     </label>
                   </div>
-                  <span className="text-xs text-slate-500">{formData.serviceImages.length}/4 images</span>
+                  <span className="text-xs text-slate-500">
+                    {formData.serviceImages.length}/4 images
+                  </span>
                 </div>
 
                 {formData.serviceImages.length < 4 && (
@@ -1609,7 +1996,10 @@ const Services = () => {
                         type="url"
                         value={imageUrlInput}
                         onChange={(e) => setImageUrlInput(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddImageUrl())}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" &&
+                          (e.preventDefault(), handleAddImageUrl())
+                        }
                         placeholder="Paste image URL here..."
                         className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm"
                       />
@@ -1626,7 +2016,9 @@ const Services = () => {
                     {/* Divider */}
                     <div className="flex items-center gap-3">
                       <div className="flex-1 h-px bg-slate-200"></div>
-                      <span className="text-xs text-slate-400">or upload from PC</span>
+                      <span className="text-xs text-slate-400">
+                        or upload from PC
+                      </span>
                       <div className="flex-1 h-px bg-slate-200"></div>
                     </div>
 
@@ -1638,8 +2030,8 @@ const Services = () => {
                       onClick={() => fileInputRef.current?.click()}
                       className={`relative border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
                         isDragging
-                          ? 'border-[#DFB13B] bg-[#FFEEC3]/20'
-                          : 'border-slate-300 hover:border-[#DFB13B]/50 hover:bg-slate-50'
+                          ? "border-[#DFB13B] bg-[#FFEEC3]/20"
+                          : "border-slate-300 hover:border-[#DFB13B]/50 hover:bg-slate-50"
                       }`}
                     >
                       <input
@@ -1659,9 +2051,13 @@ const Services = () => {
                         <div className="flex flex-col items-center">
                           <Upload className="w-6 h-6 text-[#DFB13B] mb-2" />
                           <p className="text-sm font-medium text-slate-700">
-                            {isDragging ? 'Drop images here' : 'Drag & drop or click to browse'}
+                            {isDragging
+                              ? "Drop images here"
+                              : "Drag & drop or click to browse"}
                           </p>
-                          <p className="text-xs text-slate-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            PNG, JPG, GIF up to 5MB
+                          </p>
                         </div>
                       )}
                     </div>
@@ -1672,13 +2068,17 @@ const Services = () => {
                 {formData.serviceImages.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
                     {formData.serviceImages.map((img, index) => (
-                      <div key={index} className="relative group rounded-md overflow-hidden bg-slate-100 w-14 h-14">
+                      <div
+                        key={index}
+                        className="relative group rounded-md overflow-hidden bg-slate-100 w-14 h-14"
+                      >
                         <img
                           src={img.url}
                           alt={`Service image ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56"><rect fill="%23f1f5f9" width="56" height="56"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-size="8">Err</text></svg>'
+                            (e.target as HTMLImageElement).src =
+                              'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56"><rect fill="%23f1f5f9" width="56" height="56"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-size="8">Err</text></svg>';
                           }}
                         />
                         {/* Delete button overlay */}
@@ -1699,7 +2099,9 @@ const Services = () => {
                 )}
 
                 {formData.serviceImages.length === 0 && (
-                  <p className="text-xs text-slate-400 text-center py-2">No images uploaded yet. Drag & drop or click to upload.</p>
+                  <p className="text-xs text-slate-400 text-center py-2">
+                    No images uploaded yet. Drag & drop or click to upload.
+                  </p>
                 )}
               </div>
             </div>
@@ -1722,7 +2124,7 @@ const Services = () => {
                 ) : (
                   <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 )}
-                {saving ? 'Saving...' : 'Save Service'}
+                {saving ? "Saving..." : "Save Service"}
               </button>
             </div>
           </div>
@@ -1737,7 +2139,7 @@ const Services = () => {
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Services
+export default Services;

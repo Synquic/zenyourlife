@@ -66,6 +66,10 @@ const propertySchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  galleryImages: {
+    type: [String],
+    default: []
+  },
   cleanliness: {
     title: { type: String, default: 'Cleanliness' },
     description: { type: String, default: 'Professionally cleaned and sanitized before every stay.' }

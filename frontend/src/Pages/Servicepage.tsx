@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useMemo } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar'
 import serviceF1 from '../assets/serviceF1.png'
@@ -79,14 +79,33 @@ interface PageContent {
 
 const Servicepage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Get category filter from URL query parameter
+  const categoryFilter = searchParams.get('category');
+
   // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
   const currentLang = i18n.language?.split('-')[0] || 'en';
+
+  // Filter services by category if query param exists
+  const filteredServices = useMemo(() => {
+    if (!categoryFilter) return services;
+    return services.filter((service) => {
+      const cat = service.category?.toLowerCase();
+      if (categoryFilter === 'massage') {
+        return cat === 'massage' || cat === 'therapy';
+      }
+      if (categoryFilter === 'facial') {
+        return cat === 'facial' || cat === 'facial care';
+      }
+      return true;
+    });
+  }, [services, categoryFilter]);
 
   // Fetch services and page content from backend (with translation)
   useEffect(() => {
@@ -190,12 +209,12 @@ const Servicepage = () => {
       <section className="px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
-            {(pageContent?.statistics || [
+            {[
               { value: '100+', label: t('home.treatments_offered'), isHighlighted: false },
-              { value: '50+', label: t('home.certified_therapists'), isHighlighted: true },
+              { value: '5+', label: t('home.years_experience'), isHighlighted: true },
               { value: '2k+', label: t('home.satisfied_clients'), isHighlighted: false },
               { value: '300+', label: t('home.unique_wellness'), isHighlighted: false }
-            ]).map((stat, index) => (
+            ].map((stat, index) => (
               <div
                 key={index}
                 className={`text-center p-4 sm:p-8 ${
@@ -208,9 +227,7 @@ const Servicepage = () => {
                   {stat.value}
                 </h3>
                 <p className={`text-xs sm:text-sm ${stat.isHighlighted ? 'text-white' : 'text-gray-600'}`}>
-                  {stat.label.split(' ').map((word, i) => (
-                    <span key={i}>{word}<br /></span>
-                  ))}
+                  {stat.label}
                 </p>
               </div>
             ))}
@@ -255,7 +272,7 @@ const Servicepage = () => {
             )}
 
             {/* Dynamic Service Cards - Show only first 8 */}
-            {!loading && !error && services.slice(0, 8).map((service, index) => (
+            {!loading && !error && filteredServices.slice(0, 8).map((service, index) => (
               <div
                 key={service._id}
                 className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"

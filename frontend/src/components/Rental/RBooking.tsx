@@ -85,7 +85,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
     <div className="bg-white w-full">
         {/* Header */}
         <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200">
-          <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Appointment Booking</h2>
+          <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Check Availability</h2>
           <div className="flex items-center gap-1 sm:gap-2">
             <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
