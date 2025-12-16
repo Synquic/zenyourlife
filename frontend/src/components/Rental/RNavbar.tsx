@@ -70,12 +70,12 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
 
 
           <div className="hidden md:flex space-x-8">
-            <button
-              onClick={() => handleSectionClick('hero')}
+            <Link
+              to="/"
               className="text-gray-700 font-semibold hover:text-gray-900"
             >
-              {t('rental.nav.overview')}
-            </button>
+              {t('rental.nav.home')}
+            </Link>
             <button
               onClick={() => handleSectionClick('apartments')}
               className="text-gray-700 font-semibold hover:text-gray-900 cursor-pointer"
@@ -176,7 +176,7 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
               }}
               className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
-              {t('rental.nav.overview')}
+              {t('rental.nav.home')}
             </button>
             <button
               onClick={() => {

@@ -180,25 +180,20 @@ const Dashboard = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white/80 backdrop-blur-xl border-b border-slate-200/50 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 relative z-50">
+        {/* Header - Modern Design */}
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
+          {/* Top row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {/* Mobile menu button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors -ml-2"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#DFB13B] to-[#C9A032] flex items-center justify-center shadow-lg shadow-[#DFB13B]/20">
-                  <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-base sm:text-xl font-bold text-slate-800">Dashboard</h1>
-                  <p className="text-slate-500 text-[10px] sm:text-xs hidden sm:block">{currentDate}</p>
-                </div>
+              <div>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-800">Dashboard</h1>
+                <p className="text-slate-500 text-xs mt-0.5 hidden sm:block">{currentDate}</p>
               </div>
             </div>
 
@@ -206,7 +201,7 @@ const Dashboard = () => {
             <div className="relative" ref={filterDropdownRef}>
               <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-sm font-medium text-slate-700"
+                className="flex items-center gap-2 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors text-xs sm:text-sm font-medium text-slate-700"
               >
                 <Filter className="w-4 h-4" />
                 <span className="hidden sm:inline">{filterOptions.find(opt => opt.value === filterPeriod)?.label}</span>
@@ -214,7 +209,7 @@ const Dashboard = () => {
               </button>
 
               {isFilterOpen && (
-                <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-200 overflow-visible w-48 z-[100]">
+                <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-2xl border border-slate-100 overflow-hidden w-48 z-[100]">
                   {filterOptions.map((option) => (
                     <button
                       key={option.value}
@@ -224,7 +219,7 @@ const Dashboard = () => {
                       }}
                       className={`w-full text-left px-4 py-2.5 text-sm hover:bg-slate-50 transition-colors ${
                         filterPeriod === option.value
-                          ? 'bg-[#DFB13B]/10 text-[#DFB13B] font-semibold'
+                          ? 'bg-gradient-to-r from-[#DFB13B]/10 to-[#C9A032]/5 text-[#DFB13B] font-semibold'
                           : 'text-slate-700'
                       }`}
                     >
@@ -235,6 +230,90 @@ const Dashboard = () => {
               )}
             </div>
           </div>
+
+          {/* Stats row - Mobile: Compact badges, Desktop: Gradient cards */}
+          {!loading && (
+            <>
+              {/* Mobile: Compact badges */}
+              <div className="flex sm:hidden items-center gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-violet-50 rounded-lg shrink-0">
+                  <span className="w-2 h-2 bg-violet-400 rounded-full"></span>
+                  <span className="text-xs text-violet-700">{stats.totalBookings} total</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 rounded-lg shrink-0">
+                  <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                  <span className="text-xs text-blue-700">{stats.upcomingBookings} upcoming</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 rounded-lg shrink-0">
+                  <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
+                  <span className="text-xs text-amber-700">{stats.pendingBookings} pending</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-lg shrink-0">
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
+                  <span className="text-xs text-emerald-700">{stats.confirmedRate}% rate</span>
+                </div>
+              </div>
+
+              {/* Desktop: Modern gradient stat cards */}
+              <div className="hidden sm:grid grid-cols-4 gap-3 mt-3">
+                {/* Total Bookings */}
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-500 via-violet-600 to-purple-700 p-3.5 shadow-md">
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats.totalBookings}</p>
+                      <p className="text-xs text-white/80">Total Bookings</p>
+                    </div>
+                    <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upcoming */}
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 p-3.5 shadow-md">
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats.upcomingBookings}</p>
+                      <p className="text-xs text-white/80">Upcoming</p>
+                    </div>
+                    <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pending */}
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-600 p-3.5 shadow-md">
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats.pendingBookings}</p>
+                      <p className="text-xs text-white/80">Pending</p>
+                    </div>
+                    <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Confirmed Rate */}
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 p-3.5 shadow-md">
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+                  <div className="relative flex items-center justify-between">
+                    <div>
+                      <p className="text-2xl font-bold text-white">{stats.confirmedRate}%</p>
+                      <p className="text-xs text-white/80">Confirmed Rate</p>
+                    </div>
+                    <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                      <TrendingUp className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </header>
 
         {/* Main Content */}
@@ -264,76 +343,23 @@ const Dashboard = () => {
 
           {!loading && (
             <>
-              {/* Welcome Banner */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-[#DFB13B] via-[#C9A032] to-[#B8922D] rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6">
-                <div className="absolute top-0 right-0 w-32 sm:w-64 h-32 sm:h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-1/3 w-16 sm:w-32 h-16 sm:h-32 bg-white/5 rounded-full translate-y-1/2" />
-                <div className="relative z-10">
-                  <div className="mb-3 sm:mb-0">
-                    <h2 className="text-lg sm:text-2xl font-bold text-white mb-1">Welcome back, Admin!</h2>
-                    <p className="text-white/70 text-xs sm:text-sm">Here's what's happening with your massage appointments today.</p>
+              {/* Welcome Banner - Compact Modern Design */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-[#DFB13B] via-[#E8C54A] to-[#C9A032] rounded-2xl p-4 sm:p-5 mb-4 sm:mb-6">
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-xl" />
+                <div className="absolute -bottom-8 left-1/4 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-bold text-white">Welcome back, Admin!</h2>
+                    <p className="text-white/80 text-xs sm:text-sm mt-0.5">Here's what's happening with your massage appointments today.</p>
                   </div>
-                  <div className="flex gap-2 sm:gap-3 mt-3 sm:mt-4">
-                    <div className="flex-1 sm:flex-none bg-white/10 backdrop-blur rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 text-center">
-                      <p className="text-xl sm:text-3xl font-bold text-white">{stats.upcomingBookings}</p>
-                      <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Upcoming</p>
-                    </div>
-                    <div className="flex-1 sm:flex-none bg-white/10 backdrop-blur rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 text-center">
-                      <p className="text-xl sm:text-3xl font-bold text-white">{stats.pendingBookings}</p>
-                      <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Pending</p>
-                    </div>
-                    <div className="flex-1 sm:flex-none bg-white/10 backdrop-blur rounded-xl sm:rounded-2xl px-3 sm:px-5 py-2 sm:py-3 text-center">
-                      <p className="text-xl sm:text-3xl font-bold text-white">{stats.confirmedRate}%</p>
-                      <p className="text-white/70 text-[10px] sm:text-xs mt-0.5">Confirmed</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stats Cards */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-violet-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/appointments')}>
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform">
-                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs bg-violet-50 text-violet-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">Massage</span>
-                  </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.totalBookings}</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Total Appointments</p>
-                </div>
-
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => navigate('/appointments')}>
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
-                      <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs bg-blue-50 text-blue-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">7 Days</span>
-                  </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.upcomingBookings}</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Upcoming Bookings</p>
-                </div>
-
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
-                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs bg-amber-50 text-amber-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">Action</span>
-                  </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.pendingBookings}</p>
-                  <p className="text-xs sm:text-sm text-slate-500">Awaiting Confirmation</p>
-                </div>
-
-                <div className="group bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 hover:-translate-y-1 transition-all duration-300">
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <div className="w-9 h-9 sm:w-11 sm:h-11 bg-gradient-to-br from-emerald-400 to-green-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
-                      <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs bg-emerald-50 text-emerald-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-medium">{stats.confirmedRate}%</span>
-                  </div>
-                  <p className="text-xl sm:text-3xl font-bold text-slate-800 mb-0.5 sm:mb-1">{stats.totalBookings}</p>
-                  <p className="text-xs sm:text-sm text-slate-500">All Time Bookings</p>
+                  <button
+                    onClick={() => navigate('/massage-appointments')}
+                    className="flex items-center gap-2 bg-white/20 backdrop-blur hover:bg-white/30 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all self-start sm:self-auto"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View All
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
@@ -341,27 +367,25 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column - Bookings */}
                 <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-                  {/* Recent Massage Bookings */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                    <div className="px-3 sm:px-5 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-purple-50">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <div className="w-8 h-8 sm:w-9 sm:h-9 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-md shadow-violet-500/20">
-                            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-slate-800 text-sm sm:text-base">Recent Massage Bookings</h3>
-                            <p className="text-[10px] sm:text-xs text-slate-500">{stats.totalBookings} total appointments</p>
-                          </div>
+                  {/* Recent Massage Bookings - Modern Card */}
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-violet-50 to-purple-50 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30">
+                          <Sparkles className="w-5 h-5 text-white" />
                         </div>
-                        <button
-                          onClick={() => navigate('/massage-appointments')}
-                          className="flex items-center gap-1 text-[10px] sm:text-xs text-violet-600 hover:text-violet-700 font-medium bg-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg shadow-sm hover:shadow transition-all"
-                        >
-                          View All
-                          <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                        </button>
+                        <div>
+                          <h3 className="font-bold text-slate-800">Recent Bookings</h3>
+                          <p className="text-xs text-slate-500">{stats.totalBookings} total appointments</p>
+                        </div>
                       </div>
+                      <button
+                        onClick={() => navigate('/massage-appointments')}
+                        className="flex items-center gap-1.5 text-xs text-violet-600 hover:text-violet-700 font-semibold bg-white px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md transition-all"
+                      >
+                        View All
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
                     </div>
                     <div className="divide-y divide-slate-50">
                       {recentMassageBookings.length === 0 ? (
@@ -400,25 +424,24 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* Chart Section */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm p-4 sm:p-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 sm:mb-6">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                          <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  {/* Chart Section - Modern Card */}
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                          <BarChart3 className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h2 className="text-sm sm:text-lg font-semibold text-slate-800">Booking Analytics</h2>
-                          <p className="text-[10px] sm:text-xs text-slate-500">Last 6 months performance</p>
+                          <h3 className="font-bold text-slate-800">Booking Analytics</h3>
+                          <p className="text-xs text-slate-500">Last 6 months performance</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 sm:gap-4 text-[10px] sm:text-xs">
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-gradient-to-r from-violet-500 to-purple-600"></div>
-                          <span className="text-slate-600 font-medium">Massage Appointments</span>
-                        </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-violet-500 to-purple-600"></div>
+                        <span className="text-slate-600 font-medium hidden sm:inline">Massage Appointments</span>
                       </div>
                     </div>
+                    <div className="p-4 sm:p-5">
                     <div className="flex items-end justify-between h-32 sm:h-48 px-1 sm:px-4 pt-4">
                       {chartData.map((data, index) => {
                         const currentMonthName = new Date().toLocaleString('en-US', { month: 'short' })
@@ -444,16 +467,22 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
+              </div>
 
                 {/* Right Column */}
                 <div className="space-y-3 sm:space-y-4">
-                  {/* Quick Actions */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm p-3 sm:p-5">
-                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                      <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500" />
-                      <h2 className="font-semibold text-slate-800 text-sm sm:text-base">Quick Actions</h2>
+                  {/* Quick Actions - Modern Card */}
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-3 sm:p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-slate-100">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <h2 className="font-bold text-slate-800 text-sm sm:text-base">Quick Actions</h2>
+                        <p className="text-[10px] sm:text-xs text-slate-500">Navigate to sections</p>
+                      </div>
                     </div>
-                    <div className="space-y-2">
+                    <div className="p-3 sm:p-4 space-y-2">
                       <button
                         onClick={() => navigate('/massage-appointments')}
                         className="w-full flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-violet-500 to-purple-600 text-white p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-violet-500/25 transition-all group"
@@ -498,33 +527,40 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* Performance Card */}
-                  <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 rounded-xl sm:rounded-2xl p-3 sm:p-5 text-white overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                    <div className="relative z-10">
-                      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
-                        <h3 className="font-semibold text-sm sm:text-base">Performance</h3>
+                  {/* Performance Card - Modern Glassmorphism */}
+                  <div className="relative overflow-hidden rounded-xl sm:rounded-2xl">
+                    <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800" />
+                    <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl" />
+                    <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-violet-500/20 rounded-full blur-2xl" />
+                    <div className="relative z-10 p-3 sm:p-5">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                          <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white text-sm sm:text-base">Performance</h3>
+                          <p className="text-[10px] sm:text-xs text-slate-400">Real-time metrics</p>
+                        </div>
                       </div>
                       <div className="space-y-3 sm:space-y-4">
-                        <div>
-                          <div className="flex items-center justify-between text-xs sm:text-sm mb-1.5 sm:mb-2">
-                            <span className="text-slate-400">Confirmation Rate</span>
+                        <div className="bg-white/5 backdrop-blur rounded-xl p-3">
+                          <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
+                            <span className="text-slate-300">Confirmation Rate</span>
                             <span className="font-bold text-emerald-400">{stats.confirmedRate}%</span>
                           </div>
-                          <div className="w-full bg-slate-700 rounded-full h-2 sm:h-2.5 overflow-hidden">
+                          <div className="w-full bg-slate-700/50 rounded-full h-2.5 overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-emerald-400 to-green-400 rounded-full transition-all duration-1000"
                               style={{ width: `${stats.confirmedRate}%` }}
                             />
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-2 sm:pt-3 border-t border-slate-700">
-                          <div className="bg-slate-700/50 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
-                            <p className="text-lg sm:text-2xl font-bold">{stats.totalBookings}</p>
+                        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                          <div className="bg-white/5 backdrop-blur rounded-xl p-2.5 sm:p-3 text-center border border-white/10">
+                            <p className="text-lg sm:text-2xl font-bold text-white">{stats.totalBookings}</p>
                             <p className="text-[10px] sm:text-xs text-slate-400">Total Bookings</p>
                           </div>
-                          <div className="bg-slate-700/50 rounded-lg sm:rounded-xl p-2 sm:p-3 text-center">
+                          <div className="bg-white/5 backdrop-blur rounded-xl p-2.5 sm:p-3 text-center border border-white/10">
                             <p className="text-lg sm:text-2xl font-bold text-amber-400">{stats.pendingBookings}</p>
                             <p className="text-[10px] sm:text-xs text-slate-400">Pending</p>
                           </div>
@@ -533,15 +569,28 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* System Status */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm p-3 sm:p-5">
-                    <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500" />
-                      <h3 className="font-semibold text-slate-800 text-sm sm:text-base">System Status</h3>
+                  {/* System Status - Modern Card */}
+                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-3 sm:p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-slate-100">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                        <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-800 text-sm sm:text-base">System Status</h3>
+                        <p className="text-[10px] sm:text-xs text-slate-500">Server health</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 sm:p-3 bg-emerald-50 rounded-lg sm:rounded-xl">
-                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                      <span className="text-xs sm:text-sm font-medium text-emerald-700">All systems operational</span>
+                    <div className="p-3 sm:p-4">
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-50 to-emerald-100/50 rounded-xl border border-emerald-100">
+                        <div className="relative">
+                          <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
+                          <div className="absolute inset-0 w-3 h-3 bg-emerald-400 rounded-full animate-ping" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-emerald-700 block">All systems operational</span>
+                          <span className="text-[10px] text-emerald-600">Last checked: Just now</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

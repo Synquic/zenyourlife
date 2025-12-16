@@ -73,7 +73,7 @@ const MassageBooking = () => {
   const filterDropdownRef = useRef<HTMLDivElement>(null)
 
   // Panel resize and collapse states
-  const [leftPanelWidth, setLeftPanelWidth] = useState(420)
+  const [leftPanelWidth, setLeftPanelWidth] = useState(450)
   const [activePanel, setActivePanel] = useState<'both' | 'left' | 'right'>('both')
   const [isResizing, setIsResizing] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -135,7 +135,9 @@ const MassageBooking = () => {
       const data = await response.json()
       if (data.success) {
         setBookings(data.data)
-        if (data.data.length > 0 && !selectedBooking) {
+        // Only auto-select first booking on desktop (md breakpoint = 768px)
+        // On mobile, show list first and let user select
+        if (data.data.length > 0 && !selectedBooking && window.innerWidth >= 768) {
           setSelectedBooking(data.data[0])
         }
       }
@@ -245,8 +247,8 @@ const MassageBooking = () => {
     const newWidth = e.clientX - containerRect.left
 
     // Set min and max widths
-    const minLeftWidth = 280  // Minimum left panel width
-    const minRightWidth = 550 // Minimum right panel width to preserve layout
+    const minLeftWidth = 380  // Minimum left panel width
+    const minRightWidth = 560 // Minimum right panel width to preserve layout
     const maxLeftWidth = containerRect.width - minRightWidth
 
     setLeftPanelWidth(Math.min(Math.max(newWidth, minLeftWidth), maxLeftWidth))
@@ -458,32 +460,33 @@ const MassageBooking = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5 relative z-50">
+        {/* Header - Modern Design */}
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
+          {/* Top row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               {/* Mobile menu button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors -ml-2"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-lg sm:text-2xl font-semibold text-slate-800">Massage Appointments</h1>
-                <p className="text-slate-500 text-xs sm:text-sm mt-0.5 hidden sm:block">Manage massage and wellness bookings</p>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-800">Massage Appointments</h1>
+                <p className="text-slate-500 text-xs mt-0.5 hidden sm:block">Manage massage and wellness bookings</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2">
               {/* Filter Dropdown */}
               <div className="relative" ref={filterDropdownRef}>
                 <button
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="flex items-center gap-2 px-3 py-2 sm:py-2.5 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors text-sm font-medium text-slate-700"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-xs sm:text-sm font-medium text-slate-700"
                 >
-                  <Filter className="w-4 h-4" />
+                  <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span className="hidden sm:inline">{filterOptions.find(opt => opt.value === filterPeriod)?.label}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isFilterOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isFilterOpen && (
@@ -510,74 +513,162 @@ const MassageBooking = () => {
 
               <button
                 onClick={openNewBookingModal}
-                className="flex items-center gap-2 bg-[#DFB13B] text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:bg-[#C9A032] transition font-medium shadow-sm shadow-[#DFB13B]/20 text-sm sm:text-base"
+                className="flex items-center gap-1.5 bg-[#DFB13B] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#C9A032] transition font-medium shadow-sm text-xs sm:text-sm"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">New Appointment</span>
-                <span className="sm:hidden">New</span>
+                <span className="hidden sm:inline">New</span>
               </button>
+            </div>
+          </div>
+
+          {/* Stats row - Compact on mobile, full cards on desktop */}
+          {/* Mobile: Compact badges */}
+          <div className="flex sm:hidden items-center gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg shrink-0">
+              <span className="text-xs text-slate-500">Total</span>
+              <span className="text-sm font-bold text-slate-800">{stats.total}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
+              <span className="text-xs text-amber-700">{stats.pending}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
+              <span className="text-xs text-emerald-700">{stats.confirmed}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+              <span className="text-xs text-blue-700">{stats.completed}</span>
+            </div>
+          </div>
+          {/* Desktop: Modern gradient stat cards - Compact */}
+          <div className="hidden sm:grid grid-cols-4 gap-3 mt-3">
+            {/* Total Bookings Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/5 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{stats.total}</p>
+                  <p className="text-xs text-slate-400">Total Bookings</p>
+                </div>
+                <div className="w-9 h-9 bg-white/10 backdrop-blur rounded-lg flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Pending Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{stats.pending}</p>
+                  <p className="text-xs text-white/80">Pending</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Confirmed Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{stats.confirmed}</p>
+                  <p className="text-xs text-white/80">Confirmed</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Completed Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{stats.completed}</p>
+                  <p className="text-xs text-white/80">Completed</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <CalendarCheck className="w-4 h-4 text-white" />
+                </div>
+              </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden" ref={containerRef}>
-          {/* Left Panel */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative" ref={containerRef}>
+          {/* Left Panel - Full screen on mobile (hidden when booking selected), resizable on desktop */}
           <div
-            className={`border-r border-slate-200 flex flex-col bg-white transition-all duration-300 ${
-              activePanel === 'right' ? 'w-0 overflow-hidden' : activePanel === 'left' ? 'flex-1' : ''
-            }`}
+            className={`md:border-r border-slate-200 flex flex-col bg-white transition-all duration-300 ${
+              activePanel === 'right' ? 'hidden md:block md:w-0 md:overflow-hidden' : activePanel === 'left' ? 'flex-1' : ''
+            } ${selectedBooking ? 'hidden md:flex' : 'flex-1 md:flex-none'}`}
             style={{
               width: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : `${leftPanelWidth}px`,
               minWidth: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : '280px'
             }}
           >
-            {/* Panel header with toggle */}
+            {/* Panel header with toggle - Hidden on mobile */}
             {activePanel !== 'right' && (
-              <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50">
-                <span className="text-xs font-medium text-slate-500">Appointments List</span>
+              <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-[#DFB13B] rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Appointments</span>
+                </div>
                 <button
                   onClick={() => setActivePanel(activePanel === 'left' ? 'both' : 'left')}
-                  className={`p-1.5 rounded-lg transition-colors ${activePanel === 'left' ? 'bg-[#DFB13B] text-white' : 'hover:bg-slate-200 text-slate-500'}`}
+                  className={`p-1.5 rounded-lg transition-all ${activePanel === 'left' ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30' : 'hover:bg-slate-100 text-slate-500'}`}
                   title={activePanel === 'left' ? 'Show both panels' : 'Expand to full width'}
                 >
                   <PanelLeftClose className="w-4 h-4" />
                 </button>
               </div>
             )}
-            {/* Search & Filter */}
-            <div className="p-4 space-y-3 border-b border-slate-100">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            {/* Search & Filter - Modern Design */}
+            <div className="p-4 space-y-4 bg-gradient-to-b from-white to-slate-50/50">
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-[#DFB13B]/20 to-[#C9A032]/10 rounded-lg flex items-center justify-center">
+                  <Search className="text-[#DFB13B] w-4 h-4" />
+                </div>
                 <input
                   type="text"
-                  placeholder="Search appointments..."
+                  placeholder="Search by name, service..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all text-sm"
+                  className="w-full pl-14 pr-4 py-3 bg-white border-2 border-slate-100 rounded-2xl focus:outline-none focus:border-[#DFB13B] focus:shadow-lg focus:shadow-[#DFB13B]/10 transition-all text-sm placeholder-slate-400"
                 />
               </div>
 
-              {/* Status Tabs */}
-              <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
+              {/* Status Tabs - Modern Pill Design */}
+              <div className="flex gap-2 p-1.5 bg-slate-100/80 rounded-2xl">
                 {[
-                  { key: 'all', label: 'All', count: stats.total },
-                  { key: 'pending', label: 'Pending', count: stats.pending },
-                  { key: 'confirmed', label: 'Confirmed', count: stats.confirmed },
-                  { key: 'completed', label: 'Done', count: stats.completed }
+                  { key: 'all', label: 'All', count: stats.total, color: 'slate' },
+                  { key: 'pending', label: 'Pending', count: stats.pending, color: 'amber' },
+                  { key: 'confirmed', label: 'Confirmed', count: stats.confirmed, color: 'emerald' },
+                  { key: 'completed', label: 'Done', count: stats.completed, color: 'blue' }
                 ].map(tab => (
                   <button
                     key={tab.key}
                     onClick={() => setStatusFilter(tab.key)}
-                    className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                    className={`flex-1 px-2 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                       statusFilter === tab.key
-                        ? 'bg-white text-slate-800 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-700'
+                        ? 'bg-white text-slate-800 shadow-md'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
                     }`}
                   >
-                    {tab.label}
-                    <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[10px] ${
-                      statusFilter === tab.key ? 'bg-[#DFB13B]/10 text-[#DFB13B]' : 'bg-slate-200/50'
+                    <span>{tab.label}</span>
+                    <span className={`ml-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      statusFilter === tab.key
+                        ? tab.color === 'amber' ? 'bg-amber-100 text-amber-600'
+                          : tab.color === 'emerald' ? 'bg-emerald-100 text-emerald-600'
+                          : tab.color === 'blue' ? 'bg-blue-100 text-blue-600'
+                          : 'bg-[#DFB13B]/10 text-[#DFB13B]'
+                        : 'bg-slate-200/70 text-slate-500'
                     }`}>
                       {tab.count}
                     </span>
@@ -586,18 +677,18 @@ const MassageBooking = () => {
               </div>
             </div>
 
-            {/* Booking List */}
-            <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {/* Booking List - Modern Cards */}
+            <div className="flex-1 overflow-y-auto p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-slate-500">
-                  <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-                    <Calendar className="w-8 h-8 text-slate-400" />
+                  <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
+                    <Calendar className="w-10 h-10 text-slate-400" />
                   </div>
-                  <p className="font-medium text-slate-700">No appointments found</p>
+                  <p className="font-semibold text-slate-700 text-lg">No appointments</p>
                   <p className="text-sm text-slate-400 mt-1">Try adjusting your filters</p>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-100">
+                <div className="space-y-2">
                   {filteredBookings.map((booking) => {
                     const statusConfig = getStatusConfig(booking.status)
                     const isSelected = selectedBooking?._id === booking._id
@@ -606,41 +697,45 @@ const MassageBooking = () => {
                       <div
                         key={booking._id}
                         onClick={() => setSelectedBooking(booking)}
-                        className={`p-4 cursor-pointer transition-all ${
+                        className={`p-4 cursor-pointer transition-all rounded-2xl border-2 ${
                           isSelected
-                            ? 'bg-[#DFB13B]/5 border-l-3 border-l-[#DFB13B]'
-                            : 'hover:bg-slate-50'
+                            ? 'bg-gradient-to-r from-[#DFB13B]/10 to-[#C9A032]/5 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/10'
+                            : 'bg-white border-transparent hover:border-slate-200 hover:shadow-md'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-semibold text-sm ${
-                              booking.gender === 'male' ? 'bg-blue-500' : booking.gender === 'female' ? 'bg-pink-500' : 'bg-slate-500'
+                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                              booking.gender === 'male'
+                                ? 'bg-gradient-to-br from-blue-400 to-blue-600'
+                                : booking.gender === 'female'
+                                ? 'bg-gradient-to-br from-pink-400 to-pink-600'
+                                : 'bg-gradient-to-br from-slate-400 to-slate-600'
                             }`}>
                               {booking.firstName?.charAt(0)}{booking.lastName?.charAt(0)}
                             </div>
                             <div>
-                              <h4 className="font-semibold text-slate-800 text-sm">{booking.firstName} {booking.lastName}</h4>
-                              <p className="text-xs text-slate-500 mt-0.5">{booking.serviceTitle}</p>
+                              <h4 className="font-bold text-slate-800 text-sm">{booking.firstName} {booking.lastName}</h4>
+                              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{booking.serviceTitle}</p>
                             </div>
                           </div>
-                          <span className={`px-2 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wide border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}>
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${statusConfig.bg} ${statusConfig.text}`}>
                             {booking.status}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
-                          <div className="flex items-center gap-3 text-xs text-slate-500">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3.5 h-3.5" />
+                        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100/80">
+                          <div className="flex items-center gap-2">
+                            <span className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
+                              <Calendar className="w-3 h-3 text-[#DFB13B]" />
                               {formatDate(booking.appointmentDate)}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5" />
+                            <span className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg">
+                              <Clock className="w-3 h-3 text-[#DFB13B]" />
                               {booking.appointmentTime}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 font-mono">#{booking.enrollmentId}</span>
+                          <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-2 py-1 rounded">#{booking.enrollmentId}</span>
                         </div>
                       </div>
                     )
@@ -650,10 +745,10 @@ const MassageBooking = () => {
             </div>
           </div>
 
-          {/* Resizer Handle */}
+          {/* Resizer Handle - Hidden on mobile */}
           {activePanel === 'both' && (
             <div
-              className="w-1 bg-slate-200 hover:bg-[#DFB13B] cursor-col-resize transition-colors relative group flex-shrink-0"
+              className="hidden md:block w-1 bg-slate-200 hover:bg-[#DFB13B] cursor-col-resize transition-colors relative group flex-shrink-0"
               onMouseDown={handleMouseDown}
             >
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-slate-300 group-hover:bg-[#DFB13B] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -662,63 +757,73 @@ const MassageBooking = () => {
             </div>
           )}
 
-          {/* Collapsed Left Panel Button */}
+          {/* Collapsed Left Panel Button - Hidden on mobile */}
           {activePanel === 'right' && (
             <button
               onClick={() => setActivePanel('both')}
-              className="w-10 bg-white border-r border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-colors"
+              className="hidden md:flex w-10 bg-white border-r border-slate-200 items-center justify-center hover:bg-slate-50 transition-colors"
               title="Show appointments list"
             >
               <PanelRightClose className="w-4 h-4 text-slate-500" />
             </button>
           )}
 
-          {/* Right Panel - Details */}
+          {/* Right Panel - Details (Full height within content area on mobile) */}
           <div
             className={`flex-1 flex flex-col bg-slate-50 transition-all duration-300 ${
-              activePanel === 'left' ? 'w-0 overflow-hidden' : ''
-            }`}
-            style={{
-              display: activePanel === 'left' ? 'none' : 'flex'
-            }}
+              activePanel === 'left' ? 'hidden md:flex md:w-0 md:overflow-hidden' : ''
+            } ${selectedBooking ? 'absolute md:relative inset-0 md:inset-auto z-30 md:z-auto bg-slate-50' : 'hidden md:flex'}`}
           >
-            {/* Right panel header with toggle */}
-            <div className="flex items-center justify-between px-6 py-2 border-b border-slate-200 bg-white">
-              <span className="text-xs font-medium text-slate-500">Booking Details</span>
+            {/* Right panel header with toggle and back button - Modern */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50 sticky top-0 z-10">
+              <div className="flex items-center gap-3">
+                {/* Back button - Mobile only */}
+                <button
+                  onClick={() => setSelectedBooking(null)}
+                  className="md:hidden flex items-center gap-2 px-3 py-2 -ml-3 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 rounded-xl transition-all shadow-sm"
+                >
+                  <ChevronDown className="w-4 h-4 text-slate-600 rotate-90" />
+                  <span className="text-sm font-semibold text-slate-600">Back</span>
+                </button>
+                <div className="hidden md:flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Booking Details</span>
+                </div>
+              </div>
               <button
                 onClick={() => setActivePanel(activePanel === 'right' ? 'both' : 'right')}
-                className={`p-1.5 rounded-lg transition-colors ${activePanel === 'right' ? 'bg-[#DFB13B] text-white' : 'hover:bg-slate-100 text-slate-500'}`}
+                className={`hidden md:block p-1.5 rounded-lg transition-all ${activePanel === 'right' ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30' : 'hover:bg-slate-100 text-slate-500'}`}
                 title={activePanel === 'right' ? 'Show both panels' : 'Expand to full width'}
               >
                 <PanelRightClose className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             {selectedBooking ? (
               <div className="max-w-3xl mx-auto space-y-6">
                 {/* Booking Header Card */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-6 py-5 text-white">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-xl font-bold">
+                  <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-4 sm:px-6 py-4 sm:py-5 text-white">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-lg sm:text-xl font-bold shrink-0">
                           {selectedBooking.firstName?.charAt(0)}{selectedBooking.lastName?.charAt(0)}
                         </div>
-                        <div>
-                          <h2 className="text-xl font-semibold">{selectedBooking.firstName} {selectedBooking.lastName}</h2>
-                          <p className="text-white/80 text-sm">{selectedBooking.serviceTitle}</p>
+                        <div className="min-w-0">
+                          <h2 className="text-lg sm:text-xl font-semibold truncate">{selectedBooking.firstName} {selectedBooking.lastName}</h2>
+                          <p className="text-white/80 text-xs sm:text-sm truncate">{selectedBooking.serviceTitle}</p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left sm:text-right pl-14 sm:pl-0">
                         <p className="text-white/60 text-xs font-medium uppercase tracking-wider">Appointment ID</p>
-                        <p className="text-lg font-mono font-semibold">#{selectedBooking.enrollmentId}</p>
+                        <p className="text-base sm:text-lg font-mono font-semibold">#{selectedBooking.enrollmentId}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick Stats */}
-                  <div className="grid grid-cols-4 divide-x divide-slate-100">
+                  <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-slate-100">
                     <div className="p-4 text-center">
                       <p className="text-lg font-bold text-slate-800">{formatDate(selectedBooking.appointmentDate)}</p>
                       <p className="text-xs text-slate-500 mt-1">Date</p>
@@ -746,39 +851,39 @@ const MassageBooking = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-3">
+                {/* Action Buttons - Modern Gradient Design */}
+                <div className="flex items-center gap-3 flex-wrap">
                   {selectedBooking.status === 'pending' && (
                     <button
                       onClick={() => updateBookingStatus(selectedBooking._id, 'confirmed')}
                       disabled={actionLoading === 'confirmed'}
-                      className="flex items-center gap-2 bg-emerald-500 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-600 transition font-medium shadow-sm disabled:opacity-50"
+                      className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs sm:text-sm"
                     >
                       {actionLoading === 'confirmed' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                      Confirm Appointment
+                      <span>Confirm</span>
                     </button>
                   )}
                   {selectedBooking.status === 'confirmed' && (
                     <button
                       onClick={() => updateBookingStatus(selectedBooking._id, 'completed')}
                       disabled={actionLoading === 'completed'}
-                      className="flex items-center gap-2 bg-blue-500 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition font-medium shadow-sm disabled:opacity-50"
+                      className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs sm:text-sm"
                     >
                       {actionLoading === 'completed' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CalendarCheck className="w-4 h-4" />}
-                      Mark Complete
+                      <span className="hidden sm:inline">Mark</span> Complete
                     </button>
                   )}
                   <button
                     onClick={openMessageModal}
-                    className="flex items-center gap-2 bg-amber-500 text-white px-5 py-2.5 rounded-xl hover:bg-amber-600 transition font-medium shadow-sm"
+                    className="flex items-center gap-2 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition-all font-semibold shadow-md text-xs sm:text-sm"
                   >
                     <Send className="w-4 h-4" />
-                    Send Message
+                    <span className="hidden sm:inline">Send</span> Message
                   </button>
                   {selectedBooking.status !== 'cancelled' && selectedBooking.status !== 'completed' && (
                     <button
                       onClick={() => setShowCancelConfirm(selectedBooking._id)}
-                      className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl hover:bg-red-100 transition font-medium border border-red-200"
+                      className="flex items-center gap-2 bg-white text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-all font-semibold border-2 border-red-200 text-xs sm:text-sm"
                     >
                       <XCircle className="w-4 h-4" />
                       Cancel
@@ -786,115 +891,125 @@ const MassageBooking = () => {
                   )}
                   <button
                     onClick={() => setShowDeleteConfirm(selectedBooking._id)}
-                    className="flex items-center gap-2 bg-red-500 text-white px-5 py-2.5 rounded-xl hover:bg-red-600 transition font-medium shadow-sm"
+                    className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all font-semibold shadow-md text-xs sm:text-sm"
                   >
                     <Trash2 className="w-4 h-4" />
                     Delete
                   </button>
                 </div>
 
-                {/* Info Grid */}
-                <div className="grid grid-cols-2 gap-6">
+                {/* Info Grid - Modern Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                   {/* Customer Information */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
-                        <User className="w-4 h-4 text-[#DFB13B]" />
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                        <User className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800">Customer Information</h3>
+                      <h3 className="font-bold text-slate-800">Customer Information</h3>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-semibold text-sm ${
-                          selectedBooking.gender === 'male' ? 'bg-blue-500' : selectedBooking.gender === 'female' ? 'bg-pink-500' : 'bg-slate-500'
+                    <div className="p-5 space-y-4">
+                      <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-lg ${
+                          selectedBooking.gender === 'male'
+                            ? 'bg-gradient-to-br from-blue-400 to-blue-600'
+                            : selectedBooking.gender === 'female'
+                            ? 'bg-gradient-to-br from-pink-400 to-pink-600'
+                            : 'bg-gradient-to-br from-slate-400 to-slate-600'
                         }`}>
                           {selectedBooking.firstName?.charAt(0)}{selectedBooking.lastName?.charAt(0)}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-800">{selectedBooking.firstName} {selectedBooking.lastName}</p>
+                          <p className="font-bold text-slate-800">{selectedBooking.firstName} {selectedBooking.lastName}</p>
                           <p className="text-xs text-slate-500 capitalize">{selectedBooking.gender}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <Mail className="w-4 h-4 text-slate-400" />
+                      <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                          <Mail className="w-4 h-4 text-amber-600" />
+                        </div>
                         <span className="text-slate-600">{selectedBooking.email}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <Phone className="w-4 h-4 text-slate-400" />
+                      <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                          <Phone className="w-4 h-4 text-emerald-600" />
+                        </div>
                         <span className="text-slate-600">{selectedBooking.phoneNumber}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
-                        <MapPin className="w-4 h-4 text-slate-400" />
+                      <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors">
+                        <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                          <MapPin className="w-4 h-4 text-blue-600" />
+                        </div>
                         <span className="text-slate-600">{countryNames[selectedBooking.country] || selectedBooking.country}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Appointment Details */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
-                        <Calendar className="w-4 h-4 text-[#DFB13B]" />
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                        <Calendar className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800">Appointment Details</h3>
+                      <h3 className="font-bold text-slate-800">Appointment Details</h3>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div className="p-5 space-y-4">
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-slate-400" />
+                          <Calendar className="w-4 h-4 text-emerald-500" />
                           <span className="text-sm text-slate-600">Date</span>
                         </div>
-                        <span className="text-sm font-medium text-slate-800">{formatDate(selectedBooking.appointmentDate)}</span>
+                        <span className="text-sm font-bold text-slate-800">{formatDate(selectedBooking.appointmentDate)}</span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                          <span className="text-xs text-slate-500">Time</span>
-                          <span className="text-sm font-medium text-slate-800">{selectedBooking.appointmentTime}</span>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100">
+                          <span className="text-xs text-amber-600 font-medium">Time</span>
+                          <span className="text-lg font-bold text-slate-800 mt-1">{selectedBooking.appointmentTime}</span>
                         </div>
-                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                          <span className="text-xs text-slate-500">Day</span>
-                          <span className="text-sm font-medium text-slate-800">{selectedBooking.appointmentDay}</span>
+                        <div className="flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                          <span className="text-xs text-blue-600 font-medium">Day</span>
+                          <span className="text-lg font-bold text-slate-800 mt-1">{selectedBooking.appointmentDay}</span>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 text-sm">
+                      <div className="flex items-center gap-3 text-sm p-2 text-slate-500">
                         <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-slate-600">Booked on {formatDate(selectedBooking.createdAt)}</span>
+                        <span>Booked on {formatDate(selectedBooking.createdAt)}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Service Details */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-[#DFB13B]" />
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-yellow-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                        <Sparkles className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800">Service</h3>
+                      <h3 className="font-bold text-slate-800">Service</h3>
                     </div>
-                    <div className="space-y-3">
-                      <div className="p-3 bg-gradient-to-r from-[#DFB13B]/5 to-transparent rounded-xl">
-                        <p className="font-medium text-slate-800">{selectedBooking.serviceTitle}</p>
+                    <div className="p-5">
+                      <div className="p-4 bg-gradient-to-r from-[#DFB13B]/10 to-[#C9A032]/5 rounded-xl border border-[#DFB13B]/20">
+                        <p className="font-bold text-slate-800 text-lg">{selectedBooking.serviceTitle}</p>
                         <p className="text-xs text-slate-500 mt-1">Wellness Treatment</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Booking Timeline */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
-                        <Clock className="w-4 h-4 text-[#DFB13B]" />
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                        <Clock className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800">Timeline</h3>
+                      <h3 className="font-bold text-slate-800">Timeline</h3>
                     </div>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div className="p-5 space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl">
                         <span className="text-sm text-slate-600">Created</span>
-                        <span className="text-sm font-medium text-slate-800">{formatDate(selectedBooking.createdAt)}</span>
+                        <span className="text-sm font-bold text-slate-800">{formatDate(selectedBooking.createdAt)}</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                      <div className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-slate-100/50 rounded-xl">
                         <span className="text-sm text-slate-600">Last Updated</span>
-                        <span className="text-sm font-medium text-slate-800">{formatDate(selectedBooking.updatedAt)}</span>
+                        <span className="text-sm font-bold text-slate-800">{formatDate(selectedBooking.updatedAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -902,24 +1017,24 @@ const MassageBooking = () => {
 
                 {/* Special Requests */}
                 {(selectedBooking.specialRequests || selectedBooking.message) && (
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 bg-[#DFB13B]/10 rounded-lg flex items-center justify-center">
-                        <MessageSquare className="w-4 h-4 text-[#DFB13B]" />
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-rose-50 to-orange-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-orange-500 rounded-xl flex items-center justify-center shadow-lg shadow-rose-500/30">
+                        <MessageSquare className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-semibold text-slate-800">Additional Notes</h3>
+                      <h3 className="font-bold text-slate-800">Additional Notes</h3>
                     </div>
-                    <div className="space-y-3">
+                    <div className="p-5 space-y-4">
                       {selectedBooking.specialRequests && (
                         <div>
-                          <p className="text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Special Requests</p>
-                          <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl">{selectedBooking.specialRequests}</p>
+                          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Special Requests</p>
+                          <p className="text-sm text-slate-700 bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-xl">{selectedBooking.specialRequests}</p>
                         </div>
                       )}
                       {selectedBooking.message && (
                         <div>
-                          <p className="text-xs font-medium text-slate-500 mb-1.5 uppercase tracking-wider">Message</p>
-                          <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl">{selectedBooking.message}</p>
+                          <p className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wider">Message</p>
+                          <p className="text-sm text-slate-700 bg-gradient-to-r from-slate-50 to-slate-100/50 p-4 rounded-xl">{selectedBooking.message}</p>
                         </div>
                       )}
                     </div>
@@ -1277,156 +1392,151 @@ const MassageBooking = () => {
         </div>
       )}
 
-      {/* Send Message Modal */}
+      {/* Send Message Modal - Compact Modern Design */}
       {showMessageModal && selectedBooking && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowMessageModal(false)}>
           <div
-            className="bg-white rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl"
+            className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-4 text-white">
+            {/* Compact Header */}
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-5 py-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-semibold">Send Message</h2>
-                  <p className="text-white/70 text-sm">Contact {selectedBooking.firstName} {selectedBooking.lastName}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+                    <Send className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-bold text-white">Send Message</h2>
+                    <p className="text-white/80 text-xs">to {selectedBooking.firstName} {selectedBooking.lastName}</p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setShowMessageModal(false)}
-                  className="p-2 hover:bg-white/10 rounded-lg transition"
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
 
             {/* Status Notification */}
             {messageStatus && (
-              <div className={`px-6 py-3 flex items-center gap-3 ${
-                messageStatus.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-700 border-b border-emerald-100'
-                  : 'bg-red-50 text-red-700 border-b border-red-100'
+              <div className={`px-5 py-2.5 flex items-center gap-2 ${
+                messageStatus.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
               }`}>
                 {messageStatus.type === 'success' ? (
-                  <CheckCircle className="w-5 h-5 text-emerald-500" />
+                  <CheckCircle className="w-4 h-4" />
                 ) : (
-                  <XCircle className="w-5 h-5 text-red-500" />
+                  <XCircle className="w-4 h-4" />
                 )}
-                <span className="text-sm font-medium">{messageStatus.text}</span>
+                <span className="text-xs font-medium">{messageStatus.text}</span>
               </div>
             )}
 
-            {/* Horizontal Layout */}
-            <div className="flex">
-              {/* Left Side - Contact Info & Type Selection */}
-              <div className="w-64 bg-slate-50 p-5 border-r border-slate-200 space-y-4">
-                {/* Customer Contact Info */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Customer Contact</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-600 truncate text-xs">{selectedBooking.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Phone className="w-4 h-4 text-slate-400" />
-                      <span className="text-slate-600 text-xs">{selectedBooking.phoneNumber}</span>
-                    </div>
-                  </div>
+            {/* Content */}
+            <div className="p-5 space-y-4">
+              {/* Inline Contact Info */}
+              <div className="flex items-center gap-4 text-xs text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-[#DFB13B]" />
+                  <span className="truncate max-w-[140px]">{selectedBooking.email}</span>
                 </div>
-
-                {/* Message Type Selection */}
-                <div>
-                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Send via</h3>
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setMessageType('email')}
-                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                        messageType === 'email'
-                          ? 'bg-amber-500 text-white shadow-sm'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300'
-                      }`}
-                    >
-                      <Mail className="w-4 h-4" />
-                      Email
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMessageType('sms')}
-                      className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                        messageType === 'sms'
-                          ? 'bg-amber-500 text-white shadow-sm'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:border-amber-300'
-                      }`}
-                    >
-                      <Phone className="w-4 h-4" />
-                      SMS
-                    </button>
-                  </div>
+                <div className="w-px h-3 bg-slate-200" />
+                <div className="flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-[#DFB13B]" />
+                  <span>{selectedBooking.phoneNumber}</span>
                 </div>
               </div>
 
-              {/* Right Side - Message Content */}
-              <div className="flex-1 p-5 space-y-4">
-                {/* Email Subject (only for email) */}
+              {/* Compact Type Toggle */}
+              <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setMessageType('email')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                    messageType === 'email'
+                      ? 'bg-white text-slate-800 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMessageType('sms')}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                    messageType === 'sms'
+                      ? 'bg-white text-slate-800 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-700'
+                  }`}
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  SMS
+                </button>
+              </div>
+
+              {/* Form Fields */}
+              <div className="space-y-3">
                 {messageType === 'email' && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Subject</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Subject</label>
                     <input
                       type="text"
                       value={messageSubject}
                       onChange={(e) => setMessageSubject(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm"
-                      placeholder="Enter email subject..."
+                      className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:border-[#DFB13B] focus:ring-2 focus:ring-[#DFB13B]/10 transition-all text-sm"
+                      placeholder="Email subject..."
                     />
                   </div>
                 )}
 
-                {/* Message Content */}
-                <div className="flex-1">
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">Message</label>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Message</label>
                   <textarea
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
-                    className={`w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-sm resize-none ${
-                      messageType === 'email' ? 'h-28' : 'h-36'
+                    className={`w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:bg-white focus:border-[#DFB13B] focus:ring-2 focus:ring-[#DFB13B]/10 transition-all text-sm resize-none ${
+                      messageType === 'email' ? 'h-24' : 'h-28'
                     }`}
-                    placeholder={messageType === 'email' ? 'Type your email message here...' : 'Type your SMS message here...'}
+                    placeholder={messageType === 'email' ? 'Write your message...' : 'Write your SMS...'}
                   />
                   {messageType === 'sms' && (
-                    <p className="text-xs text-slate-400 mt-1">
-                      {messageContent.length}/160 characters
-                    </p>
+                    <div className="flex items-center justify-end mt-1">
+                      <p className={`text-[10px] font-medium ${messageContent.length > 160 ? 'text-red-500' : 'text-slate-400'}`}>
+                        {messageContent.length}/160
+                      </p>
+                    </div>
                   )}
                 </div>
+              </div>
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-1">
-                  <button
-                    onClick={() => setShowMessageModal(false)}
-                    className="px-5 py-2 border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 transition font-medium text-sm"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={sendMessage}
-                    disabled={sendingMessage || !messageContent.trim()}
-                    className="flex-1 px-5 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition font-medium flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm text-sm"
-                  >
-                    {sendingMessage ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Sending...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-4 h-4" />
-                        Send {messageType === 'email' ? 'Email' : 'SMS'}
-                      </>
-                    )}
-                  </button>
-                </div>
+              {/* Compact Action Buttons */}
+              <div className="flex gap-2 pt-1">
+                <button
+                  onClick={() => setShowMessageModal(false)}
+                  className="px-4 py-2.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all font-medium text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={sendMessage}
+                  disabled={sendingMessage || !messageContent.trim()}
+                  className="flex-1 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/25 transition-all font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                >
+                  {sendingMessage ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      Send {messageType === 'email' ? 'Email' : 'SMS'}
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

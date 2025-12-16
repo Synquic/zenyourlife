@@ -343,28 +343,112 @@ const BookingManagement = () => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5">
+        {/* Header - Modern Design */}
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
+          {/* Top row */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              {/* Mobile menu button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg transition-colors -ml-2"
               >
                 <Menu className="w-5 h-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-semibold text-slate-800">Booking Management</h1>
-                <p className="text-slate-500 text-xs sm:text-sm mt-0.5">Configure working hours, time slots & blocked dates</p>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-800">Booking Management</h1>
+                <p className="text-slate-500 text-xs mt-0.5 hidden sm:block">Configure working hours, time slots & blocked dates</p>
               </div>
             </div>
             <button
               onClick={() => setShowBlockModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:shadow-lg hover:shadow-red-500/20 transition-all text-sm font-medium"
+              className="flex items-center gap-1.5 bg-gradient-to-r from-red-500 to-rose-500 text-white px-3 sm:px-4 py-2 rounded-lg hover:shadow-lg hover:shadow-red-500/30 transition-all font-medium shadow-sm text-xs sm:text-sm"
             >
               <CalendarOff className="w-4 h-4" />
               <span className="hidden sm:inline">Block Date</span>
             </button>
+          </div>
+
+          {/* Stats row - Compact on mobile, full cards on desktop */}
+          {/* Mobile: Compact badges */}
+          <div className="flex sm:hidden items-center gap-2 mt-3 overflow-x-auto pb-1 -mx-4 px-4">
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-100 rounded-lg shrink-0">
+              <span className="text-xs text-slate-500">Days</span>
+              <span className="text-sm font-bold text-slate-800">{workingDaysCount}</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
+              <span className="text-xs text-emerald-700">{settings ? Object.values(settings.weeklySchedule).reduce((acc, day) => acc + (day.isWorking ? day.timeSlots.length : 0), 0) : 0} slots</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-red-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+              <span className="text-xs text-red-700">{activeBlocksCount} blocked</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-purple-50 rounded-lg shrink-0">
+              <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
+              <span className="text-xs text-purple-700">{partialBlocksCount} partial</span>
+            </div>
+          </div>
+
+          {/* Desktop: Modern gradient stat cards - Compact */}
+          <div className="hidden sm:grid grid-cols-4 gap-3 mt-3">
+            {/* Working Days Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{workingDaysCount}</p>
+                  <p className="text-xs text-white/80">Working Days</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <CalendarDays className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Time Slots Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">
+                    {settings ? Object.values(settings.weeklySchedule).reduce((acc, day) => acc + (day.isWorking ? day.timeSlots.length : 0), 0) : 0}
+                  </p>
+                  <p className="text-xs text-white/80">Time Slots</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Active Blocks Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-red-400 via-red-500 to-rose-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{activeBlocksCount}</p>
+                  <p className="text-xs text-white/80">Active Blocks</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <CalendarOff className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Partial Blocks Card */}
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-400 via-purple-500 to-violet-600 p-3.5 shadow-md">
+              <div className="absolute -top-4 -right-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+              <div className="relative flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-white">{partialBlocksCount}</p>
+                  <p className="text-xs text-white/80">Partial Blocks</p>
+                </div>
+                <div className="w-9 h-9 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center">
+                  <Clock3 className="w-4 h-4 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -379,89 +463,32 @@ const BookingManagement = () => {
             </div>
           ) : (
             <>
-              {/* Stats Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-6 sm:mb-8">
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-emerald-200 transition-all">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Working Days</p>
-                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{workingDaysCount}</p>
-                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Per week</p>
-                    </div>
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                      <CalendarDays className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-blue-200 transition-all">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Time Slots</p>
-                      <p className="text-xl sm:text-3xl font-bold text-slate-800">
-                        {settings ? Object.values(settings.weeklySchedule).reduce((acc, day) => acc + (day.isWorking ? day.timeSlots.length : 0), 0) : 0}
-                      </p>
-                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">All days</p>
-                    </div>
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Clock className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-red-200 transition-all">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Active Blocks</p>
-                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{activeBlocksCount}</p>
-                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Blocked</p>
-                    </div>
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-red-100 to-red-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                      <CalendarOff className="w-4 h-4 sm:w-6 sm:h-6 text-red-600" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-slate-100 shadow-sm group hover:shadow-md hover:border-purple-200 transition-all">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1 truncate">Partial Blocks</p>
-                      <p className="text-xl sm:text-3xl font-bold text-slate-800">{partialBlocksCount}</p>
-                      <p className="text-[10px] sm:text-xs text-slate-400 mt-1 sm:mt-2">Slots</p>
-                    </div>
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-100 to-purple-50 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                      <Clock3 className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tabs */}
-              <div className="flex gap-2 mb-6">
+              {/* Modern Tabs with Pill Design */}
+              <div className="flex gap-2 p-1.5 bg-slate-100/80 rounded-2xl mb-6 w-fit">
                 <button
                   onClick={() => setActiveTab('schedule')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     activeTab === 'schedule'
-                      ? 'bg-[#DFB13B] text-white shadow-lg shadow-[#DFB13B]/20'
-                      : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                      ? 'bg-white text-slate-800 shadow-md'
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
                   }`}
                 >
-                  <Settings2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Weekly</span> Schedule
+                  <Settings2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Weekly</span> Schedule
                 </button>
                 <button
                   onClick={() => setActiveTab('blocked')}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     activeTab === 'blocked'
-                      ? 'bg-red-500 text-white shadow-lg shadow-red-500/20'
-                      : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+                      ? 'bg-white text-slate-800 shadow-md'
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
                   }`}
                 >
-                  <CalendarOff className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden xs:inline">Blocked</span> Dates
+                  <CalendarOff className="w-4 h-4" />
+                  <span className="hidden sm:inline">Blocked</span> Dates
                   {activeBlocksCount > 0 && (
-                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] sm:text-xs ${
-                      activeTab === 'blocked' ? 'bg-white/20' : 'bg-red-100 text-red-600'
+                    <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      activeTab === 'blocked' ? 'bg-red-100 text-red-600' : 'bg-slate-200/70 text-slate-500'
                     }`}>
                       {activeBlocksCount}
                     </span>
@@ -472,24 +499,22 @@ const BookingManagement = () => {
               {/* Tab Content */}
               {activeTab === 'schedule' ? (
                 <div className="space-y-6">
-                  {/* Advance Booking Settings */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                    <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 to-orange-50">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center">
-                          <Clock className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Advance Booking Settings</h3>
-                          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Configure how far in advance users can book</p>
-                        </div>
+                  {/* Advance Booking Settings - Modern Card */}
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 border-b border-slate-100">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center shadow-lg shadow-[#DFB13B]/30">
+                        <Clock className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-800">Advance Booking Settings</h3>
+                        <p className="text-xs text-slate-500">Configure how far in advance users can book</p>
                       </div>
                     </div>
 
-                    <div className="p-4 sm:p-6">
+                    <div className="p-5">
                       <div className="flex flex-col sm:flex-row sm:items-end gap-4">
                         <div className="flex-1">
-                          <label className="block text-sm font-medium text-slate-700 mb-2">
+                          <label className="block text-sm font-semibold text-slate-700 mb-2">
                             Minimum Advance Booking (Hours)
                           </label>
                           <p className="text-xs text-slate-500 mb-3">
@@ -503,7 +528,7 @@ const BookingManagement = () => {
                               max="720"
                               value={minAdvanceHours}
                               onChange={(e) => setMinAdvanceHours(Math.max(0, parseInt(e.target.value) || 0))}
-                              className="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all"
+                              className="w-32 px-4 py-2.5 border-2 border-slate-100 rounded-xl text-center text-lg font-semibold focus:outline-none focus:border-[#DFB13B] focus:shadow-lg focus:shadow-[#DFB13B]/10 transition-all"
                             />
                             <span className="text-slate-600 font-medium">hours</span>
                             <span className="text-slate-400 text-sm">
@@ -514,7 +539,7 @@ const BookingManagement = () => {
                         <button
                           onClick={handleSaveAdvanceBooking}
                           disabled={savingAdvance || minAdvanceHours === settings?.minAdvanceBooking}
-                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-[#DFB13B]/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                         >
                           {savingAdvance ? (
                             <>
@@ -531,8 +556,8 @@ const BookingManagement = () => {
                       </div>
 
                       {minAdvanceHours > 0 && (
-                        <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-                          <p className="text-sm text-amber-800">
+                        <div className="mt-4 p-3 bg-gradient-to-r from-[#DFB13B]/10 to-[#C9A032]/5 border border-[#DFB13B]/20 rounded-xl">
+                          <p className="text-sm text-[#8B7B2A]">
                             <span className="font-semibold">Current setting:</span> Users can only book appointments that are at least <span className="font-bold">{minAdvanceHours} hours</span> ({minAdvanceHours >= 24 ? `${Math.floor(minAdvanceHours / 24)} day${Math.floor(minAdvanceHours / 24) !== 1 ? 's' : ''}` : `${minAdvanceHours} hours`}) from now.
                           </p>
                         </div>
@@ -540,14 +565,15 @@ const BookingManagement = () => {
                     </div>
                   </div>
 
-                  {/* Weekly Schedule Tab */}
-                  <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-slate-50/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Weekly Working Schedule</h3>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Configure time slots for each day</p>
-                      </div>
+                  {/* Weekly Schedule Tab - Modern Card */}
+                  <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-slate-100">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                      <CalendarDays className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-800">Weekly Working Schedule</h3>
+                      <p className="text-xs text-slate-500">Configure time slots for each day</p>
                     </div>
                   </div>
 
@@ -706,33 +732,35 @@ const BookingManagement = () => {
                 </div>
                 </div>
               ) : (
-                /* Blocked Dates Tab */
-                <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-                  <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-slate-100 bg-slate-50/50">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-slate-700 text-sm sm:text-base">Blocked Dates</h3>
-                        <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Dates when bookings not allowed</p>
+                /* Blocked Dates Tab - Modern Card */
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 border-b border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-rose-500 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/30">
+                        <CalendarOff className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-xs sm:text-sm text-slate-500">
-                        {blockedDates.length} blocked
-                      </span>
+                      <div>
+                        <h3 className="font-bold text-slate-800">Blocked Dates</h3>
+                        <p className="text-xs text-slate-500">Dates when bookings not allowed</p>
+                      </div>
                     </div>
+                    <span className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-semibold">
+                      {blockedDates.length} blocked
+                    </span>
                   </div>
 
                   {blockedDates.length === 0 ? (
-                    <div className="text-center py-20">
-                      <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <CalendarCheck className="w-8 h-8 text-slate-400" />
+                    <div className="flex flex-col items-center justify-center py-16 text-slate-500">
+                      <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
+                        <CalendarCheck className="w-10 h-10 text-slate-400" />
                       </div>
-                      <h3 className="text-lg font-semibold text-slate-700 mb-1">No blocked dates</h3>
-                      <p className="text-slate-500 text-sm">
-                        All dates follow the weekly schedule
-                      </p>
+                      <p className="font-semibold text-slate-700 text-lg">No blocked dates</p>
+                      <p className="text-sm text-slate-400 mt-1">All dates follow the weekly schedule</p>
                       <button
                         onClick={() => setShowBlockModal(true)}
-                        className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors"
+                        className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-red-500/30 transition-all shadow-md"
                       >
+                        <CalendarOff className="w-4 h-4" />
                         Block a Date
                       </button>
                     </div>
@@ -887,37 +915,45 @@ const BookingManagement = () => {
         </div>
       </div>
 
-      {/* Block Date Modal */}
+      {/* Block Date Modal - Modern Design */}
       {showBlockModal && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={() => setShowBlockModal(false)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto transform transition-all"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-gradient-to-r from-red-500 to-red-600 px-6 py-5 text-white relative sticky top-0">
-              <button
-                onClick={() => setShowBlockModal(false)}
-                className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-lg transition-all"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-                  <CalendarOff className="w-6 h-6" />
+            {/* Modern Header with Gradient & Pattern */}
+            <div className="bg-gradient-to-br from-red-500 via-red-600 to-rose-600 px-6 py-5 text-white overflow-hidden sticky top-0">
+              {/* Decorative circles */}
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-white/10 rounded-full" />
+
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
+                    <CalendarOff className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Block Date</h3>
+                    <p className="text-white/80 text-sm mt-0.5">Block full day or specific time slots</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Block Date</h3>
-                  <p className="text-white/80 text-sm">Block full day or specific time slots</p>
-                </div>
+                <button
+                  onClick={() => setShowBlockModal(false)}
+                  className="p-2.5 bg-white/20 hover:bg-white/30 rounded-xl transition-all backdrop-blur-sm"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
 
-            <div className="p-6">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+            <div className="p-6 space-y-5">
+              {/* Date Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Select Date
                 </label>
                 <input
@@ -928,24 +964,25 @@ const BookingManagement = () => {
                     setSelectedBlockSlots([])
                   }}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                  className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
                 />
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+              {/* Block Type Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Block Type
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="flex gap-3">
                   <button
                     onClick={() => {
                       setBlockType('full')
                       setSelectedBlockSlots([])
                     }}
-                    className={`px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                    className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
                       blockType === 'full'
-                        ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-2 border-transparent'
+                        ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/30'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     <CalendarOff className="w-4 h-4" />
@@ -953,10 +990,10 @@ const BookingManagement = () => {
                   </button>
                   <button
                     onClick={() => setBlockType('slots')}
-                    className={`px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2 ${
+                    className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
                       blockType === 'slots'
-                        ? 'bg-purple-100 text-purple-700 border-2 border-purple-300'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-2 border-transparent'
+                        ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg shadow-purple-500/30'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     <Clock className="w-4 h-4" />
@@ -965,9 +1002,10 @@ const BookingManagement = () => {
                 </div>
               </div>
 
+              {/* Time Slots Selection */}
               {blockType === 'slots' && selectedDate && (
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Select Time Slots to Block
                   </label>
                   {getTimeSlotsForSelectedDate().length > 0 ? (
@@ -976,9 +1014,9 @@ const BookingManagement = () => {
                         <button
                           key={slot}
                           onClick={() => toggleBlockSlotSelection(slot)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                             selectedBlockSlots.includes(slot)
-                              ? 'bg-purple-500 text-white'
+                              ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-md'
                               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                           }`}
                         >
@@ -987,39 +1025,40 @@ const BookingManagement = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="p-4 bg-amber-50 rounded-xl">
+                    <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
                       <div className="flex items-center gap-2 text-amber-700">
                         <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm">This is a non-working day. No slots available.</span>
+                        <span className="text-sm font-medium">This is a non-working day. No slots available.</span>
                       </div>
                     </div>
                   )}
                   {selectedBlockSlots.length === 0 && getTimeSlotsForSelectedDate().length > 0 && (
-                    <p className="text-xs text-amber-600 mt-2">
+                    <p className="text-xs text-amber-600 mt-2 font-medium">
                       Select at least one time slot to block
                     </p>
                   )}
                 </div>
               )}
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Reason (Optional)
+              {/* Reason Input */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  Reason <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={blockReason}
                   onChange={(e) => setBlockReason(e.target.value)}
                   placeholder="e.g., Holiday, Personal day, etc."
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all"
+                  className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm placeholder-slate-400"
                 />
               </div>
 
+              {/* Summary Preview */}
               {selectedDate && (
-                <div className={`mb-6 p-4 rounded-xl border ${blockType === 'full' ? 'bg-red-50 border-red-100' : 'bg-purple-50 border-purple-100'}`}>
-                  <p className={`text-sm ${blockType === 'full' ? 'text-red-700' : 'text-purple-700'}`}>
-                    <span className="font-medium">Blocking:</span>{' '}
-                    {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
+                <div className={`p-4 rounded-xl ${blockType === 'full' ? 'bg-gradient-to-r from-red-50 to-rose-50 border border-red-100' : 'bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100'}`}>
+                  <p className={`text-sm font-semibold ${blockType === 'full' ? 'text-red-700' : 'text-purple-700'}`}>
+                    Blocking: {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -1037,7 +1076,8 @@ const BookingManagement = () => {
                 </div>
               )}
 
-              <div className="flex gap-3">
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
                 <button
                   onClick={() => {
                     setShowBlockModal(false)
@@ -1046,14 +1086,14 @@ const BookingManagement = () => {
                     setSelectedDate('')
                     setBlockReason('')
                   }}
-                  className="flex-1 px-4 py-3 border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors"
+                  className="px-6 py-3.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all font-semibold text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleBlockDate}
                   disabled={!selectedDate || submitting || (blockType === 'slots' && selectedBlockSlots.length === 0)}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-red-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all font-semibold flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-sm"
                 >
                   {submitting ? (
                     <>

@@ -282,10 +282,10 @@ const Testimonials = () => {
                 />
               </div>
               {/* Notification */}
-              <button className="p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative flex-shrink-0">
+              {/* <button className="p-2 sm:p-2.5 text-slate-500 hover:bg-slate-100 rounded-xl transition relative flex-shrink-0">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              </button> */}
               {/* Profile */}
               <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold shadow-lg shadow-[#DFB13B]/20 flex-shrink-0">
                 A
