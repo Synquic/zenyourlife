@@ -48,13 +48,32 @@ interface CardProps {
 
 const Card = ({ property, t, onBookNow }: CardProps) => {
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Get fallback image based on property.image or default
+  const getFallbackImage = () => {
+    if (property.image && imageMap[property.image]) return imageMap[property.image];
+    return apat1;
+  };
 
   // Get image source - prefer imageUrl from server, fallback to mapped image
   const getImageSrc = () => {
+    // If server image failed to load, use fallback
+    if (imageError) {
+      return getFallbackImage();
+    }
+
     const serverUrl = getImageUrl(property.imageUrl);
     if (serverUrl) return serverUrl;
-    if (property.image && imageMap[property.image]) return imageMap[property.image];
-    return apat1; // Default fallback
+    return getFallbackImage();
+  };
+
+  // Handle image load error - switch to fallback
+  const handleImageError = () => {
+    if (!imageError) {
+      console.log(`Image failed to load for ${property.name}, using fallback`);
+      setImageError(true);
+    }
   };
 
   return (
@@ -64,6 +83,7 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
         <img
           src={getImageSrc()}
           alt={property.name}
+          onError={handleImageError}
           className="w-full h-48 sm:h-52 lg:h-full lg:min-h-[220px] object-cover rounded-lg sm:rounded-xl"
         />
       </div>
@@ -149,7 +169,7 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
             className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-xl shadow-md hover:bg-blue-700 transition-all font-medium text-sm"
           >
             {t('rental.apartments.view_more')}
-            <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5 brightness-0 invert" />
+            
           </Link>
           <button
             onClick={onBookNow}

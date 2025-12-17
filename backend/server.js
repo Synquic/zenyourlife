@@ -173,6 +173,15 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// Handle 404 for uploads - prevent falling through to SPA catch-all
+app.use('/uploads', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'File not found',
+    path: req.path
+  });
+});
+
 // Catch-all routes for SPA (must be after API routes) - Only in production
 if (process.env.NODE_ENV === 'production') {
   // Admin panel catch-all route

@@ -55,14 +55,46 @@ const ParticularProperty = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
+  // Image error states for fallback handling
+  const [mainImageError, setMainImageError] = useState(false);
+  const [galleryImageErrors, setGalleryImageErrors] = useState<{[key: number]: boolean}>({});
+
   const currentLang = i18n.language?.split("-")[0] || "en";
 
-  // Get image source
-  const getImageSrc = (imageUrl?: string, imageName?: string) => {
+  // Get fallback image based on property.image or default
+  const getFallbackImage = (imageName?: string, index?: number) => {
+    if (imageName && imageMap[imageName]) return imageMap[imageName];
+    // Alternate between apat1 and apat2 for gallery images
+    if (index !== undefined) return index % 2 === 0 ? apat1 : apat2;
+    return apat1;
+  };
+
+  // Get image source with error handling
+  const getImageSrc = (imageUrl?: string, imageName?: string, hasError?: boolean, index?: number) => {
+    // If image failed to load, use fallback
+    if (hasError) {
+      return getFallbackImage(imageName, index);
+    }
     const serverUrl = getImageUrl(imageUrl);
     if (serverUrl) return serverUrl;
     if (imageName && imageMap[imageName]) return imageMap[imageName];
-    return apat1;
+    return getFallbackImage(imageName, index);
+  };
+
+  // Handle main image error
+  const handleMainImageError = () => {
+    if (!mainImageError) {
+      console.log('Main image failed to load, using fallback');
+      setMainImageError(true);
+    }
+  };
+
+  // Handle gallery image error
+  const handleGalleryImageError = (index: number) => {
+    if (!galleryImageErrors[index]) {
+      console.log(`Gallery image ${index} failed to load, using fallback`);
+      setGalleryImageErrors(prev => ({ ...prev, [index]: true }));
+    }
   };
 
   // Disable background scroll when modal is open
@@ -77,6 +109,12 @@ const ParticularProperty = () => {
     };
   }, [isBookingModalOpen, isContactModalOpen]);
 
+  // Reset image error states when property ID changes
+  useEffect(() => {
+    setMainImageError(false);
+    setGalleryImageErrors({});
+  }, [id]);
+
   // Fetch property data
   useEffect(() => {
     const fetchProperty = async () => {
@@ -85,8 +123,6 @@ const ParticularProperty = () => {
           `${API_BASE_URL}/properties/${id}?lang=${currentLang}`
         );
         const data = await response.json();
-        console.log("[Frontend] Fetched property data:", data);
-        console.log("[Frontend] Gallery images from DB:", data.data?.galleryImages);
         if (data.success) {
           setProperty(data.data);
         }
@@ -156,13 +192,18 @@ const ParticularProperty = () => {
     );
   }
 
-  // Get gallery images (main + additional)
-  const mainImage = getImageSrc(property.imageUrl, property.image);
-  console.log("[Frontend] Raw galleryImages from property:", property.galleryImages);
+  // Get gallery images (main + additional) with error handling
+  const mainImage = getImageSrc(property.imageUrl, property.image, mainImageError);
+
+  // Process gallery images with fallback support
   const galleryImages = property.galleryImages && property.galleryImages.length > 0
-    ? property.galleryImages.map((img: string) => getImageUrl(img) || apat1)
+    ? property.galleryImages.map((img: string, idx: number) => {
+        if (galleryImageErrors[idx]) {
+          return idx % 2 === 0 ? apat1 : apat2; // Fallback if error
+        }
+        return getImageUrl(img) || (idx % 2 === 0 ? apat1 : apat2);
+      })
     : [apat1, apat2];
-  console.log("[Frontend] Processed galleryImages for display:", galleryImages);
 
   return (
     <>
@@ -177,6 +218,7 @@ const ParticularProperty = () => {
             <img
               src={mainImage}
               alt={property.name}
+              onError={handleMainImageError}
               className="w-full h-full object-cover rounded-2xl sm:rounded-3xl shadow-lg"
             />
           </div>
@@ -187,6 +229,7 @@ const ParticularProperty = () => {
               <img
                 src={galleryImages[0] || apat1}
                 alt={`${property.name} view 1`}
+                onError={() => handleGalleryImageError(0)}
                 className="w-full h-full object-cover rounded-xl sm:rounded-2xl shadow-md"
               />
             </div>
@@ -194,6 +237,7 @@ const ParticularProperty = () => {
               <img
                 src={galleryImages[1] || apat2}
                 alt={`${property.name} view 2`}
+                onError={() => handleGalleryImageError(1)}
                 className="w-full h-full object-cover rounded-xl sm:rounded-2xl shadow-md"
               />
             </div>
@@ -311,132 +355,130 @@ const ParticularProperty = () => {
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-md transition-all font-medium text-xs sm:text-sm"
               >
                 {t("rental.apartments.book_now")}
-                <img
-                  src={blueArrow}
-                  alt="arrow"
-                  className="w-3 h-3 sm:w-4 sm:h-4 brightness-0 invert"
-                />
+               
               </button>
             </div>
           </div>
         </div>
 
         {/* overview */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-5 mt-10 sm:p-8 grid grid-cols-2 gap-8">
-          {/* LEFT */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 text-blue-500 text-sm mb-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span>{t("rental.property_overview.label")}</span>
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-5 mt-10 sm:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* LEFT */}
+            <div>
+              <div className="flex items-center gap-2 text-blue-500 text-sm mb-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>{t("rental.property_overview.label")}</span>
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">{t("rental.property_overview.title")}</h2>
+
+              <p className="text-gray-800 text-sm mt-4 leading-relaxed">
+                {t("rental.property_overview.description1")}
+              </p>
+
+              <p className="text-gray-800 text-sm mt-4 leading-relaxed">
+                {t("rental.property_overview.description2")}
+              </p>
+
+              <p className="text-gray-800 text-sm mt-4 leading-relaxed font-bold">
+                {t("rental.property_overview.highlights")}
+              </p>
+              <ul className="list-disc list-inside mt-2 text-gray-600 text-sm leading-relaxed space-y-1">
+                <li>{t("rental.property_overview.highlight1")}</li>
+                <li>{t("rental.property_overview.highlight2")}</li>
+                <li>{t("rental.property_overview.highlight3")}</li>
+                <li>{t("rental.property_overview.highlight4")}</li>
+                <li>{t("rental.property_overview.highlight5")}</li>
+                <li>{t("rental.property_overview.highlight6")}</li>
+                <li>{t("rental.property_overview.highlight7")}</li>
+                <li>{t("rental.property_overview.highlight8")}</li>
+              </ul>
             </div>
 
-            <h2 className="text-3xl font-semibold text-gray-900">{t("rental.property_overview.title")}</h2>
-
-            <p className="text-gray-800 text-sm mt-4 leading-relaxed w-[80%]">
-              {t("rental.property_overview.description1")}
-            </p>
-
-            <p className="text-gray-800 text-sm mt-4 leading-relaxed w-[80%]">
-              {t("rental.property_overview.description2")}
-            </p>
-
-            <p className="text-gray-800 text-sm mt-4 leading-relaxed font-bold">
-              {t("rental.property_overview.highlights")}
-            </p>
-            <ul className="list-disc list-inside mt-2 text-gray-600 text-sm leading-relaxed space-y-1">
-              <li>{t("rental.property_overview.highlight1")}</li>
-              <li>{t("rental.property_overview.highlight2")}</li>
-              <li>{t("rental.property_overview.highlight3")}</li>
-              <li>{t("rental.property_overview.highlight4")}</li>
-              <li>{t("rental.property_overview.highlight5")}</li>
-              <li>{t("rental.property_overview.highlight6")}</li>
-              <li>{t("rental.property_overview.highlight7")}</li>
-              <li>{t("rental.property_overview.highlight8")}</li>
-            </ul>
-          </div>
-
-          {/* right */}
-          <div className="lg:col-span-1">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Card 1 - Private terrace */}
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="p-4">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {t("rental.property_overview.private_terrace")}
-                  </h3>
-                  <p className="text-gray-500 text-xs leading-relaxed">
-                    {t("rental.property_overview.private_terrace_desc")}
-                  </p>
+            {/* RIGHT - Cards Grid */}
+            <div>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                {/* Card 1 - Private terrace */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                      {t("rental.property_overview.private_terrace")}
+                    </h3>
+                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                      {t("rental.property_overview.private_terrace_desc")}
+                    </p>
+                  </div>
+                  <div className="relative h-24 sm:h-36 overflow-hidden">
+                    <img
+                      src={ov1}
+                      alt={t("rental.property_overview.private_terrace")}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                  </div>
                 </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img
-                    src={ov1}
-                    alt={t("rental.property_overview.private_terrace")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                </div>
-              </div>
 
-              {/* Card 2 - Airy bedroom */}
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="p-4">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {t("rental.property_overview.airy_bedroom")}
-                  </h3>
-                  <p className="text-gray-500 text-xs leading-relaxed">
-                    {t("rental.property_overview.airy_bedroom_desc")}
-                  </p>
+                {/* Card 2 - Airy bedroom */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                      {t("rental.property_overview.airy_bedroom")}
+                    </h3>
+                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                      {t("rental.property_overview.airy_bedroom_desc")}
+                    </p>
+                  </div>
+                  <div className="relative h-24 sm:h-36 overflow-hidden">
+                    <img
+                      src={ov2}
+                      alt={t("rental.property_overview.airy_bedroom")}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                  </div>
                 </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img
-                    src={ov2}
-                    alt={t("rental.property_overview.airy_bedroom")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                </div>
-              </div>
 
-              {/* Card 3 - Open-plan living room */}
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="p-4">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {t("rental.property_overview.living_room")}
-                  </h3>
-                  <p className="text-gray-500 text-xs leading-relaxed">
-                    {t("rental.property_overview.living_room_desc")}
-                  </p>
+                {/* Card 3 - Open-plan living room */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                      {t("rental.property_overview.living_room")}
+                    </h3>
+                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                      {t("rental.property_overview.living_room_desc")}
+                    </p>
+                  </div>
+                  <div className="relative h-24 sm:h-36 overflow-hidden">
+                    <img
+                      src={ov3}
+                      alt={t("rental.property_overview.living_room")}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                  </div>
                 </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img
-                    src={ov3}
-                    alt={t("rental.property_overview.living_room")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                </div>
-              </div>
 
-              {/* Card 4 - Fully equipped kitchen */}
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="p-4">
-                  <h3 className="text-base font-semibold text-gray-900 mb-1">
-                    {t("rental.property_overview.kitchen")}
-                  </h3>
-                  <p className="text-gray-500 text-xs leading-relaxed">
-                    {t("rental.property_overview.kitchen_desc")}
-                  </p>
-                </div>
-                <div className="relative h-36 overflow-hidden">
-                  <img
-                    src={ov4}
-                    alt={t("rental.property_overview.kitchen")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                {/* Card 4 - Fully equipped kitchen */}
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                  <div className="p-3 sm:p-4">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                      {t("rental.property_overview.kitchen")}
+                    </h3>
+                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                      {t("rental.property_overview.kitchen_desc")}
+                    </p>
+                  </div>
+                  <div className="relative h-24 sm:h-36 overflow-hidden">
+                    <img
+                      src={ov4}
+                      alt={t("rental.property_overview.kitchen")}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                  </div>
                 </div>
               </div>
             </div>
