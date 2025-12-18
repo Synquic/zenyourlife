@@ -80,7 +80,7 @@ interface PageContent {
 const Servicepage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -88,9 +88,6 @@ const Servicepage = () => {
 
   // Get category filter from URL query parameter
   const categoryFilter = searchParams.get('category');
-
-  // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
-  const currentLang = i18n.language?.split('-')[0] || 'en';
 
   // Filter services by category if query param exists
   const filteredServices = useMemo(() => {
@@ -113,9 +110,9 @@ const Servicepage = () => {
       try {
         setLoading(true);
 
-        // Fetch services and page content in parallel (with language parameter)
+        // Fetch services and page content in parallel (services always in English)
         const [servicesRes, pageContentRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/services?lang=${currentLang}`),
+          fetch(`${API_BASE_URL}/services`),
           fetch(`${API_BASE_URL}/page-content/services`)
         ]);
 
@@ -140,7 +137,7 @@ const Servicepage = () => {
     };
 
     fetchData();
-  }, [currentLang]);
+  }, []);
 
   // Get image source - prefer imageUrl from server, fallback to local image
   const getServiceImage = (service: Service, index: number) => {

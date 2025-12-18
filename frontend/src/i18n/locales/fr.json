@@ -17,7 +17,7 @@
     "language": "Langue"
   },
   "main_landing": {
-    "trusted_partners": "Approuvé par 1000+ Partenaires",
+    "trusted_partners": "Approuvé par 1000+ Clients",
     "book_massage": "Réserver un Massage",
     "book_rental": "Réserver une Location",
     "location_massage": "Groot-Bijgaarden, Belgique",
@@ -228,9 +228,9 @@
     "subtitle": "Expériences réelles de nos clients appréciés"
   },
   "experts": {
-    "title": "Rencontrez Nos Experts",
+    "title": "Rencontrez Notre Expert",
     "subtitle": "Thérapeutes professionnels dédiés à votre bien-être",
-    "team_badge": "Équipe",
+    "team_badge": "Expert",
     "description": "Notre équipe de professionnels du bien-être s'engage à vous fournir des soins de la plus haute qualité. Chaque thérapeute apporte des années d'expérience et une passion pour la santé holistique pour vous aider à atteindre l'équilibre et le bien-être."
   },
   "pmu": {
@@ -287,7 +287,7 @@
       "contact_us": "Contactez-nous"
     },
     "hero": {
-      "trusted_by": "Approuvé par 1000+ Partenaires",
+      "trusted_by": "Approuvé par 1000+ Clients",
       "title_1": "Trouvez le",
       "title_2": "Meilleur Séjour.",
       "description": "Villas de luxe dans le magnifique paysage volcanique de Lanzarote",
@@ -299,11 +299,11 @@
       "title_2": "À Votre Maison de l'Île",
       "description_1": "Lanzarote n'est pas seulement une destination — c'est un rythme. Des falaises volcaniques, des villages blanchis à la chaux, des plages de sable noir et des coins de calme que vous ne trouverez nulle part ailleurs. Nos séjours sélectionnés sont conçus pour vous aider à glisser dans ce rythme sans effort.",
       "description_2": "Que vous souhaitiez une vue sur l'océan, un isolement total ou une base moderne proche des sites culturels de Lanzarote, vous trouverez ici un endroit qui vous semblera confortablement vôtre.",
-      "villas_title": "Villas",
+      "villas_title": "Villas Privées",
       "villas_desc": "Spacieuses, privées et parfaites pour les familles ou les longs séjours.",
-      "countryside_title": "Maisons de Campagne",
+      "countryside_title": "Vie Côtière",
       "countryside_desc": "Vie lente entourée de paysages volcaniques.",
-      "luxury_title": "Séjours de Luxe",
+      "luxury_title": "Collection Premium",
       "luxury_desc": "Intérieurs haut de gamme, équipements premium et tranquillité totale."
     },
     "service": {

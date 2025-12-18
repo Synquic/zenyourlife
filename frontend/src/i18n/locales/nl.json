@@ -17,7 +17,7 @@
     "language": "Taal"
   },
   "main_landing": {
-    "trusted_partners": "Vertrouwd door 1000+ Partners",
+    "trusted_partners": "Vertrouwd door 1000+ Klanten",
     "book_massage": "Boek een Massage",
     "book_rental": "Boek een Verblijf",
     "location_massage": "Groot-Bijgaarden, België",
@@ -228,9 +228,9 @@
     "subtitle": "Echte ervaringen van onze gewaardeerde klanten"
   },
   "experts": {
-    "title": "Ontmoet Onze Experts",
+    "title": "Ontmoet Onze Expert",
     "subtitle": "Professionele therapeuten toegewijd aan uw wellness",
-    "team_badge": "Team",
+    "team_badge": "Expert",
     "description": "Ons team van wellness professionals is toegewijd aan het bieden van de hoogste kwaliteit zorg. Elke therapeut brengt jarenlange ervaring en een passie voor holistische gezondheid om u te helpen balans en welzijn te bereiken."
   },
   "pmu": {
@@ -287,7 +287,7 @@
       "contact_us": "Contacteer ons"
     },
     "hero": {
-      "trusted_by": "Vertrouwd door 1000+ Partners",
+      "trusted_by": "Vertrouwd door 1000+ Klanten",
       "title_1": "Vind de",
       "title_2": "Beste Verblijfplaats.",
       "description": "Luxe villa's in het prachtige vulkanische landschap van Lanzarote",
@@ -299,11 +299,11 @@
       "title_2": "Als Uw Eilandhuis",
       "description_1": "Lanzarote is niet zomaar een bestemming — het is een ritme. Vulkanische kliffen, witgekalkte dorpen, zwarte zandstranden en stille plekjes van rust die je nergens anders vindt. Onze geselecteerde verblijven zijn ontworpen om je moeiteloos in dat ritme te laten glijden.",
       "description_2": "Of je nu zeezicht wilt, totale afzondering of een moderne uitvalsbasis dicht bij de culturele plekken van Lanzarote, je vindt hier een plek die comfortabel de jouwe voelt.",
-      "villas_title": "Villa's",
+      "villas_title": "Privé Villa's",
       "villas_desc": "Ruim, privé en perfect voor gezinnen of lange verblijven.",
-      "countryside_title": "Landhuizen",
+      "countryside_title": "Kustleven",
       "countryside_desc": "Langzaam leven omringd door vulkanische landschappen.",
-      "luxury_title": "Luxe Verblijven",
+      "luxury_title": "Premium Collectie",
       "luxury_desc": "Hoogwaardige interieurs, premium voorzieningen en totale rust."
     },
     "service": {

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, CalendarCheck, MessageSquare, Building2, Sparkles, Users, LogOut, Quote, ChevronRight, Flower2, X, Settings2, Activity } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Building2, Sparkles, Users, LogOut, Quote, Flower2, X, Settings2 } from 'lucide-react'
 import znlogo from '../assets/znlogo.png'
 import { destroyAdminSession } from '../utils/cookies'
 
@@ -50,27 +50,25 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[60] lg:hidden"
           onClick={onClose}
         />
       )}
 
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-50
-        w-64 h-screen bg-white flex flex-col border-r border-slate-200/80 shadow-sm
+        fixed lg:static inset-y-0 left-0 z-[70]
+        w-64 lg:w-60 h-screen bg-white flex flex-col border-r border-slate-200/80 shadow-lg lg:shadow-sm
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo Section */}
-        <div className="px-4 sm:px-6 py-4 sm:py-5">
+        <div className="px-4 py-4 border-b border-slate-100">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src={znlogo} alt="ZenYourLife" className="w-10 h-10 sm:w-11 sm:h-11 object-contain" />
+              <img src={znlogo} alt="ZenYourLife" className="w-10 h-10 object-contain" />
               <div>
-                <h1 className="text-sm sm:text-base font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                  ZenYourLife
-                </h1>
-                <p className="text-[10px] sm:text-xs text-slate-400 font-medium">Admin Portal</p>
+                <h1 className="text-sm font-bold text-slate-800">ZenYourLife</h1>
+                <p className="text-xs text-slate-400">Admin Portal</p>
               </div>
             </div>
             {/* Close button for mobile */}
@@ -86,28 +84,23 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
           </div>
         </div>
 
-      {/* Menu Label */}
-      <div className="px-6 py-2">
-        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Main Menu</span>
-      </div>
-
         {/* Menu Items */}
-        <nav className="flex-1 px-3 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <nav className="flex-1 px-3 py-3 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <ul className="space-y-1">
             {menuItems.map((item) => (
               <li key={item.name}>
                 <button
                   onClick={() => handleNavigation(item.path)}
-                  className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 group ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${
                     isActive(item.path)
-                      ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-lg shadow-[#DFB13B]/30'
+                      ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-md shadow-[#DFB13B]/25'
                       : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
                   <span className={`transition-transform duration-200 ${isActive(item.path) ? '' : 'group-hover:scale-110'}`}>
                     {item.icon}
                   </span>
-                  <span className="flex-1 text-left">{item.name}</span>
+                  <span className="flex-1 text-left truncate">{item.name}</span>
                   {item.badge && (
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                       isActive(item.path)
@@ -117,9 +110,6 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
                       {item.badge}
                     </span>
                   )}
-                  {isActive(item.path) && (
-                    <ChevronRight className="w-4 h-4 text-white/70" />
-                  )}
                 </button>
               </li>
             ))}
@@ -127,29 +117,21 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="px-3 py-3 mt-auto">
-          {/* Settings */}
-          
-
+        <div className="px-3 py-3 mt-auto border-t border-slate-100">
           {/* User Profile */}
-          <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-xl hover:bg-slate-50 transition cursor-pointer">
-            <div className="relative">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-[#DFB13B]/20">
-                A
-              </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-[#DFB13B] rounded-full border-2 border-white"></div>
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-slate-50 transition cursor-pointer">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-md shadow-[#DFB13B]/20">
+              A
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs sm:text-sm font-semibold text-slate-700 truncate">Admin User</p>
-              <p className="text-[10px] sm:text-xs text-slate-400 truncate">admin@zenyourlife.com</p>
+              <p className="text-sm font-medium text-slate-700 truncate">Admin User</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 hidden sm:block" />
           </div>
 
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 mt-3 rounded-xl text-xs sm:text-sm font-medium text-red-500 hover:bg-red-50 border border-red-100 transition-all"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 mt-2 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 border border-red-100 transition-all"
           >
             <LogOut className="w-4 h-4" />
             Sign Out

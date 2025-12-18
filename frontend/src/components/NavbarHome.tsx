@@ -4,10 +4,12 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import znlogo from "../assets/znlogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Booking from "./Booking";
 
 const NavbarHome = () => {
    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
    const [isLangOpen, setIsLangOpen] = React.useState(false);
+   const [showBookingModal, setShowBookingModal] = React.useState(false);
    const langDropdownRef = React.useRef<HTMLDivElement>(null);
 
    const navigate=useNavigate();
@@ -76,16 +78,12 @@ const NavbarHome = () => {
     {t('nav.services')}
   </Link>
 
-  <a
-    href='#booking'
-     onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+  <button
+    onClick={() => setShowBookingModal(true)}
     className="text-gray-700 font-medium hover:text-gray-900"
   >
     {t('nav.booking')}
-  </a>
+  </button>
 
   <Link
     to="/about"
@@ -203,17 +201,15 @@ const NavbarHome = () => {
               {t('nav.services')}
             </Link>
 
-            <a
-              href="#booking"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth' });
+            <button
+              onClick={() => {
+                setShowBookingModal(true);
                 setIsMenuOpen(false);
               }}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
+              className="block text-gray-700 font-medium hover:text-gray-900 py-2 w-full text-left"
             >
               {t('nav.booking')}
-            </a>
+            </button>
 
             <Link
               to="/about"
@@ -281,6 +277,31 @@ const NavbarHome = () => {
             >
               {t('nav.contact_us')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Booking Modal */}
+      {showBookingModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBookingModal(false)}
+          ></div>
+
+          {/* Modal Content */}
+          <div className="relative z-10 bg-white rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowBookingModal(false)}
+              className="absolute top-4 right-4 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition z-50"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {/* Booking Component */}
+            <Booking onClose={() => setShowBookingModal(false)} />
           </div>
         </div>
       )}
