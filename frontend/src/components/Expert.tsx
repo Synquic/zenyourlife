@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import lock from "../assets/lock.png";
-import nadia2 from "../assets/nadia2.png";
+import nadia02 from "../assets/naida02.png"
 
 const Expert = () => {
   const { t } = useTranslation();
@@ -22,7 +22,7 @@ const Expert = () => {
             {/* Image Section */}
             <div className="md:w-2/5 relative">
               <img
-                src={nadia2}
+                src={nadia02}
                 alt="Nadia Delens"
                 className="w-full h-56 sm:h-72 md:h-full object-cover object-top"
               />
