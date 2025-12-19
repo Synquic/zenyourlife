@@ -308,7 +308,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-sm text-gray-900 font-medium mb-1 sm:mb-2">
-                    help@info.com
+                    <a href="mailto:info@zenyourlife.be" className="hover:text-blue-600">info@zenyourlife.be</a>
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
                     {t('rental.contact.assistance_hours')}
@@ -324,7 +324,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-sm text-gray-900 font-medium mb-1 sm:mb-2">
-                    (808) 998-34256
+                    <a href="tel:+32476667115" className="hover:text-blue-600">0476 66 71 15</a>
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
                     {t('rental.contact.assistance_hours')}
@@ -340,9 +340,9 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-xs text-gray-600 leading-relaxed">
-                    123 serenity road, 35510,
+                    Lanzarote,
                     <br />
-                    Lanzarote, Spain
+                    Canary Islands, Spain
                   </p>
                 </div>
               </div>

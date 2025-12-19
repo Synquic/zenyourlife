@@ -233,11 +233,15 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex items-start">
                 <Phone className="w-4 h-4 mr-2 mt-1" />
-                <span>+32 123 456 789</span>
+                <a href="tel:+32476667115" className="hover:text-white">0476 66 71 15</a>
               </li>
               <li className="flex items-start">
                 <Mail className="w-4 h-4 mr-2 mt-1" />
-                <span>info@zenyouths.be</span>
+                <a href="mailto:info@zenyourlife.be" className="hover:text-white">info@zenyourlife.be</a>
+              </li>
+              <li className="flex items-start">
+                <FileText className="w-4 h-4 mr-2 mt-1" />
+                <span>BTW: BE0899912649</span>
               </li>
               <li className="flex items-start">
                 <Shield className="w-4 h-4 mr-2 mt-1" />
