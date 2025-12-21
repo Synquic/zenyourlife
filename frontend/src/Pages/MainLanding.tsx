@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import znlogo from '../assets/znlogo.png';
-import main1 from '../assets/main1.png';
+import main01 from '../assets/main01.png'
+import lanz01 from '../assets/lanz01.jpg'
 // import main2 from '../assets/main2.png';
 import tp1 from '../assets/tp1.jpg';
 import tp2 from '../assets/tp2.jpg';
@@ -123,9 +124,9 @@ const MainLanding = () => {
               className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
               <img
-                src={main1}
+                src={main01}
                 alt="Book A Massage"
-                className="w-full h-80 object-cover"
+                className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
@@ -166,9 +167,9 @@ const MainLanding = () => {
               className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
               <img
-                src={zenurlifeRental}
+                src={lanz01}
                 alt="Book A Rental"
-                className="w-full h-80 object-cover"
+                className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
               />
               {/* Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>

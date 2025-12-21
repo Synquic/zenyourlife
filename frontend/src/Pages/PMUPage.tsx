@@ -92,7 +92,7 @@ const PMUPage = () => {
 
         {/* Hero Banner Section */}
         <section className="px-4 sm:px-6 lg:px-8 py-8 mt-10">
-          <div className="relative max-w-7xl mx-auto h-[300px] rounded-3xl overflow-hidden">
+          <div className="relative max-w-7xl mx-auto min-h-[300px] rounded-3xl overflow-hidden">
             {/* Background Image */}
             <img
               src={serviceF1}
@@ -104,7 +104,7 @@ const PMUPage = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 via-40% to-transparent"></div>
 
             {/* Content */}
-            <div className="relative z-20 h-full flex items-center">
+            <div className="relative z-20 flex items-center py-10 md:py-12">
               <div className="max-w-xl px-8 md:px-12">
                 {/* Heading */}
                 <h1 className="text-4xl md:text-5xl font-inter text-[#d4af37] mb-4 leading-tight italic">
@@ -112,7 +112,7 @@ const PMUPage = () => {
                 </h1>
 
                 {/* Description */}
-                <p className="text-white/80 text-sm mb-6 leading-relaxed max-w-[400px]">
+                <p className="text-white/80 text-sm mb-8 leading-relaxed max-w-[400px]">
                   {pmuContent.description}
                 </p>
 

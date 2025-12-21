@@ -35,7 +35,7 @@
     "hero_title": "Parce que la santé est plus que l'absence de maladie",
     "hero_description": "Vivez une retraite paisible avec nos soins luxueux, conçus pour rafraîchir vos sens et restaurer l'harmonie.",
     "trusted_by": "Approuvé par",
-    "partners": "1000+ Partenaires",
+    "partners": "1000+ Clients",
     "treatments_offered": "Soins Proposés",
     "certified_therapists": "Thérapeutes Certifiés",
     "years_experience": "Années d'Expérience",
@@ -79,7 +79,7 @@
     "faq_help": "Vous n'avez pas trouvé la réponse? Dites-nous ce dont vous avez besoin - nous vous guiderons dans la bonne direction.",
     "contact_us": "Contactez-Nous",
     "faq_title": "Questions fréquentes sur Zen Your Life",
-    "partners_desc": "L'organisateur et développeur parfait pour l'agence de vos rêves",
+    "partners_desc": "Des clients satisfaits qui nous font confiance pour leur bien-être",
     "faq_q1": "Quels types de massages proposez-vous?",
     "faq_a1": "Nous proposons une large gamme de massages thérapeutiques incluant le massage suédois, des tissus profonds, aux pierres chaudes, le massage sportif, la réflexologie et des soins spéciaux comme notre massage signature Hopstempel utilisant du houblon belge.",
     "faq_q2": "Quelle est la durée des séances de massage?",
@@ -231,7 +231,7 @@
     "title": "Rencontrez Notre Expert",
     "subtitle": "Thérapeutes professionnels dédiés à votre bien-être",
     "team_badge": "Expert",
-    "description": "Notre équipe de professionnels du bien-être s'engage à vous fournir des soins de la plus haute qualité. Chaque thérapeute apporte des années d'expérience et une passion pour la santé holistique pour vous aider à atteindre l'équilibre et le bien-être."
+    "description": "En tant que professionnelle du bien-être dévouée, je m'engage à vous fournir des soins de la plus haute qualité. Avec des années d'expérience et une passion pour la santé holistique, je vous aide à atteindre l'équilibre et le bien-être."
   },
   "pmu": {
     "title": "Maquillage Permanent (PMU)",
@@ -338,6 +338,7 @@
       "see_about": "Voir À Propos",
       "services": "Services",
       "apartments": "Appartements",
+      "stay": "Séjour",
       "booking": "Réservation",
       "lanzarote_experience": "Expérience Lanzarote",
       "faqs": "FAQ",
@@ -405,9 +406,11 @@
       "label": "Services",
       "title": "Emplacement",
       "description": "Située sur la côte est paisible de Lanzarote, la villa vous donne un accès immédiat aux plages, sentiers volcaniques et lieux locaux sans affluence touristique.",
-      "place1": "Playa del Reducto",
-      "place2": "Sites de César Manrique",
-      "place3": "Ville d'Arrecife"
+      "place1": "Vibrant Shopping Street",
+      "place2": "Stunning Beach Views",
+      "place3": "Coastal Town Life",
+      "view_on_map": "Voir sur la carte",
+      "open_in_maps": "Ouvrir dans Google Maps"
     },
     "questions": {
       "title": "Vous avez encore des questions?",

@@ -77,6 +77,11 @@ const ParticularService = () => {
   // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
   const currentLang = i18n.language?.split('-')[0] || 'en';
 
+  // Scroll to top when component mounts or service changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
   // Disable background scroll when modal is open
   useEffect(() => {
     if (isBookingModalOpen || showApprovedModal) {
@@ -196,7 +201,7 @@ const ParticularService = () => {
 
       {/* Hero Banner Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 mt-10">
-        <div className="relative max-w-7xl mx-auto h-[300px] rounded-3xl overflow-hidden">
+        <div className="relative max-w-7xl mx-auto min-h-[300px] rounded-3xl overflow-hidden">
           {/* Background Image */}
           <img
             src={serviceF1}
@@ -208,7 +213,7 @@ const ParticularService = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 via-40% to-transparent"></div>
 
           {/* Content */}
-          <div className="relative z-20 h-full flex items-center">
+          <div className="relative z-20 flex items-center py-10 md:py-12">
             <div className="max-w-xl px-8 md:px-12">
               {/* Heading */}
               <h1 className="text-4xl md:text-5xl font-inter text-[#d4af37] mb-4 leading-tight italic">

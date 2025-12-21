@@ -100,9 +100,7 @@ const Footer = () => {
         <div className="mb-8 sm:mb-0 sm:hidden">
           <h3 className="text-xl font-semibold mb-3">zenyourlife.be</h3>
           <p className="text-gray-400 text-sm leading-relaxed mb-4">
-            This is the little note about products and this little note.
-            This place like website (it's also still place like note) is
-            currently under slight updates.
+            Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
           </p>
           <button className="text-yellow-400 hover:text-yellow-300 text-sm">
             {t('footer.see_about')} →
@@ -117,9 +115,7 @@ const Footer = () => {
               <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              This is the little note about products and this little note.
-              This place like website (it's also still place like note) is
-              currently under slight updates.
+              Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
             </p>
             <button className="text-yellow-400 hover:text-yellow-300 text-sm">
               {t('footer.see_about')} →

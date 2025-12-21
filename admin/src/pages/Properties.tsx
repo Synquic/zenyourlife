@@ -977,8 +977,9 @@ const Properties = () => {
                     <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">Guests *</label>
                     <input
                       type="number"
-                      value={formData.guests || ''}
-                      onChange={(e) => setFormData({ ...formData, guests: e.target.value === '' ? 1 : Number(e.target.value) })}
+                      value={formData.guests === 0 ? '' : formData.guests}
+                      onChange={(e) => setFormData({ ...formData, guests: e.target.value === '' ? 0 : Number(e.target.value) })}
+                      onBlur={(e) => { if (e.target.value === '' || Number(e.target.value) < 1) setFormData(prev => ({ ...prev, guests: 1 })) }}
                       className="w-full px-2 sm:px-4 py-2 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-xs sm:text-sm"
                       min="1"
                       placeholder="1"
@@ -989,8 +990,9 @@ const Properties = () => {
                     <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">Bedrooms *</label>
                     <input
                       type="number"
-                      value={formData.bedrooms || ''}
-                      onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value === '' ? 1 : Number(e.target.value) })}
+                      value={formData.bedrooms === 0 ? '' : formData.bedrooms}
+                      onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value === '' ? 0 : Number(e.target.value) })}
+                      onBlur={(e) => { if (e.target.value === '' || Number(e.target.value) < 1) setFormData(prev => ({ ...prev, bedrooms: 1 })) }}
                       className="w-full px-2 sm:px-4 py-2 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-xs sm:text-sm"
                       min="1"
                       placeholder="1"

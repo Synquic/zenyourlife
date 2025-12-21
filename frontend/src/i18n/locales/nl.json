@@ -35,7 +35,7 @@
     "hero_title": "Omdat gezondheid meer is dan de afwezigheid van ziekte",
     "hero_description": "Ervaar een vredige retraite met onze luxueuze behandelingen, ontworpen om uw zintuigen te verfrissen en harmonie te herstellen.",
     "trusted_by": "Vertrouwd door",
-    "partners": "1000+ Partners",
+    "partners": "1000+ Klanten",
     "treatments_offered": "Behandelingen Aangeboden",
     "certified_therapists": "Gecertificeerde Therapeuten",
     "years_experience": "Jaar Ervaring",
@@ -79,7 +79,7 @@
     "faq_help": "Niet het antwoord gevonden waar u naar zoekt? Vertel ons wat u nodig heeft - we wijzen u de juiste richting.",
     "contact_us": "Contacteer Ons",
     "faq_title": "Veelgestelde vragen over Zen Your Life",
-    "partners_desc": "De perfecte organisator en ontwikkelaar voor het droomagentschap",
+    "partners_desc": "Tevreden klanten die ons vertrouwen voor hun welzijn",
     "faq_q1": "Welke soorten massages bieden jullie aan?",
     "faq_a1": "Wij bieden een breed scala aan therapeutische massages, waaronder Zweedse massage, diepweefselmassage, hot stone, sportmassage, reflexologie en speciale behandelingen zoals onze kenmerkende Hopstempel-massage met Belgische hop.",
     "faq_q2": "Hoe lang duren de massagesessies?",
@@ -231,7 +231,7 @@
     "title": "Ontmoet Onze Expert",
     "subtitle": "Professionele therapeuten toegewijd aan uw wellness",
     "team_badge": "Expert",
-    "description": "Ons team van wellness professionals is toegewijd aan het bieden van de hoogste kwaliteit zorg. Elke therapeut brengt jarenlange ervaring en een passie voor holistische gezondheid om u te helpen balans en welzijn te bereiken."
+    "description": "Als toegewijde wellness professional ben ik toegewijd aan het bieden van de hoogste kwaliteit zorg. Met jarenlange ervaring en een passie voor holistische gezondheid help ik u balans en welzijn te bereiken."
   },
   "pmu": {
     "title": "Permanente Make-Up (PMU)",
@@ -338,6 +338,7 @@
       "see_about": "Bekijk Over Ons",
       "services": "Diensten",
       "apartments": "Appartementen",
+      "stay": "Verblijf",
       "booking": "Reservering",
       "lanzarote_experience": "Lanzarote Ervaring",
       "faqs": "Veelgestelde Vragen",
@@ -405,9 +406,11 @@
       "label": "Diensten",
       "title": "Locatie",
       "description": "Gelegen aan de rustige oostkust van Lanzarote, geeft de villa u direct toegang tot stranden, vulkaanpaden en lokale plekken zonder toeristendrukte.",
-      "place1": "Playa del Reducto",
-      "place2": "César Manrique bezienswaardigheden",
-      "place3": "Arrecife stad"
+      "place1": "Vibrant Shopping Street",
+      "place2": "Stunning Beach Views",
+      "place3": "Coastal Town Life",
+      "view_on_map": "Bekijk op kaart",
+      "open_in_maps": "Openen in Google Maps"
     },
     "questions": {
       "title": "Heeft u nog vragen?",

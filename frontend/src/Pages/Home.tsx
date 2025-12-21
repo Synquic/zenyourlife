@@ -170,7 +170,7 @@ const Home = () => {
 
             {/* Years of Experience */}
             <div className="text-center bg-[#B8860B] p-4 sm:p-8 border-b md:border-b-0 md:border-r border-gray-200">
-              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">15+</h3>
+              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">5+</h3>
               <p className="text-xs sm:text-sm text-white">
                 {t('home.years_experience')}
               </p>

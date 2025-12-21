@@ -192,10 +192,15 @@ const Booking = ({ onClose }: BookingProps) => {
                           <h3 className="text-base font-semibold text-gray-900 mb-2">
                             {service.title}
                           </h3>
-                          <p className="text-xs text-gray-600 leading-relaxed mb-4">
+                          <p className="text-xs text-gray-600 leading-relaxed mb-3">
                             {service.description}
                           </p>
-                          <button className="w-8 h-8 bg-[#d4b13e] hover:bg-[#9A7209] rounded-full flex items-center justify-center transition-colors ml-auto">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-bold text-[#B8860B]">€{service.price}</span>
+                              <span className="text-xs text-gray-500">/ {service.duration} min</span>
+                            </div>
+                            <button className="w-8 h-8 bg-[#d4b13e] hover:bg-[#9A7209] rounded-full flex items-center justify-center transition-colors">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-4 w-4 text-white"
@@ -210,7 +215,8 @@ const Booking = ({ onClose }: BookingProps) => {
                                 d="M9 5l7 7-7 7"
                               />
                             </svg>
-                          </button>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}

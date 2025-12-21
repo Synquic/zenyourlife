@@ -221,7 +221,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
           <div>
             <h4 className="font-semibold mb-4">{t('rental.footer.services')}</h4>
             <ul className="space-y-2 text-gray-400 text-sm">
-              <li><a href="#apartments" onClick={(e) => { e.preventDefault(); document.getElementById('apartments')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.apartments')}</a></li>
+              <li><a href="#apartments" onClick={(e) => { e.preventDefault(); document.getElementById('apartments')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.stay')}</a></li>
               <li><button onClick={handleBookNow} className="hover:text-white cursor-pointer">{t('rental.footer.booking')}</button></li>
               <li><a href="#experience" onClick={(e) => { e.preventDefault(); document.getElementById('experience')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.lanzarote_experience')}</a></li>
               <li><a href="#faqs" onClick={(e) => { e.preventDefault(); document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white cursor-pointer">{t('rental.footer.faqs')}</a></li>

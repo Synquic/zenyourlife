@@ -35,7 +35,7 @@
     "hero_title": "Because health is more than the absence of disease",
     "hero_description": "Experience a peaceful retreat with our luxurious treatments, crafted to refresh your senses and restore harmony.",
     "trusted_by": "Trusted by",
-    "partners": "1000+ Partners",
+    "partners": "1000+ Clients",
     "treatments_offered": "Treatments Offered",
     "certified_therapists": "Certified Therapists",
     "years_experience": "Years of Experience",
@@ -79,7 +79,7 @@
     "faq_help": "Not finding the answer you're looking for? Tell us what you need - we'll point you in the right direction.",
     "contact_us": "Contact Us",
     "faq_title": "FAQs related to Zen Your Life Experience",
-    "partners_desc": "The perfect organizer and developer for dream agency",
+    "partners_desc": "Satisfied clients who trust us for their wellness journey",
     "faq_q1": "What types of massages do you offer?",
     "faq_a1": "We offer a wide range of therapeutic massages including Swedish, deep tissue, hot stone, sports massage, reflexology, and specialty treatments like our signature Hopstempel massage using Belgian hops.",
     "faq_q2": "How long do the massage sessions last?",
@@ -231,7 +231,7 @@
     "title": "Meet Our Expert",
     "subtitle": "Professional therapists dedicated to your wellness",
     "team_badge": "Expert",
-    "description": "Our team of wellness professionals is dedicated to providing you with the highest quality care. Each therapist brings years of experience and a passion for holistic health to help you achieve balance and well-being."
+    "description": "As a dedicated wellness professional, I am committed to providing you with the highest quality care. With years of experience and a passion for holistic health, I help you achieve balance and well-being."
   },
   "pmu": {
     "title": "Permanent Make-Up (PMU)",
@@ -338,6 +338,7 @@
       "see_about": "See About",
       "services": "Services",
       "apartments": "Apartments",
+      "stay": "Stay",
       "booking": "Booking",
       "lanzarote_experience": "Lanzarote Experience",
       "faqs": "FAQs",
@@ -405,9 +406,11 @@
       "label": "Services",
       "title": "Location",
       "description": "Situated on Lanzarote's peaceful eastern coast, the villa gives you immediate access to beaches, volcanic trails, and local spots without tourist overload.",
-      "place1": "Playa del Reducto",
-      "place2": "César Manrique landmarks",
-      "place3": "Arrecife town"
+      "place1": "Vibrant Shopping Street",
+      "place2": "Stunning Beach Views",
+      "place3": "Coastal Town Life",
+      "view_on_map": "View on Map",
+      "open_in_maps": "Open in Google Maps"
     },
     "questions": {
       "title": "Still Have Questions?",

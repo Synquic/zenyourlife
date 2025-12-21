@@ -35,7 +35,7 @@
     "hero_title": "Weil Gesundheit mehr ist als die Abwesenheit von Krankheit",
     "hero_description": "Erleben Sie einen friedlichen Rückzugsort mit unseren luxuriösen Behandlungen, die Ihre Sinne erfrischen und Harmonie wiederherstellen.",
     "trusted_by": "Vertraut von",
-    "partners": "1000+ Partnern",
+    "partners": "1000+ Kunden",
     "treatments_offered": "Angebotene Behandlungen",
     "certified_therapists": "Zertifizierte Therapeuten",
     "years_experience": "Jahre Erfahrung",
@@ -79,7 +79,7 @@
     "faq_help": "Die Antwort nicht gefunden? Sagen Sie uns, was Sie brauchen - wir weisen Ihnen den richtigen Weg.",
     "contact_us": "Kontaktieren Sie Uns",
     "faq_title": "Häufig gestellte Fragen zu Zen Your Life",
-    "partners_desc": "Der perfekte Organisator und Entwickler für die Traumagentur",
+    "partners_desc": "Zufriedene Kunden, die uns für ihr Wohlbefinden vertrauen",
     "faq_q1": "Welche Arten von Massagen bieten Sie an?",
     "faq_a1": "Wir bieten eine breite Palette therapeutischer Massagen an, darunter Schwedische Massage, Tiefengewebsmassage, Hot Stone, Sportmassage, Reflexologie und Spezialbehandlungen wie unsere charakteristische Hopstempel-Massage mit belgischem Hopfen.",
     "faq_q2": "Wie lange dauern die Massagesitzungen?",
@@ -231,7 +231,7 @@
     "title": "Treffen Sie Unseren Experten",
     "subtitle": "Professionelle Therapeuten, die sich Ihrem Wohlbefinden widmen",
     "team_badge": "Expert",
-    "description": "Unser Team von Wellness-Fachleuten ist bestrebt, Ihnen die höchste Qualität der Pflege zu bieten. Jeder Therapeut bringt jahrelange Erfahrung und eine Leidenschaft für ganzheitliche Gesundheit mit, um Ihnen zu helfen, Gleichgewicht und Wohlbefinden zu erreichen."
+    "description": "Als engagierte Wellness-Fachfrau bin ich bestrebt, Ihnen die höchste Qualität der Pflege zu bieten. Mit jahrelanger Erfahrung und einer Leidenschaft für ganzheitliche Gesundheit helfe ich Ihnen, Gleichgewicht und Wohlbefinden zu erreichen."
   },
   "pmu": {
     "title": "Permanent Make-Up (PMU)",
@@ -338,6 +338,7 @@
       "see_about": "Über Uns Sehen",
       "services": "Dienstleistungen",
       "apartments": "Wohnungen",
+      "stay": "Aufenthalt",
       "booking": "Buchung",
       "lanzarote_experience": "Lanzarote Erlebnis",
       "faqs": "Häufige Fragen",
@@ -405,9 +406,11 @@
       "label": "Dienstleistungen",
       "title": "Lage",
       "description": "An der ruhigen Ostküste Lanzarotes gelegen, bietet die Villa direkten Zugang zu Stränden, Vulkanwegen und lokalen Orten ohne Touristenmassen.",
-      "place1": "Playa del Reducto",
-      "place2": "César Manrique Sehenswürdigkeiten",
-      "place3": "Arrecife Stadt"
+      "place1": "Vibrant Shopping Street",
+      "place2": "Stunning Beach Views",
+      "place3": "Coastal Town Life",
+      "view_on_map": "Auf Karte anzeigen",
+      "open_in_maps": "In Google Maps öffnen"
     },
     "questions": {
       "title": "Haben Sie noch Fragen?",

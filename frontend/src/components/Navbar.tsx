@@ -36,13 +36,16 @@ const Navbar = () => {
   const [isLangOpen, setIsLangOpen] = React.useState(false);
   const [isFacialOpen, setIsFacialOpen] = React.useState(false);
   const [isMassageOpen, setIsMassageOpen] = React.useState(false);
+  const [isPmuOpen, setIsPmuOpen] = React.useState(false);
   const [services, setServices] = React.useState<Service[]>([]);
   // Mobile accordion states
   const [isMobileMassageOpen, setIsMobileMassageOpen] = React.useState(false);
   const [isMobileFacialOpen, setIsMobileFacialOpen] = React.useState(false);
+  const [isMobilePmuOpen, setIsMobilePmuOpen] = React.useState(false);
   const langDropdownRef = React.useRef<HTMLDivElement>(null);
   const facialDropdownRef = React.useRef<HTMLDivElement>(null);
   const massageDropdownRef = React.useRef<HTMLDivElement>(null);
+  const pmuDropdownRef = React.useRef<HTMLDivElement>(null);
 
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -92,43 +95,30 @@ const Navbar = () => {
       s.category?.toLowerCase() === "facial care"
   );
 
+  const pmuServices = services.filter(
+    (s) => s.category?.toLowerCase() === "pmu"
+  );
+
   // Handle service click - navigate to ParticularService page
-  const handleServiceClick = (menuItemName: string) => {
-    console.log("handleServiceClick - menuItemName:", menuItemName);
-    console.log(
-      "handleServiceClick - available services:",
-      services.map((s) => s.title)
-    );
-
-    // Find matching service by title (case-insensitive partial match)
-    const matchedService = services.find(
-      (s) =>
-        s.title.toLowerCase().includes(menuItemName.toLowerCase()) ||
-        menuItemName.toLowerCase().includes(s.title.toLowerCase())
-    );
-
-    console.log("handleServiceClick - matchedService:", matchedService);
+  const handleServiceClick = (serviceId: string) => {
+    const matchedService = services.find((s) => s._id === serviceId);
 
     if (matchedService) {
-      const serviceIndex = services.findIndex(
-        (s) => s._id === matchedService._id
-      );
-      console.log(
-        "Navigating to service with benefits:",
-        matchedService.benefits
-      );
+      const serviceIndex = services.findIndex((s) => s._id === serviceId);
       navigate(`/service/${matchedService._id}`, {
         state: { service: matchedService, imageIndex: serviceIndex % 9 },
       });
     } else {
-      console.log("No match found, redirecting to /services");
-      // If no exact match, go to services page
       navigate("/services");
     }
+
+    // Scroll to top of page
+    window.scrollTo(0, 0);
 
     // Close dropdowns
     setIsMassageOpen(false);
     setIsFacialOpen(false);
+    setIsPmuOpen(false);
   };
 
   // Close dropdown when clicking outside
@@ -152,6 +142,12 @@ const Navbar = () => {
       ) {
         setIsMassageOpen(false);
       }
+      if (
+        pmuDropdownRef.current &&
+        !pmuDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsPmuOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -173,6 +169,14 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
+            {/* Home Link */}
+            <Link
+              to="/home"
+              className="text-gray-700 font-medium hover:text-gray-900"
+            >
+              {t("nav.home")}
+            </Link>
+
             {/* Massage Dropdown */}
             <div className="relative" ref={massageDropdownRef}>
               <button
@@ -197,7 +201,7 @@ const Navbar = () => {
                     massageServices.map((service, index) => (
                       <button
                         key={service._id}
-                        onClick={() => handleServiceClick(service.title)}
+                        onClick={() => handleServiceClick(service._id)}
                         className={`block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#FFFBEA] hover:text-[#B8860B] transition-colors ${
                           index !== massageServices.length - 1
                             ? "border-b border-gray-50"
@@ -240,7 +244,7 @@ const Navbar = () => {
                     facialServices.map((service, index) => (
                       <button
                         key={service._id}
-                        onClick={() => handleServiceClick(service.title)}
+                        onClick={() => handleServiceClick(service._id)}
                         className={`block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#FFFBEA] hover:text-[#B8860B] transition-colors ${
                           index !== facialServices.length - 1
                             ? "border-b border-gray-50"
@@ -258,12 +262,49 @@ const Navbar = () => {
                 </div>
               )}
             </div>
-            <Link
-              to="/pmu"
-              className="text-gray-700 font-medium hover:text-gray-900"
-            >
-              {t("nav.pmu")}
-            </Link>
+            {/* PMU Dropdown */}
+            <div className="relative" ref={pmuDropdownRef}>
+              <button
+                onClick={() => {
+                  setIsPmuOpen(!isPmuOpen);
+                  setIsMassageOpen(false);
+                  setIsFacialOpen(false);
+                }}
+                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
+              >
+                {t("nav.pmu")}
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-300 ${
+                    isPmuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* Simple Dropdown Menu */}
+              {isPmuOpen && (
+                <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden w-64 z-50">
+                  {pmuServices.length > 0 ? (
+                    pmuServices.map((service, index) => (
+                      <button
+                        key={service._id}
+                        onClick={() => handleServiceClick(service._id)}
+                        className={`block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-[#FFFBEA] hover:text-[#B8860B] transition-colors ${
+                          index !== pmuServices.length - 1
+                            ? "border-b border-gray-50"
+                            : ""
+                        }`}
+                      >
+                        {service.title}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-sm text-gray-500">
+                      Loading...
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <a
               href="/contact"
@@ -350,6 +391,15 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg max-h-[80vh] overflow-y-auto">
           <div className="px-4 py-4 space-y-1">
+            {/* Home Link */}
+            <Link
+              to="/home"
+              onClick={() => setIsMenuOpen(false)}
+              className="block text-gray-700 font-medium hover:text-gray-900 py-3 border-b border-gray-100"
+            >
+              {t("nav.home")}
+            </Link>
+
             {/* Massage Section - Accordion */}
             <div className="border-b border-gray-100">
               <button
@@ -369,7 +419,7 @@ const Navbar = () => {
                     <button
                       key={service._id}
                       onClick={() => {
-                        handleServiceClick(service.title);
+                        handleServiceClick(service._id);
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left text-gray-600 hover:text-[#B8860B] py-2 text-sm"
@@ -400,7 +450,38 @@ const Navbar = () => {
                     <button
                       key={service._id}
                       onClick={() => {
-                        handleServiceClick(service.title);
+                        handleServiceClick(service._id);
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-gray-600 hover:text-[#B8860B] py-2 text-sm"
+                    >
+                      {service.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* PMU Section - Accordion */}
+            <div className="border-b border-gray-100">
+              <button
+                onClick={() => setIsMobilePmuOpen(!isMobilePmuOpen)}
+                className="w-full flex items-center justify-between py-3 text-gray-900 font-medium"
+              >
+                <span>{t("nav.pmu")}</span>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${
+                    isMobilePmuOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              {isMobilePmuOpen && (
+                <div className="pb-3 pl-4 space-y-1">
+                  {pmuServices.map((service) => (
+                    <button
+                      key={service._id}
+                      onClick={() => {
+                        handleServiceClick(service._id);
                         setIsMenuOpen(false);
                       }}
                       className="block w-full text-left text-gray-600 hover:text-[#B8860B] py-2 text-sm"
@@ -413,14 +494,6 @@ const Navbar = () => {
             </div>
 
             {/* Other Links */}
-            <Link
-              to="/pmu"
-              onClick={() => setIsMenuOpen(false)}
-              className="block text-gray-700 font-medium hover:text-gray-900 py-2"
-            >
-              {t("nav.pmu")}
-            </Link>
-
             <a
               href="#"
               className="block text-gray-700 font-medium hover:text-gray-900 py-2"
