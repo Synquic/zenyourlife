@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import znlogo from '../assets/znlogo.png';
-import main01 from '../assets/main01.png'
+import main001 from '../assets/main001.jpg'
 import lanz01 from '../assets/lanz01.jpg'
 // import main2 from '../assets/main2.png';
 import tp1 from '../assets/tp1.jpg';
@@ -124,7 +124,7 @@ const MainLanding = () => {
               className="relative group cursor-pointer rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
             >
               <img
-                src={main01}
+                src={main001}
                 alt="Book A Massage"
                 className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-110"
               />

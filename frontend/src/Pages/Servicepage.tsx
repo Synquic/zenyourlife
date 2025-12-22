@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Navbar from '../components/Navbar'
-import serviceF1 from '../assets/serviceF1.png'
+import serviceF001 from '../assets/serviceF001.png'
 import lock from '../assets/lock.png'
 import m1 from '../assets/m1.png'
 import m2 from '../assets/m2.png'
@@ -25,7 +25,7 @@ const serviceImages = [m1, m2, m3, m4, m5, m6, m7, m8, m9]
 // Default fallback images map
 const defaultImages: { [key: string]: string } = {
   'm1.png': m1, 'm2.png': m2, 'm3.png': m3, 'm4.png': m4, 'm5.png': m5,
-  'm6.png': m6, 'm7.png': m7, 'm8.png': m8, 'm9.png': m9, 'serviceF1.png': serviceF1
+  'm6.png': m6, 'm7.png': m7, 'm8.png': m8, 'm9.png': m9, 'serviceF001.png': serviceF001
 }
 
 interface BenefitItem {
@@ -154,7 +154,7 @@ const Servicepage = () => {
     if (pageContent?.hero?.backgroundImage && defaultImages[pageContent.hero.backgroundImage]) {
       return defaultImages[pageContent.hero.backgroundImage];
     }
-    return serviceF1;
+    return serviceF001;
   };
   return (
     <>

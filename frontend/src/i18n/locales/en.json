@@ -366,6 +366,7 @@
       "amenities": "Amenities",
       "book_now": "Book Now",
       "view_more": "View More",
+      "view_on_map": "View on Map",
       "no_properties": "No properties available at the moment."
     },
     "property_overview": {

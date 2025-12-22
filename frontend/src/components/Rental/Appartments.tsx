@@ -110,6 +110,18 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
               <span>🚗</span> <span className="text-xs sm:text-sm">{property.parking}</span>
             </div>
           )}
+          {/* View on Map Link */}
+          {(property.name?.toLowerCase().includes("artevista") || property.name?.toLowerCase().includes("zen your life") || property.name?.toLowerCase().includes("villa")) && (
+            <a
+              href={property.name?.toLowerCase().includes("artevista") ? "https://maps.app.goo.gl/7b9kPZAamqiLh7M76" : "https://maps.app.goo.gl/WBD6v5AaYVhcPdo39"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 sm:gap-3 text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <span>📍</span>
+              <span className="text-xs sm:text-sm font-medium">{t('rental.apartments.view_on_map')}</span>
+            </a>
+          )}
         </div>
 
         {property.hostName && (

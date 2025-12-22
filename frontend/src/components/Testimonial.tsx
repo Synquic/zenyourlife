@@ -165,7 +165,7 @@ const Testimonial = () => {
   "shadow-[0_8px_25px_rgba(0,0,0,0.25)] bg-[#f4f4f4] text-gray-900 " +
   "hover:scale-[1.02] sm:hover:scale-[1.04] hover:shadow-[0_15px_35px_rgba(0,0,0,0.35)] " +
   "sm:hover:[transform:rotateX(-5deg)_rotateY(-10deg)_rotateZ(2deg)] " +
-  "h-auto min-h-[200px] sm:h-64" ;
+  "h-auto min-h-[200px]";
 
   const hoverGradient =
     "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-900 " +
