@@ -237,35 +237,43 @@ const MassageBooking = () => {
   // Handle panel resizing
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     setIsResizing(true)
-  }, [])
-
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (!isResizing || !containerRef.current) return
-
-    const containerRect = containerRef.current.getBoundingClientRect()
-    const newWidth = e.clientX - containerRect.left
-
-    // Set min and max widths
-    const minLeftWidth = 380  // Minimum left panel width
-    const minRightWidth = 560 // Minimum right panel width to preserve layout
-    const maxLeftWidth = containerRect.width - minRightWidth
-
-    setLeftPanelWidth(Math.min(Math.max(newWidth, minLeftWidth), maxLeftWidth))
-  }, [isResizing])
-
-  const handleMouseUp = useCallback(() => {
-    setIsResizing(false)
   }, [])
 
   // Add mouse event listeners for resizing
   useEffect(() => {
-    if (isResizing) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = 'col-resize'
-      document.body.style.userSelect = 'none'
+    if (!isResizing) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return
+
+      e.preventDefault()
+
+      const containerRect = containerRef.current.getBoundingClientRect()
+      const mouseX = e.clientX - containerRect.left
+
+      // Set min and max widths to prevent UI breaking
+      const minLeftWidth = 350  // Minimum left panel width
+      const minRightWidth = 550 // Minimum right panel width to preserve layout
+      const maxLeftWidth = containerRect.width - minRightWidth
+
+      // Clamp the width between min and max
+      const clampedWidth = Math.min(Math.max(mouseX, minLeftWidth), maxLeftWidth)
+
+      requestAnimationFrame(() => {
+        setLeftPanelWidth(clampedWidth)
+      })
     }
+
+    const handleMouseUp = () => {
+      setIsResizing(false)
+    }
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove)
@@ -273,7 +281,7 @@ const MassageBooking = () => {
       document.body.style.cursor = ''
       document.body.style.userSelect = ''
     }
-  }, [isResizing, handleMouseMove, handleMouseUp])
+  }, [isResizing])
 
   useEffect(() => {
     fetchBookings()
@@ -456,10 +464,10 @@ const MassageBooking = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="lg:ml-72 flex flex-col min-h-screen">
         {/* Header - Modern Design */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
           {/* Top row */}
@@ -602,15 +610,15 @@ const MassageBooking = () => {
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative" ref={containerRef}>
+        <div className="flex flex-col md:flex-row relative min-h-[600px]" ref={containerRef}>
           {/* Left Panel - Full screen on mobile (hidden when booking selected), resizable on desktop */}
           <div
-            className={`md:border-r border-slate-200 flex flex-col bg-white transition-all duration-300 ${
-              activePanel === 'right' ? 'hidden md:block md:w-0 md:overflow-hidden' : activePanel === 'left' ? 'flex-1' : ''
-            } ${selectedBooking ? 'hidden md:flex' : 'flex-1 md:flex-none'}`}
+            className={`md:border-r border-slate-200 bg-white transition-none flex-shrink-0 ${
+              activePanel === 'right' ? 'hidden md:block md:w-0 md:overflow-hidden' : activePanel === 'left' ? 'w-full' : ''
+            } ${selectedBooking ? 'hidden md:block' : 'block'}`}
             style={{
               width: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : `${leftPanelWidth}px`,
-              minWidth: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : '280px'
+              minWidth: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : '350px'
             }}
           >
             {/* Panel header with toggle - Hidden on mobile */}
@@ -678,7 +686,7 @@ const MassageBooking = () => {
             </div>
 
             {/* Booking List - Modern Cards */}
-            <div className="flex-1 overflow-y-auto p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="p-3">
               {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-slate-500">
                   <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
@@ -748,10 +756,10 @@ const MassageBooking = () => {
           {/* Resizer Handle - Hidden on mobile */}
           {activePanel === 'both' && (
             <div
-              className="hidden md:block w-1 bg-slate-200 hover:bg-[#DFB13B] cursor-col-resize transition-colors relative group flex-shrink-0"
+              className={`hidden md:flex w-2 bg-slate-200 hover:bg-[#DFB13B] cursor-col-resize relative group flex-shrink-0 items-center justify-center ${isResizing ? 'bg-[#DFB13B]' : ''}`}
               onMouseDown={handleMouseDown}
             >
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-8 bg-slate-300 group-hover:bg-[#DFB13B] rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className={`w-4 h-10 bg-slate-300 group-hover:bg-[#DFB13B] rounded-full flex items-center justify-center ${isResizing ? 'bg-[#DFB13B] opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
                 <GripVertical className="w-3 h-3 text-white" />
               </div>
             </div>
@@ -770,9 +778,9 @@ const MassageBooking = () => {
 
           {/* Right Panel - Details (Full height within content area on mobile) */}
           <div
-            className={`flex-1 flex flex-col bg-slate-50 transition-all duration-300 ${
-              activePanel === 'left' ? 'hidden md:flex md:w-0 md:overflow-hidden' : ''
-            } ${selectedBooking ? 'absolute md:relative inset-0 md:inset-auto z-30 md:z-auto bg-slate-50' : 'hidden md:flex'}`}
+            className={`flex-1 bg-slate-50 transition-none ${
+              activePanel === 'left' ? 'hidden md:block md:w-0 md:overflow-hidden' : ''
+            } ${selectedBooking ? 'block' : 'hidden md:block'}`}
           >
             {/* Right panel header with toggle and back button - Modern */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50 sticky top-0 z-10">
@@ -799,9 +807,9 @@ const MassageBooking = () => {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="p-4 sm:p-6">
             {selectedBooking ? (
-              <div className="max-w-3xl mx-auto space-y-6">
+              <div className="space-y-6">
                 {/* Booking Header Card */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                   <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-4 sm:px-6 py-4 sm:py-5 text-white">
@@ -899,7 +907,7 @@ const MassageBooking = () => {
                 </div>
 
                 {/* Info Grid - Modern Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                   {/* Customer Information */}
                   <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                     <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-slate-100">
@@ -924,11 +932,11 @@ const MassageBooking = () => {
                           <p className="text-xs text-slate-500 capitalize">{selectedBooking.gender}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors">
-                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors min-w-0">
+                        <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Mail className="w-4 h-4 text-amber-600" />
                         </div>
-                        <span className="text-slate-600">{selectedBooking.email}</span>
+                        <span className="text-slate-600 truncate">{selectedBooking.email}</span>
                       </div>
                       <div className="flex items-center gap-3 text-sm p-2 hover:bg-slate-50 rounded-lg transition-colors">
                         <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
