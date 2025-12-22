@@ -339,10 +339,10 @@ const BookingManagement = () => {
   const partialBlocksCount = blockedDates.filter(bd => !bd.isFullDayBlocked && bd.blockedTimeSlots.length > 0).length
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="lg:ml-60 flex flex-col min-h-screen">
         {/* Header - Modern Design */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
           {/* Top row */}

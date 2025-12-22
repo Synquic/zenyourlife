@@ -3,7 +3,7 @@ import {
   Search, Plus, Edit2, Trash2, X, Save, Loader2, Building2, Users,
   BedDouble, DollarSign, Euro, Filter, ChevronDown, Eye, EyeOff, LayoutGrid,
   List, Car, Sparkles, Settings2, Star, TrendingUp, Home,
-  ArrowUpRight, Image as ImageIcon, Menu, Upload, Link
+  ArrowUpRight, Image as ImageIcon, Menu, Upload, Link, MapPin
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
@@ -27,6 +27,7 @@ interface PropertyData {
   guests: number
   bedrooms: number
   parking: string
+  mapUrl?: string
   image: string
   imageUrl?: string
   galleryImages?: string[]
@@ -83,6 +84,7 @@ const Properties = () => {
     guests: 1,
     bedrooms: 1,
     parking: '',
+    mapUrl: '',
     image: 'Apat1.png',
     imageUrl: '',
     galleryImages: [] as string[],
@@ -229,6 +231,7 @@ const Properties = () => {
       guests: property.guests,
       bedrooms: property.bedrooms,
       parking: property.parking,
+      mapUrl: property.mapUrl || '',
       image: property.image,
       imageUrl: property.imageUrl || '',
       galleryImages: property.galleryImages || [],
@@ -252,6 +255,7 @@ const Properties = () => {
       guests: 1,
       bedrooms: 1,
       parking: '',
+      mapUrl: '',
       image: 'Apat1.png',
       imageUrl: '',
       galleryImages: [],
@@ -413,10 +417,10 @@ const Properties = () => {
   const totalCapacity = properties.reduce((sum, p) => sum + p.guests, 0)
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="lg:ml-60 min-h-screen overflow-y-auto">
         {/* Top Header Bar */}
         <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
           <div className="px-4 sm:px-8 py-4">
@@ -1009,6 +1013,24 @@ const Properties = () => {
                       placeholder="e.g., 2 cars"
                     />
                   </div>
+                </div>
+
+                {/* Map Location URL */}
+                <div>
+                  <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#DFB13B]" />
+                      Map Location URL
+                    </div>
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.mapUrl}
+                    onChange={(e) => setFormData({ ...formData, mapUrl: e.target.value })}
+                    className="w-full px-2 sm:px-4 py-2 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-xs sm:text-sm placeholder:text-[10px] sm:placeholder:text-sm"
+                    placeholder="e.g., https://maps.app.goo.gl/..."
+                  />
+                  <p className="text-[9px] sm:text-xs text-slate-400 mt-1">Google Maps share link for "View on Map" feature</p>
                 </div>
               </div>
 

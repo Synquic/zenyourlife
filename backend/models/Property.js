@@ -58,6 +58,10 @@ const propertySchema = new mongoose.Schema({
     type: String,
     default: 'No parking'
   },
+  mapUrl: {
+    type: String,
+    default: ''
+  },
   image: {
     type: String,
     default: 'Apat1.png'

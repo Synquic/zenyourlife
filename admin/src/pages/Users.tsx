@@ -135,10 +135,10 @@ const Users = () => {
   const totalBookings = users.reduce((sum, u) => sum + u.totalBookings, 0)
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="lg:ml-60 flex flex-col min-h-screen">
         {/* Header */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-4 sm:py-5">
           <div className="flex items-center justify-between gap-3">

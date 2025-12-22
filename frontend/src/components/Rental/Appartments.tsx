@@ -24,6 +24,7 @@ interface PropertyData {
   guests: number;
   bedrooms: number;
   parking: string;
+  mapUrl?: string;
   image: string;
   imageUrl?: string;
   cleanliness: {
@@ -111,9 +112,9 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
             </div>
           )}
           {/* View on Map Link */}
-          {(property.name?.toLowerCase().includes("artevista") || property.name?.toLowerCase().includes("zen your life") || property.name?.toLowerCase().includes("villa")) && (
+          {property.mapUrl && (
             <a
-              href={property.name?.toLowerCase().includes("artevista") ? "https://maps.app.goo.gl/7b9kPZAamqiLh7M76" : "https://maps.app.goo.gl/WBD6v5AaYVhcPdo39"}
+              href={property.mapUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 sm:gap-3 text-blue-600 hover:text-blue-700 transition-colors"

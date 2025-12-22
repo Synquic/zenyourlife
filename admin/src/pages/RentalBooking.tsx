@@ -310,10 +310,10 @@ const RentalBooking = () => {
   }
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="lg:ml-60 flex flex-col min-h-screen">
         {/* Header */}
         <header className="bg-white border-b border-slate-200 px-8 py-5">
           <div className="flex items-center justify-between">

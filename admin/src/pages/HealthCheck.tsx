@@ -371,10 +371,10 @@ const HealthCheck = () => {
   const overallColors = getStatusColor(overallStatus)
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="lg:ml-60 min-h-screen overflow-y-auto">
         {/* Top Header Bar */}
         <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
           <div className="px-4 sm:px-8 py-4">
