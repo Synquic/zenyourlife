@@ -3,7 +3,9 @@ import {
   Search, Plus, Edit2, Trash2, X, Save, Loader2, Building2, Users,
   BedDouble, DollarSign, Euro, Filter, ChevronDown, Eye, EyeOff, LayoutGrid,
   List, Car, Sparkles, Settings2, Star, TrendingUp, Home,
-  ArrowUpRight, Image as ImageIcon, Menu, Upload, Link, MapPin
+  ArrowUpRight, Image as ImageIcon, Menu, Upload, Link, MapPin,
+  Wifi, Tv, Coffee, Key, Shield, Wind, Waves, Utensils, Shirt, ParkingCircle,
+  Umbrella, Mountain, TreeDeciduous, Dumbbell, Bath, Check
 } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
@@ -16,6 +18,36 @@ const availableImages = [
   { name: 'Villa1.png', label: 'Villa 1', color: 'from-emerald-500 via-teal-500 to-cyan-500' },
   { name: 'Villa2.png', label: 'Villa 2', color: 'from-amber-500 via-orange-500 to-red-500' },
 ]
+
+// Predefined amenities with icons for selection
+const predefinedAmenities = [
+  { id: 'wifi', label: 'High-speed Wi-Fi', icon: Wifi },
+  { id: 'washing', label: 'Washing machine', icon: Shirt },
+  { id: 'tv', label: 'Smart TV', icon: Tv },
+  { id: 'linens', label: 'Fresh linens & towels', icon: Bath },
+  { id: 'safe', label: 'Safe neighborhood', icon: Shield },
+  { id: 'coffee', label: 'Coffee maker', icon: Coffee },
+  { id: 'outdoor', label: 'Outdoor seating', icon: Umbrella },
+  { id: 'checkin', label: 'Self check-in', icon: Key },
+  { id: 'ac', label: 'Air conditioning', icon: Wind },
+  { id: 'pool', label: 'Swimming pool', icon: Waves },
+  { id: 'kitchen', label: 'Fully equipped kitchen', icon: Utensils },
+  { id: 'parking', label: 'Free parking', icon: ParkingCircle },
+  { id: 'garden', label: 'Private garden', icon: TreeDeciduous },
+  { id: 'gym', label: 'Gym access', icon: Dumbbell },
+  { id: 'view', label: 'Ocean/Mountain view', icon: Mountain },
+]
+
+interface OverviewFeature {
+  title: string
+  description: string
+  imageUrl: string
+}
+
+interface LocationPlace {
+  title: string
+  imageUrl: string
+}
 
 interface PropertyData {
   _id: string
@@ -37,6 +69,19 @@ interface PropertyData {
   }
   amenities: string[]
   hostName?: string
+  overview?: {
+    title: string
+    description1: string
+    description2: string
+    highlights: string[]
+    features: OverviewFeature[]
+  }
+  location?: {
+    title: string
+    description: string
+    mapEmbedUrl: string
+    places: LocationPlace[]
+  }
   displayOrder: number
   isActive: boolean
 }
@@ -45,6 +90,23 @@ interface SectionSettings {
   sectionType: string
   title: string
   description: string
+  isActive: boolean
+}
+
+interface OverviewCard {
+  title: string
+  description: string
+  imageUrl: string
+}
+
+interface RentalOverviewSettings {
+  _id?: string
+  badge: string
+  title1: string
+  title2: string
+  description1: string
+  description2: string
+  cards: OverviewCard[]
   isActive: boolean
 }
 
@@ -60,6 +122,25 @@ const Properties = () => {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isOverviewModalOpen, setIsOverviewModalOpen] = useState(false)
+  const [overviewSettings, setOverviewSettings] = useState<RentalOverviewSettings>({
+    badge: 'Overview',
+    title1: 'Find a Space That Feels',
+    title2: 'Like Your Island Home',
+    description1: "Lanzarote isn't just a destination — it's a rhythm. Volcanic cliffs, whitewashed villages, black-sand beaches, and quiet pockets of calm you won't find anywhere else. Our curated stays are designed to help you slip into that rhythm effortlessly.",
+    description2: "Whether you want ocean views, total seclusion, or a modern base close to Lanzarote's cultural spots, you'll find a place here that feels comfortably yours.",
+    cards: [
+      { title: 'Private Villas', description: 'Spacious, private, and perfect for families or long stays.', imageUrl: '' },
+      { title: 'Coastal Living', description: 'Slow living surrounded by volcanic landscapes.', imageUrl: '' }
+    ],
+    isActive: true
+  })
+  const [uploadingOverviewImage, setUploadingOverviewImage] = useState<number | null>(null)
+  const overviewImageRef1 = useRef<HTMLInputElement>(null)
+  const overviewImageRef2 = useRef<HTMLInputElement>(null)
+  const overviewImageRef3 = useRef<HTMLInputElement>(null)
+  const overviewImageRef4 = useRef<HTMLInputElement>(null)
+  const overviewImageRefs = [overviewImageRef1, overviewImageRef2, overviewImageRef3, overviewImageRef4]
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
@@ -94,8 +175,24 @@ const Properties = () => {
     },
     amenities: [] as string[],
     hostName: '',
+    overview: {
+      title: '',
+      description1: '',
+      description2: '',
+      highlights: [] as string[],
+      features: [] as OverviewFeature[]
+    },
+    location: {
+      title: '',
+      description: '',
+      mapEmbedUrl: '',
+      places: [] as LocationPlace[]
+    },
     displayOrder: 0
   })
+
+  // State for adding highlights
+  const [highlightInput, setHighlightInput] = useState('')
 
   // Fetch properties from backend
   const fetchProperties = async () => {
@@ -125,9 +222,23 @@ const Properties = () => {
     }
   }
 
+  // Fetch rental overview settings
+  const fetchOverviewSettings = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/rental-page/overview`)
+      const data = await response.json()
+      if (data.success) {
+        setOverviewSettings(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching overview settings:', error)
+    }
+  }
+
   useEffect(() => {
     fetchProperties()
     fetchSectionSettings()
+    fetchOverviewSettings()
   }, [])
 
   // Handle form submission
@@ -187,6 +298,85 @@ const Properties = () => {
     }
   }
 
+  // Handle overview settings update
+  const handleOverviewSettingsSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/rental-page/overview`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(overviewSettings)
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        setIsOverviewModalOpen(false)
+      }
+    } catch (error) {
+      console.error('Error updating overview settings:', error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Handle overview card image upload
+  const handleOverviewImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, cardIndex: number) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingOverviewImage(cardIndex)
+
+    const uploadFormData = new FormData()
+    uploadFormData.append('image', file)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: 'POST',
+        body: uploadFormData
+      })
+
+      const data = await response.json()
+      console.log('Upload response:', data)
+      if (data.success && data.data?.url) {
+        const updatedCards = [...overviewSettings.cards]
+        updatedCards[cardIndex] = { ...updatedCards[cardIndex], imageUrl: data.data.url }
+        setOverviewSettings({ ...overviewSettings, cards: updatedCards })
+        console.log('Updated card with image:', data.data.url)
+      } else {
+        console.error('Upload failed:', data.message || 'No URL in response')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+    } finally {
+      setUploadingOverviewImage(null)
+    }
+  }
+
+  // Update overview card field
+  const updateOverviewCard = (index: number, field: keyof OverviewCard, value: string) => {
+    const updatedCards = [...overviewSettings.cards]
+    updatedCards[index] = { ...updatedCards[index], [field]: value }
+    setOverviewSettings({ ...overviewSettings, cards: updatedCards })
+  }
+
+  // Add new overview card
+  const addOverviewCard = () => {
+    if (overviewSettings.cards.length < 4) {
+      const newCard = { title: '', description: '', imageUrl: '' }
+      setOverviewSettings({ ...overviewSettings, cards: [...overviewSettings.cards, newCard] })
+    }
+  }
+
+  // Remove overview card
+  const removeOverviewCard = (index: number) => {
+    if (overviewSettings.cards.length > 1) {
+      const updatedCards = overviewSettings.cards.filter((_, i) => i !== index)
+      setOverviewSettings({ ...overviewSettings, cards: updatedCards })
+    }
+  }
+
   // Toggle property visibility
   const handleToggleStatus = async (property: PropertyData) => {
     try {
@@ -238,6 +428,19 @@ const Properties = () => {
       cleanliness: property.cleanliness || { title: 'Cleanliness', description: '' },
       amenities: property.amenities || [],
       hostName: property.hostName || '',
+      overview: property.overview || {
+        title: '',
+        description1: '',
+        description2: '',
+        highlights: [],
+        features: []
+      },
+      location: property.location || {
+        title: '',
+        description: '',
+        mapEmbedUrl: '',
+        places: []
+      },
       displayOrder: property.displayOrder || 0
     })
     setIsModalOpen(true)
@@ -262,6 +465,19 @@ const Properties = () => {
       cleanliness: { title: 'Cleanliness', description: '' },
       amenities: [],
       hostName: '',
+      overview: {
+        title: '',
+        description1: '',
+        description2: '',
+        highlights: [],
+        features: []
+      },
+      location: {
+        title: '',
+        description: '',
+        mapEmbedUrl: '',
+        places: []
+      },
       displayOrder: properties.length
     })
     setIsModalOpen(true)
@@ -572,6 +788,32 @@ const Properties = () => {
               >
                 <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Edit Settings
+                <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden sm:block" />
+              </button>
+            </div>
+          </div>
+
+          {/* Overview Section Banner */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
+            <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center border border-white/10">
+                  <LayoutGrid className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-white mb-0.5">Overview Section (Rental Page)</h3>
+                  <p className="text-blue-100 text-xs sm:text-sm">
+                    Edit the overview section content and feature cards shown on the rental home page
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOverviewModalOpen(true)}
+                className="flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 bg-white/10 hover:bg-white/20 border border-white/10 text-white rounded-lg sm:rounded-xl transition-all text-xs sm:text-sm font-medium backdrop-blur"
+              >
+                <Edit2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                Edit Overview
                 <ArrowUpRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 hidden sm:block" />
               </button>
             </div>
@@ -1230,76 +1472,93 @@ const Properties = () => {
                 </div>
               </div>
 
-              {/* Amenities */}
+              {/* Amenities with Icons */}
               <div className="space-y-3 sm:space-y-4 bg-slate-50/50 rounded-xl p-3 sm:p-4">
-                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
-                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#DFB13B]" />
-                  Amenities
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+                    <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#DFB13B]" />
+                    Amenities
+                  </div>
+                  {formData.amenities.length > 0 && (
+                    <span className="text-xs bg-[#DFB13B] text-white px-2 py-0.5 rounded-full">
+                      {formData.amenities.length} selected
+                    </span>
+                  )}
                 </div>
+                <p className="text-[10px] sm:text-xs text-slate-500">Select the amenities available at this property. These will be displayed with icons on the property page.</p>
 
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={amenityInput}
-                    onChange={(e) => setAmenityInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAmenity())}
-                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-0 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:bg-white transition-all text-sm"
-                    placeholder="Type an amenity and press Enter"
-                  />
-                  <button
-                    type="button"
-                    onClick={addAmenity}
-                    className="px-3 sm:px-5 py-2.5 sm:py-3 bg-[#DFB13B] text-white rounded-lg sm:rounded-xl hover:bg-[#C9A032] transition-all"
-                  >
-                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </button>
-                </div>
-
-                {/* Quick Add Suggested Amenities */}
-                <div className="space-y-2">
-                  <p className="text-[10px] sm:text-xs text-slate-500">Quick add:</p>
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {[
-                      'The entire place is yours',
-                      '100 m² size',
-                      'Private bathroom',
-                      'Balcony',
-                      'Hot tub',
-                      'Ocean view',
-                      'Free WiFi',
-                      'Kitchen',
-                      'Terrace',
-                      'Washing machine',
-                      'Air conditioning',
-                      'Pool',
-                      'Garden',
-                      'BBQ area',
-                      'Parking included'
-                    ].filter(a => !formData.amenities.includes(a)).slice(0, 8).map((suggestion) => (
+                {/* Predefined Amenities Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {predefinedAmenities.map((amenity) => {
+                    const isSelected = formData.amenities.includes(amenity.id)
+                    const IconComponent = amenity.icon
+                    return (
                       <button
-                        key={suggestion}
+                        key={amenity.id}
                         type="button"
-                        onClick={() => setFormData({ ...formData, amenities: [...formData.amenities, suggestion] })}
-                        className="px-2 sm:px-2.5 py-1 sm:py-1.5 bg-white border border-slate-200 text-slate-600 rounded-lg text-[10px] sm:text-xs hover:border-[#DFB13B] hover:text-[#B8922D] transition-all"
+                        onClick={() => {
+                          if (isSelected) {
+                            setFormData({ ...formData, amenities: formData.amenities.filter(a => a !== amenity.id) })
+                          } else {
+                            setFormData({ ...formData, amenities: [...formData.amenities, amenity.id] })
+                          }
+                        }}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 transition-all text-left ${
+                          isSelected
+                            ? 'border-[#DFB13B] bg-[#FFEEC3]/30 text-[#B8922D]'
+                            : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                        }`}
                       >
-                        + {suggestion}
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                          isSelected ? 'bg-[#DFB13B]/20' : 'bg-slate-100'
+                        }`}>
+                          <IconComponent className={`w-4 h-4 ${isSelected ? 'text-[#DFB13B]' : 'text-slate-500'}`} />
+                        </div>
+                        <span className="text-xs font-medium line-clamp-1">{amenity.label}</span>
+                        {isSelected && (
+                          <Check className="w-4 h-4 text-[#DFB13B] ml-auto flex-shrink-0" />
+                        )}
                       </button>
-                    ))}
+                    )
+                  })}
+                </div>
+
+                {/* Custom Amenity Input */}
+                <div className="border-t border-slate-200 pt-3 mt-3">
+                  <p className="text-[10px] sm:text-xs text-slate-500 mb-2">Add custom amenities (for property card display):</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={amenityInput}
+                      onChange={(e) => setAmenityInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addAmenity())}
+                      className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-xs sm:text-sm"
+                      placeholder="Type a custom amenity..."
+                    />
+                    <button
+                      type="button"
+                      onClick={addAmenity}
+                      className="px-3 py-2 bg-[#DFB13B] text-white rounded-lg hover:bg-[#C9A032] transition-all"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
 
-                {formData.amenities.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                    {formData.amenities.map((amenity, idx) => (
+                {/* Show custom amenities (non-predefined ones) */}
+                {formData.amenities.filter(a => !predefinedAmenities.some(p => p.id === a)).length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-2">
+                    <span className="text-[10px] sm:text-xs text-slate-400 w-full">Custom amenities:</span>
+                    {formData.amenities.filter(a => !predefinedAmenities.some(p => p.id === a)).map((amenity, idx) => (
                       <span
                         key={idx}
-                        className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-[#FFEEC3]/30 text-[#B8922D] rounded-full text-xs sm:text-sm font-medium"
+                        className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 bg-slate-100 text-slate-600 rounded-full text-xs sm:text-sm font-medium"
                       >
                         {amenity}
                         <button
                           type="button"
                           onClick={() => removeAmenity(amenity)}
-                          className="hover:text-[#8B7424]"
+                          className="hover:text-red-500"
                         >
                           <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                         </button>
@@ -1307,6 +1566,266 @@ const Properties = () => {
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Overview Section */}
+              <div className="space-y-3 sm:space-y-4 bg-blue-50/50 rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+                  <Home className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
+                  Overview Section
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Overview Title</label>
+                    <input
+                      type="text"
+                      value={formData.overview.title}
+                      onChange={(e) => setFormData({ ...formData, overview: { ...formData.overview, title: e.target.value } })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm"
+                      placeholder="e.g., Your Perfect Escape"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Description 1</label>
+                    <textarea
+                      value={formData.overview.description1}
+                      onChange={(e) => setFormData({ ...formData, overview: { ...formData.overview, description1: e.target.value } })}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-none"
+                      placeholder="First paragraph of the overview description..."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Description 2</label>
+                    <textarea
+                      value={formData.overview.description2}
+                      onChange={(e) => setFormData({ ...formData, overview: { ...formData.overview, description2: e.target.value } })}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-none"
+                      placeholder="Second paragraph of the overview description..."
+                    />
+                  </div>
+
+                  {/* Highlights */}
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Highlights</label>
+                    <div className="flex gap-2 mb-2">
+                      <input
+                        type="text"
+                        value={highlightInput}
+                        onChange={(e) => setHighlightInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            if (highlightInput.trim()) {
+                              setFormData({ ...formData, overview: { ...formData.overview, highlights: [...formData.overview.highlights, highlightInput.trim()] } })
+                              setHighlightInput('')
+                            }
+                          }
+                        }}
+                        className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm"
+                        placeholder="Add a highlight and press Enter"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (highlightInput.trim()) {
+                            setFormData({ ...formData, overview: { ...formData.overview, highlights: [...formData.overview.highlights, highlightInput.trim()] } })
+                            setHighlightInput('')
+                          }
+                        }}
+                        className="px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    {formData.overview.highlights.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {formData.overview.highlights.map((highlight, idx) => (
+                          <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                            {highlight}
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, overview: { ...formData.overview, highlights: formData.overview.highlights.filter((_, i) => i !== idx) } })}
+                              className="hover:text-blue-900"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Features */}
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-2">Feature Cards (max 4)</label>
+                    <div className="space-y-3">
+                      {formData.overview.features.map((feature, idx) => (
+                        <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3 relative">
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, overview: { ...formData.overview, features: formData.overview.features.filter((_, i) => i !== idx) } })}
+                            className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="grid grid-cols-1 gap-2 pr-6">
+                            <input
+                              type="text"
+                              value={feature.title}
+                              onChange={(e) => {
+                                const newFeatures = [...formData.overview.features]
+                                newFeatures[idx].title = e.target.value
+                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                              }}
+                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                              placeholder="Feature title (e.g., Private Terrace)"
+                            />
+                            <input
+                              type="text"
+                              value={feature.description}
+                              onChange={(e) => {
+                                const newFeatures = [...formData.overview.features]
+                                newFeatures[idx].description = e.target.value
+                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                              }}
+                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                              placeholder="Feature description"
+                            />
+                            <input
+                              type="text"
+                              value={feature.imageUrl}
+                              onChange={(e) => {
+                                const newFeatures = [...formData.overview.features]
+                                newFeatures[idx].imageUrl = e.target.value
+                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                              }}
+                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                              placeholder="Image URL"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {formData.overview.features.length < 4 && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, overview: { ...formData.overview, features: [...formData.overview.features, { title: '', description: '', imageUrl: '' }] } })}
+                          className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs hover:border-blue-400 hover:text-blue-500 transition-all"
+                        >
+                          + Add Feature Card
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Location Section */}
+              <div className="space-y-3 sm:space-y-4 bg-green-50/50 rounded-xl p-3 sm:p-4">
+                <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
+                  Location Section
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Location Title</label>
+                    <input
+                      type="text"
+                      value={formData.location.title}
+                      onChange={(e) => setFormData({ ...formData, location: { ...formData.location, title: e.target.value } })}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-xs sm:text-sm"
+                      placeholder="e.g., Explore the Area"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">Location Description</label>
+                    <textarea
+                      value={formData.location.description}
+                      onChange={(e) => setFormData({ ...formData, location: { ...formData.location, description: e.target.value } })}
+                      rows={2}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-xs sm:text-sm resize-none"
+                      placeholder="Description about the location..."
+                    />
+                  </div>
+
+                  {/* Nearby Places */}
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-2">Nearby Places (max 3)</label>
+                    <div className="space-y-3">
+                      {formData.location.places.map((place, idx) => (
+                        <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3 relative">
+                          <button
+                            type="button"
+                            onClick={() => setFormData({ ...formData, location: { ...formData.location, places: formData.location.places.filter((_, i) => i !== idx) } })}
+                            className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                          <div className="grid grid-cols-1 gap-2 pr-6">
+                            <input
+                              type="text"
+                              value={place.title}
+                              onChange={(e) => {
+                                const newPlaces = [...formData.location.places]
+                                newPlaces[idx].title = e.target.value
+                                setFormData({ ...formData, location: { ...formData.location, places: newPlaces } })
+                              }}
+                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                              placeholder="Place name (e.g., Playa del Reducto)"
+                            />
+                            <input
+                              type="text"
+                              value={place.imageUrl}
+                              onChange={(e) => {
+                                const newPlaces = [...formData.location.places]
+                                newPlaces[idx].imageUrl = e.target.value
+                                setFormData({ ...formData, location: { ...formData.location, places: newPlaces } })
+                              }}
+                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                              placeholder="Image URL or paste link"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                      {formData.location.places.length < 3 && (
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, location: { ...formData.location, places: [...formData.location.places, { title: '', imageUrl: '' }] } })}
+                          className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs hover:border-green-400 hover:text-green-500 transition-all"
+                        >
+                          + Add Nearby Place
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Map Embed URL */}
+                  <div className="bg-white border border-slate-200 rounded-lg p-3">
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">
+                      <div className="flex items-center gap-1.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Google Maps Embed URL (for map display)
+                      </div>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location.mapEmbedUrl}
+                      onChange={(e) => setFormData({ ...formData, location: { ...formData.location, mapEmbedUrl: e.target.value } })}
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all text-xs sm:text-sm"
+                      placeholder="e.g., https://www.google.com/maps/embed?pb=..."
+                    />
+                    <p className="text-[9px] text-slate-400 mt-1">Go to Google Maps → Click Share → Click "Embed a map" → Copy the src URL from iframe</p>
+                  </div>
+                </div>
               </div>
 
               {/* Host Name */}
@@ -1420,6 +1939,217 @@ const Properties = () => {
                     <>
                       <Save className="w-4 h-4" />
                       <span className="hidden sm:inline">Save Settings</span>
+                      <span className="sm:hidden">Save</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Overview Settings Modal */}
+      {isOverviewModalOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 flex-shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
+                  <LayoutGrid className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-semibold text-slate-800">Overview Section Settings</h2>
+                  <p className="text-xs sm:text-sm text-slate-500">Customize the rental home page overview</p>
+                </div>
+              </div>
+              <button onClick={() => setIsOverviewModalOpen(false)} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg sm:rounded-xl transition-all">
+                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleOverviewSettingsSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-5 overflow-y-auto flex-1">
+              {/* Title Section */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-1.5">Title Line 1 *</label>
+                  <input
+                    type="text"
+                    value={overviewSettings.title1}
+                    onChange={(e) => setOverviewSettings({ ...overviewSettings, title1: e.target.value })}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-0 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all text-sm"
+                    placeholder="e.g., Find a Space That Feels"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-1.5">Title Line 2 *</label>
+                  <input
+                    type="text"
+                    value={overviewSettings.title2}
+                    onChange={(e) => setOverviewSettings({ ...overviewSettings, title2: e.target.value })}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-0 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all text-sm"
+                    placeholder="e.g., Like Your Island Home"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Descriptions */}
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-1.5">Description 1 *</label>
+                <textarea
+                  value={overviewSettings.description1}
+                  onChange={(e) => setOverviewSettings({ ...overviewSettings, description1: e.target.value })}
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-0 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all h-20 resize-none text-sm"
+                  placeholder="First paragraph..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-1.5">Description 2</label>
+                <textarea
+                  value={overviewSettings.description2}
+                  onChange={(e) => setOverviewSettings({ ...overviewSettings, description2: e.target.value })}
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border-0 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all h-20 resize-none text-sm"
+                  placeholder="Second paragraph..."
+                />
+              </div>
+
+              {/* Feature Cards */}
+              <div className="border-t border-slate-200 pt-4">
+                <h3 className="text-sm font-semibold text-slate-800 mb-3">Feature Cards</h3>
+                <div className="space-y-4">
+                  {overviewSettings.cards.map((card, index) => (
+                    <div key={index} className="p-4 bg-slate-50 rounded-xl relative">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-semibold">{index + 1}</span>
+                          <span className="text-sm font-medium text-slate-700">Card {index + 1}</span>
+                        </div>
+                        {overviewSettings.cards.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeOverviewCard(index)}
+                            className="w-7 h-7 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                            title="Remove card"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1">Title</label>
+                          <input
+                            type="text"
+                            value={card.title}
+                            onChange={(e) => updateOverviewCard(index, 'title', e.target.value)}
+                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                            placeholder="Card title"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-600 mb-1">Description</label>
+                          <input
+                            type="text"
+                            value={card.description}
+                            onChange={(e) => updateOverviewCard(index, 'description', e.target.value)}
+                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                            placeholder="Card description"
+                          />
+                        </div>
+                      </div>
+                      {/* Image Upload */}
+                      <div className="mt-3">
+                        <label className="block text-xs font-medium text-slate-600 mb-1">Card Image</label>
+                        <div className="flex items-center gap-3">
+                          {card.imageUrl && card.imageUrl.trim() !== '' ? (
+                            <div className="relative w-20 h-14 rounded-lg overflow-hidden border border-slate-200">
+                              <img src={getImageUrl(card.imageUrl) || ''} alt={card.title} className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => updateOverviewCard(index, 'imageUrl', '')}
+                                className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="w-20 h-14 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center bg-white">
+                              <ImageIcon className="w-5 h-5 text-slate-400" />
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            ref={overviewImageRefs[index]}
+                            onChange={(e) => handleOverviewImageUpload(e, index)}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => overviewImageRefs[index]?.current?.click()}
+                            disabled={uploadingOverviewImage === index}
+                            className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 flex items-center gap-1.5"
+                          >
+                            {uploadingOverviewImage === index ? (
+                              <><Loader2 className="w-3 h-3 animate-spin" /> Uploading...</>
+                            ) : (
+                              <><Upload className="w-3 h-3" /> Upload</>
+                            )}
+                          </button>
+                          <span className="text-xs text-slate-500">or</span>
+                          <input
+                            type="text"
+                            value={card.imageUrl}
+                            onChange={(e) => updateOverviewCard(index, 'imageUrl', e.target.value)}
+                            placeholder="Paste image URL"
+                            className="flex-1 px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Add Card Button */}
+                  {overviewSettings.cards.length < 4 && (
+                    <button
+                      type="button"
+                      onClick={addOverviewCard}
+                      className="w-full p-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-500 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/50 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="text-sm font-medium">Add Card</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2 sm:gap-3 pt-1 sm:pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => setIsOverviewModalOpen(false)}
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-white border border-slate-200 text-slate-600 rounded-lg sm:rounded-xl hover:bg-slate-50 transition-all font-medium text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg sm:rounded-xl hover:shadow-lg transition-all font-medium flex items-center justify-center gap-2 disabled:opacity-50 text-sm"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span className="hidden sm:inline">Save Overview</span>
                       <span className="sm:hidden">Save</span>
                     </>
                   )}

@@ -18,11 +18,121 @@ import lo3 from "../../assets/lo3.png";
 import lock2 from "../../assets/lock2.png";
 import Testimonial from "../../components/Rental/Testimonial";
 import RFooter from "../../components/Rental/RFooter";
+
+// Amenity icon mapping - matches the predefined amenities in admin
+const amenityIcons: { [key: string]: React.ReactNode } = {
+  wifi: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+    </svg>
+  ),
+  washing: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
+      <circle cx="12" cy="13" r="4" strokeWidth={2} />
+    </svg>
+  ),
+  tv: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  linens: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+    </svg>
+  ),
+  safe: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+    </svg>
+  ),
+  coffee: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h1a3 3 0 010 6h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zm4-3a2 2 0 114 0M8 5h4" />
+    </svg>
+  ),
+  outdoor: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  ),
+  checkin: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+    </svg>
+  ),
+  ac: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+    </svg>
+  ),
+  pool: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 15c2.483 0 4.345-1 6-3 1.655 2 3.517 3 6 3s4.345-1 6-3M3 20c2.483 0 4.345-1 6-3 1.655 2 3.517 3 6 3s4.345-1 6-3" />
+    </svg>
+  ),
+  kitchen: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
+  ),
+  parking: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h4a4 4 0 110 8H8V7zm0 0V5m0 10v2" />
+    </svg>
+  ),
+  garden: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  ),
+  gym: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h2m12 0h2M6 8v8m12-8v8M8 8h8M8 16h8" />
+    </svg>
+  ),
+  view: (
+    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+    </svg>
+  ),
+};
+
+// Amenity labels mapping
+const amenityLabels: { [key: string]: string } = {
+  wifi: 'High-speed Wi-Fi',
+  washing: 'Washing machine',
+  tv: 'Smart TV',
+  linens: 'Fresh linens & towels',
+  safe: 'Safe neighborhood',
+  coffee: 'Coffee maker',
+  outdoor: 'Outdoor seating',
+  checkin: 'Self check-in',
+  ac: 'Air conditioning',
+  pool: 'Swimming pool',
+  kitchen: 'Fully equipped kitchen',
+  parking: 'Free parking',
+  garden: 'Private garden',
+  gym: 'Gym access',
+  view: 'Ocean/Mountain view',
+};
 // Map image names to imported images
 const imageMap: { [key: string]: string } = {
   "Apat1.png": apat1,
   "Apat2.png": apat2,
 };
+
+interface OverviewFeature {
+  title: string;
+  description: string;
+  imageUrl: string;
+}
+
+interface LocationPlace {
+  title: string;
+  imageUrl: string;
+}
 
 interface PropertyData {
   _id: string;
@@ -34,6 +144,7 @@ interface PropertyData {
   guests: number;
   bedrooms: number;
   parking: string;
+  mapUrl?: string;
   image: string;
   imageUrl?: string;
   galleryImages?: string[];
@@ -43,6 +154,19 @@ interface PropertyData {
   };
   amenities: string[];
   hostName?: string;
+  overview?: {
+    title: string;
+    description1: string;
+    description2: string;
+    highlights: string[];
+    features: OverviewFeature[];
+  };
+  location?: {
+    title: string;
+    description: string;
+    mapEmbedUrl: string;
+    places: LocationPlace[];
+  };
   isActive: boolean;
 }
 
@@ -373,203 +497,159 @@ const ParticularProperty = () => {
                 <span>{t("rental.property_overview.label")}</span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">{t("rental.property_overview.title")}</h2>
+              <h2 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+                {property?.overview?.title || t("rental.property_overview.title")}
+              </h2>
 
               <p className="text-gray-800 text-sm mt-4 leading-relaxed">
-                {t("rental.property_overview.description1")}
+                {property?.overview?.description1 || t("rental.property_overview.description1")}
               </p>
 
               <p className="text-gray-800 text-sm mt-4 leading-relaxed">
-                {t("rental.property_overview.description2")}
+                {property?.overview?.description2 || t("rental.property_overview.description2")}
               </p>
 
               <p className="text-gray-800 text-sm mt-4 leading-relaxed font-bold">
                 {t("rental.property_overview.highlights")}
               </p>
               <ul className="list-disc list-inside mt-2 text-gray-600 text-sm leading-relaxed space-y-1">
-                <li>{t("rental.property_overview.highlight1")}</li>
-                <li>{t("rental.property_overview.highlight2")}</li>
-                <li>{t("rental.property_overview.highlight3")}</li>
-                <li>{t("rental.property_overview.highlight4")}</li>
-                <li>{t("rental.property_overview.highlight5")}</li>
-                <li>{t("rental.property_overview.highlight6")}</li>
-                <li>{t("rental.property_overview.highlight7")}</li>
-                <li>{t("rental.property_overview.highlight8")}</li>
+                {property?.overview?.highlights && property.overview.highlights.length > 0 ? (
+                  property.overview.highlights.map((highlight, idx) => (
+                    <li key={idx}>{highlight}</li>
+                  ))
+                ) : (
+                  <>
+                    <li>{t("rental.property_overview.highlight1")}</li>
+                    <li>{t("rental.property_overview.highlight2")}</li>
+                    <li>{t("rental.property_overview.highlight3")}</li>
+                    <li>{t("rental.property_overview.highlight4")}</li>
+                    <li>{t("rental.property_overview.highlight5")}</li>
+                    <li>{t("rental.property_overview.highlight6")}</li>
+                    <li>{t("rental.property_overview.highlight7")}</li>
+                    <li>{t("rental.property_overview.highlight8")}</li>
+                  </>
+                )}
               </ul>
             </div>
 
             {/* RIGHT - Cards Grid */}
             <div>
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {/* Card 1 - Private terrace */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
-                      {t("rental.property_overview.private_terrace")}
-                    </h3>
-                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {t("rental.property_overview.private_terrace_desc")}
-                    </p>
-                  </div>
-                  <div className="relative h-24 sm:h-36 overflow-hidden">
-                    <img
-                      src={ov1}
-                      alt={t("rental.property_overview.private_terrace")}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                  </div>
-                </div>
-
-                {/* Card 2 - Airy bedroom */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
-                      {t("rental.property_overview.airy_bedroom")}
-                    </h3>
-                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {t("rental.property_overview.airy_bedroom_desc")}
-                    </p>
-                  </div>
-                  <div className="relative h-24 sm:h-36 overflow-hidden">
-                    <img
-                      src={ov2}
-                      alt={t("rental.property_overview.airy_bedroom")}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                  </div>
-                </div>
-
-                {/* Card 3 - Open-plan living room */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
-                      {t("rental.property_overview.living_room")}
-                    </h3>
-                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {t("rental.property_overview.living_room_desc")}
-                    </p>
-                  </div>
-                  <div className="relative h-24 sm:h-36 overflow-hidden">
-                    <img
-                      src={ov3}
-                      alt={t("rental.property_overview.living_room")}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                  </div>
-                </div>
-
-                {/* Card 4 - Fully equipped kitchen */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div className="p-3 sm:p-4">
-                    <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
-                      {t("rental.property_overview.kitchen")}
-                    </h3>
-                    <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
-                      {t("rental.property_overview.kitchen_desc")}
-                    </p>
-                  </div>
-                  <div className="relative h-24 sm:h-36 overflow-hidden">
-                    <img
-                      src={ov4}
-                      alt={t("rental.property_overview.kitchen")}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                  </div>
-                </div>
+                {property?.overview?.features && property.overview.features.length > 0 ? (
+                  property.overview.features.map((feature, idx) => (
+                    <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {feature.title}
+                        </h3>
+                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                          {feature.description}
+                        </p>
+                      </div>
+                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                        <img
+                          src={feature.imageUrl || ov1}
+                          alt={feature.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    {/* Default Card 1 - Private terrace */}
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {t("rental.property_overview.private_terrace")}
+                        </h3>
+                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                          {t("rental.property_overview.private_terrace_desc")}
+                        </p>
+                      </div>
+                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                        <img src={ov1} alt={t("rental.property_overview.private_terrace")} className="w-full h-full object-cover" />
+                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                      </div>
+                    </div>
+                    {/* Default Card 2 - Airy bedroom */}
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {t("rental.property_overview.airy_bedroom")}
+                        </h3>
+                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                          {t("rental.property_overview.airy_bedroom_desc")}
+                        </p>
+                      </div>
+                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                        <img src={ov2} alt={t("rental.property_overview.airy_bedroom")} className="w-full h-full object-cover" />
+                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                      </div>
+                    </div>
+                    {/* Default Card 3 - Living room */}
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {t("rental.property_overview.living_room")}
+                        </h3>
+                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                          {t("rental.property_overview.living_room_desc")}
+                        </p>
+                      </div>
+                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                        <img src={ov3} alt={t("rental.property_overview.living_room")} className="w-full h-full object-cover" />
+                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                      </div>
+                    </div>
+                    {/* Default Card 4 - Kitchen */}
+                    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                      <div className="p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                          {t("rental.property_overview.kitchen")}
+                        </h3>
+                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                          {t("rental.property_overview.kitchen_desc")}
+                        </p>
+                      </div>
+                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                        <img src={ov4} alt={t("rental.property_overview.kitchen")} className="w-full h-full object-cover" />
+                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Amenities Grid Section */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 mt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* High-speed Wi-Fi */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.wifi")}</span>
-            </div>
+        {/* Amenities Grid Section - Dynamic */}
+        {property.amenities && property.amenities.length > 0 && (
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {property.amenities.map((amenityId, index) => {
+                // Check if it's a predefined amenity with an icon
+                const icon = amenityIcons[amenityId];
+                const label = amenityLabels[amenityId] || amenityId;
 
-            {/* Washing machine */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V5a1 1 0 011-1z" />
-                  <circle cx="12" cy="13" r="4" strokeWidth={2} />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.washing")}</span>
-            </div>
-
-            {/* Smart TV */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.tv")}</span>
-            </div>
-
-            {/* Fresh linens & towels */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.linens")}</span>
-            </div>
-
-            {/* Safe neighborhood */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.safe")}</span>
-            </div>
-
-            {/* Coffee maker */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h1a3 3 0 010 6h-1M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8zm4-3a2 2 0 114 0M8 5h4" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.coffee")}</span>
-            </div>
-
-            {/* Outdoor seating */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.outdoor")}</span>
-            </div>
-
-            {/* Self check-in */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                </svg>
-              </div>
-              <span className="text-gray-700 text-sm">{t("rental.amenities_list.checkin")}</span>
+                return (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      {icon || (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="text-gray-700 text-sm">{label}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Location Section */}
         <div
@@ -586,71 +666,75 @@ const ParticularProperty = () => {
             </div>
 
             {/* Title */}
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-5">{t("rental.location.title")}</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-5">
+              {property?.location?.title || t("rental.location.title")}
+            </h2>
 
             {/* Description */}
             <p className="text-gray-500 text-sm leading-relaxed text-center max-w-lg mx-auto mb-14 px-4">
-              {t("rental.location.description")}
+              {property?.location?.description || t("rental.location.description")}
             </p>
 
             {/* Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Card 1 - Playa del Reducto */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="px-5 pt-5 pb-3">
-                  <h3 className="text-base font-semibold text-gray-900">
-                    {t("rental.location.place1")}
-                  </h3>
-                </div>
-                <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
-                  <img
-                    src={lo1}
-                    alt={t("rental.location.place1")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                </div>
-              </div>
-
-              {/* Card 2 - César Manrique landmarks */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="px-5 pt-5 pb-3">
-                  <h3 className="text-base font-semibold text-gray-900">
-                    {t("rental.location.place2")}
-                  </h3>
-                </div>
-                <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
-                  <img
-                    src={lo2}
-                    alt={t("rental.location.place2")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div
-                    className="absolute top-0 left-0 right-0 h-16 z-10 pointer-events-none"
-                    style={{ background: 'linear-gradient(to bottom, white, rgba(255, 255, 255, 0.7), transparent)' }}
-                  ></div>
-                </div>
-              </div>
-
-              {/* Card 3 - Arrecife town */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="px-5 pt-5 pb-3">
-                  <h3 className="text-base font-semibold text-gray-900">
-                    {t("rental.location.place3")}
-                  </h3>
-                </div>
-                <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
-                  <img
-                    src={lo3}
-                    alt={t("rental.location.place3")}
-                    className="w-full h-full object-cover"
-                  />
-                  <div
-                    className="absolute top-0 left-0 right-0 h-16 z-10 pointer-events-none"
-                    style={{ background: 'linear-gradient(to bottom, white, rgba(255, 255, 255, 0.7), transparent)' }}
-                  ></div>
-                </div>
-              </div>
+              {property?.location?.places && property.location.places.length > 0 ? (
+                property.location.places.map((place, idx) => (
+                  <div key={idx} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div className="px-5 pt-5 pb-3">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {place.title}
+                      </h3>
+                    </div>
+                    <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
+                      <img
+                        src={place.imageUrl || lo1}
+                        alt={place.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <>
+                  {/* Default Card 1 - Playa del Reducto */}
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div className="px-5 pt-5 pb-3">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {t("rental.location.place1")}
+                      </h3>
+                    </div>
+                    <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
+                      <img src={lo1} alt={t("rental.location.place1")} className="w-full h-full object-cover" />
+                      <div className="absolute top-0 left-0 right-0 h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                    </div>
+                  </div>
+                  {/* Default Card 2 - César Manrique landmarks */}
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div className="px-5 pt-5 pb-3">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {t("rental.location.place2")}
+                      </h3>
+                    </div>
+                    <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
+                      <img src={lo2} alt={t("rental.location.place2")} className="w-full h-full object-cover" />
+                      <div className="absolute top-0 left-0 right-0 h-16 z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, white, rgba(255, 255, 255, 0.7), transparent)' }}></div>
+                    </div>
+                  </div>
+                  {/* Default Card 3 - Arrecife town */}
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div className="px-5 pt-5 pb-3">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {t("rental.location.place3")}
+                      </h3>
+                    </div>
+                    <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
+                      <img src={lo3} alt={t("rental.location.place3")} className="w-full h-full object-cover" />
+                      <div className="absolute top-0 left-0 right-0 h-16 z-10 pointer-events-none" style={{ background: 'linear-gradient(to bottom, white, rgba(255, 255, 255, 0.7), transparent)' }}></div>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Map Section */}
@@ -664,20 +748,34 @@ const ParticularProperty = () => {
                     </svg>
                     {t("rental.location.view_on_map")}
                   </h3>
-                  <a
-                    href={property?.name?.toLowerCase().includes("artevista") ? "https://maps.app.goo.gl/9MkS7FGbmEnwHsMS7" : "https://maps.app.goo.gl/PcMRvHSgtvLhPoze7"}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-                  >
-                    {t("rental.location.open_in_maps")}
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
+                  {property?.mapUrl && (
+                    <a
+                      href={property.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                    >
+                      {t("rental.location.open_in_maps")}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  )}
                 </div>
                 <div className="rounded-xl overflow-hidden">
-                  {property?.name?.toLowerCase().includes("artevista") ? (
+                  {property?.location?.mapEmbedUrl ? (
+                    <iframe
+                      src={property.location.mapEmbedUrl}
+                      width="100%"
+                      height="350"
+                      style={{ border: 0 }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      className="rounded-xl"
+                      title={`${property.name} Location`}
+                    ></iframe>
+                  ) : property?.name?.toLowerCase().includes("artevista") ? (
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3506.5!2d-13.5648!3d28.9511!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc462975c4e55555%3A0x9MkS7FGbmEnwHsMS7!2sLanzarote%2C%20Las%20Palmas%2C%20Spain!5e0!3m2!1sen!2s!4v1703200000000!5m2!1sen!2s"
                       width="100%"

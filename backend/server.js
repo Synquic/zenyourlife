@@ -93,6 +93,7 @@ const blockedDateRoutes = require('./routes/blockedDateRoutes');
 const legalPageRoutes = require('./routes/legalPageRoutes');
 const reminderTestRoutes = require('./routes/reminderTestRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const rentalPageRoutes = require('./routes/rentalPageRoutes');
 
 // Use Routes
 app.use('/api/services', serviceRoutes);
@@ -112,6 +113,7 @@ app.use('/api/blocked-dates', blockedDateRoutes);
 app.use('/api/legal-pages', legalPageRoutes);
 app.use('/api/reminder-test', reminderTestRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/rental-page', rentalPageRoutes);
 
 // Health Check Routes
 app.get('/', (req, res) => {

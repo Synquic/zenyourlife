@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar'
 import { ArrowRight, Sparkles, Heart, Users, CheckCircle2, X } from 'lucide-react'
 import serviceF1 from '../assets/serviceF1.png'
 import Footer from '../components/Footer'
+import FloatingBookButton from '../components/FloatingBookButton'
 import { useTranslation } from 'react-i18next'
 import BookingDate from '../components/BookingDate'
 import TickImage from '../assets/tick.png'
@@ -595,6 +596,8 @@ const ParticularService = () => {
         </div>
       </div>
     )}
+
+    <FloatingBookButton />
    </>
   )
 }

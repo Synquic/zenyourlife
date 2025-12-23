@@ -86,6 +86,28 @@ const propertySchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // Overview section content
+  overview: {
+    title: { type: String, default: '' },
+    description1: { type: String, default: '' },
+    description2: { type: String, default: '' },
+    highlights: { type: [String], default: [] },
+    features: [{
+      title: { type: String, default: '' },
+      description: { type: String, default: '' },
+      imageUrl: { type: String, default: '' }
+    }]
+  },
+  // Location section content
+  location: {
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    mapEmbedUrl: { type: String, default: '' },
+    places: [{
+      title: { type: String, default: '' },
+      imageUrl: { type: String, default: '' }
+    }]
+  },
   displayOrder: {
     type: Number,
     default: 0

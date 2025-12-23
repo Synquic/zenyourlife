@@ -17,6 +17,7 @@ import { ArrowRight } from 'lucide-react'
 import Expert from '../components/Expert'
 import Testimonial from '../components/Testimonial'
 import Footer from '../components/Footer'
+import FloatingBookButton from '../components/FloatingBookButton'
 import { API_BASE_URL, getImageUrl } from "../config/api";
 
 // Image array for cycling through service images (m1 to m9)
@@ -300,6 +301,7 @@ const Servicepage = () => {
       <Expert/>
       <Testimonial/>
       <Footer/>
+      <FloatingBookButton />
     </>
   )
 }

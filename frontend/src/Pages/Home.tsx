@@ -24,6 +24,7 @@ import Expert from "../components/Expert";
 import Booking from "../components/Booking";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
+import FloatingBookButton from "../components/FloatingBookButton";
 
 
 const Home = () => {
@@ -943,6 +944,8 @@ const Home = () => {
           </div>
         </div>
       )}
+
+      <FloatingBookButton />
     </div>
   );
 };

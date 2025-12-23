@@ -9,6 +9,7 @@ import Testimonials from './pages/Testimonials'
 import Properties from './pages/Properties'
 import Users from './pages/Users'
 import BookingManagement from './pages/BookingManagement'
+import CalendarView from './pages/CalendarView'
 import HealthCheck from './pages/HealthCheck'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/bookings" element={<ProtectedRoute><RentalBooking /></ProtectedRoute>} />
         <Route path="/massage-appointments" element={<ProtectedRoute><MassageBooking /></ProtectedRoute>} />
+        <Route path="/booking-calendar" element={<ProtectedRoute><CalendarView /></ProtectedRoute>} />
         <Route path="/booking-management" element={<ProtectedRoute><BookingManagement /></ProtectedRoute>} />
         <Route path="/inquiries" element={<ProtectedRoute><Inquiries /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
