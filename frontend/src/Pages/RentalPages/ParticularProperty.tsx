@@ -737,72 +737,35 @@ const ParticularProperty = () => {
               )}
             </div>
 
-            {/* Map Section */}
-            <div className="mt-10">
-              <div className="bg-white rounded-2xl overflow-hidden shadow-lg p-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    {t("rental.location.view_on_map")}
-                  </h3>
-                  {property?.mapUrl && (
-                    <a
-                      href={property.mapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-                    >
-                      {t("rental.location.open_in_maps")}
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            {/* Map Section - Only show if admin added map URL */}
+            {property?.location?.mapEmbedUrl && (
+              <div className="mt-10">
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                    </a>
-                  )}
-                </div>
-                <div className="rounded-xl overflow-hidden">
-                  {property?.location?.mapEmbedUrl ? (
+                      {t("rental.location.view_on_map")}
+                    </h3>
+                  </div>
+                  <div className="rounded-xl overflow-hidden">
                     <iframe
                       src={property.location.mapEmbedUrl}
                       width="100%"
-                      height="350"
+                      height="400"
                       style={{ border: 0 }}
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"
                       className="rounded-xl"
-                      title={`${property.name} Location`}
+                      title={`${property.name} Location Map`}
                     ></iframe>
-                  ) : property?.name?.toLowerCase().includes("artevista") ? (
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3506.5!2d-13.5648!3d28.9511!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc462975c4e55555%3A0x9MkS7FGbmEnwHsMS7!2sLanzarote%2C%20Las%20Palmas%2C%20Spain!5e0!3m2!1sen!2s!4v1703200000000!5m2!1sen!2s"
-                      width="100%"
-                      height="350"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      className="rounded-xl"
-                      title="Casa Artevista Location"
-                    ></iframe>
-                  ) : (
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3506.3!2d-13.5890!3d28.9620!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xc462a0c0c0c0c0c%3A0xPcMRvHSgtvLhPoze7!2sLanzarote%2C%20Las%20Palmas%2C%20Spain!5e0!3m2!1sen!2s!4v1703300000000!5m2!1sen!2s"
-                      width="100%"
-                      height="350"
-                      style={{ border: 0 }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      className="rounded-xl"
-                      title="Zen Your Life Villa Location"
-                    ></iframe>
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

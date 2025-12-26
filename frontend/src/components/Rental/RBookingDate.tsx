@@ -78,6 +78,14 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const handleQuickDateSelect = (fullDate: Date) => {
+    // Prevent selecting past dates
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const selectedStart = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate());
+
+    if (selectedStart < todayStart) {
+      return; // Don't allow past date selection
+    }
+
     setSelectedFullDate(fullDate);
   };
 
@@ -117,6 +125,12 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     return selectedFullDate.getDate() === fullDate.getDate() &&
            selectedFullDate.getMonth() === fullDate.getMonth() &&
            selectedFullDate.getFullYear() === fullDate.getFullYear();
+  };
+
+  const isQuickDatePast = (fullDate: Date) => {
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const checkStart = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate());
+    return checkStart < todayStart;
   };
 
   const getSelectedDayName = () => {
@@ -169,26 +183,34 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
       <div className="px-3 sm:px-6 py-4 sm:py-6">
         {/* Week Days with Calendar Icon */}
         <div className="flex gap-1.5 sm:gap-3 mb-4 sm:mb-6 items-center">
-          {weekDays.map((item) => (
-            <button
-              key={item.fullDate.toISOString()}
-              onClick={() => handleQuickDateSelect(item.fullDate)}
-              className={`
-                flex-1 flex flex-col items-center justify-center py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl border-2 transition-all
-                ${isQuickDateSelected(item.fullDate)
-                  ? 'bg-blue-500 border-blue-500 text-white'
-                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                }
-              `}
-            >
-              <span className={`text-[8px] sm:text-xs font-medium mb-0.5 sm:mb-1 ${isQuickDateSelected(item.fullDate) ? 'text-white' : 'text-gray-400'}`}>
-                {item.day}
-              </span>
-              <span className="text-sm sm:text-xl font-semibold">
-                {item.date}
-              </span>
-            </button>
-          ))}
+          {weekDays.map((item) => {
+            const isPast = isQuickDatePast(item.fullDate);
+            const isSelected = isQuickDateSelected(item.fullDate);
+
+            return (
+              <button
+                key={item.fullDate.toISOString()}
+                onClick={() => handleQuickDateSelect(item.fullDate)}
+                disabled={isPast}
+                className={`
+                  flex-1 flex flex-col items-center justify-center py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl border-2 transition-all
+                  ${isSelected
+                    ? 'bg-blue-500 border-blue-500 text-white'
+                    : isPast
+                      ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                  }
+                `}
+              >
+                <span className={`text-[8px] sm:text-xs font-medium mb-0.5 sm:mb-1 ${isSelected ? 'text-white' : isPast ? 'text-gray-300' : 'text-gray-400'}`}>
+                  {item.day}
+                </span>
+                <span className="text-sm sm:text-xl font-semibold">
+                  {item.date}
+                </span>
+              </button>
+            );
+          })}
 
           {/* Calendar Icon Button */}
           <button

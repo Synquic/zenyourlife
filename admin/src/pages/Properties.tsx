@@ -1754,6 +1754,41 @@ const Properties = () => {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-1">
+                      Google Maps Embed URL
+                      <span className="text-[9px] sm:text-[10px] text-slate-400 ml-1">(Required format: https://www.google.com/maps/embed?pb=...)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.location.mapEmbedUrl}
+                      onChange={(e) => setFormData({ ...formData, location: { ...formData.location, mapEmbedUrl: e.target.value } })}
+                      className={`w-full px-3 py-2 bg-white border rounded-lg focus:outline-none focus:ring-2 transition-all text-xs sm:text-sm ${
+                        formData.location.mapEmbedUrl && !formData.location.mapEmbedUrl.startsWith('https://www.google.com/maps/embed')
+                          ? 'border-red-300 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-slate-200 focus:ring-green-500/20 focus:border-green-500'
+                      }`}
+                      placeholder="https://www.google.com/maps/embed?pb=..."
+                    />
+                    {formData.location.mapEmbedUrl && !formData.location.mapEmbedUrl.startsWith('https://www.google.com/maps/embed') && (
+                      <p className="text-[9px] sm:text-[10px] text-red-500 mt-1 flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        Invalid URL format. Must start with "https://www.google.com/maps/embed"
+                      </p>
+                    )}
+                    <div className="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-2">
+                      <p className="text-[9px] sm:text-[10px] text-blue-700 font-medium mb-1">How to get the embed URL:</p>
+                      <ol className="text-[9px] sm:text-[10px] text-blue-600 space-y-0.5 ml-3 list-decimal">
+                        <li>Open Google Maps and search for your location</li>
+                        <li>Click "Share" button</li>
+                        <li>Click "Embed a map" tab</li>
+                        <li>Copy the URL from the iframe src attribute (starts with https://www.google.com/maps/embed?pb=)</li>
+                      </ol>
+                    </div>
+                  </div>
+
                   {/* Nearby Places */}
                   <div>
                     <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-2">Nearby Places (max 3)</label>

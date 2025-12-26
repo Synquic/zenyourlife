@@ -312,7 +312,6 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                 <option value="">Select</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
-                <option value="business">Business</option>
                 <option value="other">Other</option>
               </select>
             </div>

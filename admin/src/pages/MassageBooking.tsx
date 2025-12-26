@@ -255,7 +255,7 @@ const MassageBooking = () => {
 
       // Set min and max widths to prevent UI breaking
       const minLeftWidth = 350  // Minimum left panel width
-      const minRightWidth = 550 // Minimum right panel width to preserve layout
+      const minRightWidth = 850 // Minimum right panel width to preserve layout
       const maxLeftWidth = containerRect.width - minRightWidth
 
       // Clamp the width between min and max

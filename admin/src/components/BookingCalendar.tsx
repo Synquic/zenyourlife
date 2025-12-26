@@ -306,47 +306,19 @@ const BookingCalendar = () => {
             const isToday = formatDateStr(today) === dayStatus.dateStr
             const isPast = dayStatus.date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
             const isWeekend = dayStatus.date.getDay() === 0 || dayStatus.date.getDay() === 6
-            const dayShortName = dayStatus.date.toLocaleDateString('en-US', { weekday: 'short' })
-
-            // Determine background color based on status
-            const getBgColor = () => {
-              if (dayStatus.status === 'blocked' || dayStatus.status === 'non-working') return 'bg-slate-100'
-              if (dayStatus.status === 'full') return 'bg-rose-50'
-              if (dayStatus.status === 'partial') return 'bg-amber-50'
-              if (dayStatus.status === 'available') return 'bg-emerald-50/50'
-              return 'bg-white'
-            }
-
-            // Get status border color
-            const getBorderColor = () => {
-              if (isToday) return 'border-[#DFB13B] border-2'
-              if (dayStatus.status === 'full') return 'border-rose-200'
-              if (dayStatus.status === 'partial') return 'border-amber-200'
-              if (dayStatus.status === 'available') return 'border-emerald-200'
-              return 'border-slate-200'
-            }
 
             return (
               <button
                 key={index}
                 onClick={() => handleDayClick(dayStatus)}
-                className={`min-h-[90px] sm:min-h-[110px] border-b border-r ${getBorderColor()} p-2 sm:p-3 transition-all hover:shadow-lg hover:z-10 group relative flex flex-col ${
+                className={`min-h-[90px] border-b border-r border-slate-200 p-3 transition-all hover:bg-slate-50 relative ${
                   isPast ? 'opacity-50' : ''
-                } ${getBgColor()}`}
+                } bg-white ${isToday ? 'ring-2 ring-inset ring-[#DFB13B]' : ''}`}
               >
-                {/* Day Name & Date Header */}
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-1.5">
-                    {/* Day short name - visible on mobile too */}
-                    <span className={`text-[10px] sm:text-xs font-semibold uppercase ${
-                      isWeekend ? 'text-slate-400' : 'text-slate-500'
-                    }`}>
-                      {dayShortName}
-                    </span>
-                  </div>
-                  {/* Status Indicator Dot */}
+                {/* Status Indicator Dot - Larger, More Visible */}
+                <div className="absolute top-2 right-2">
                   <div
-                    className={`w-3 h-3 rounded-full flex-shrink-0 shadow-sm ${
+                    className={`w-3 h-3 rounded-full ${
                       dayStatus.status === 'available'
                         ? 'bg-emerald-500'
                         : dayStatus.status === 'partial'
@@ -358,44 +330,40 @@ const BookingCalendar = () => {
                   />
                 </div>
 
-                {/* Large Date Number */}
+                {/* Date Number - More Prominent */}
                 <div
-                  className={`text-2xl sm:text-3xl font-bold leading-none mb-1 ${
+                  className={`text-xl sm:text-2xl font-bold mb-2 ${
                     isToday
                       ? 'text-[#DFB13B]'
                       : isWeekend
-                      ? 'text-slate-400'
+                      ? 'text-slate-500'
                       : 'text-slate-800'
                   }`}
                 >
                   {dayStatus.date.getDate()}
                 </div>
 
-                {/* Booking Info Badge */}
-                <div className="flex-1 flex flex-col justify-end mt-auto">
-                  {dayStatus.bookedSlots > 0 && dayStatus.status !== 'blocked' && (
-                    <div
-                      className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded inline-flex self-start ${
-                        dayStatus.status === 'full'
-                          ? 'bg-rose-500 text-white'
-                          : dayStatus.status === 'partial'
-                          ? 'bg-amber-500 text-white'
-                          : 'bg-emerald-500 text-white'
-                      }`}
-                    >
-                      {dayStatus.bookedSlots}/{dayStatus.totalSlots} booked
-                    </div>
-                  )}
-
+                {/* Status Text - Larger and More Readable */}
+                <div className="space-y-1 text-left">
                   {dayStatus.status === 'blocked' && (
-                    <div className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded bg-slate-500 text-white inline-flex self-start">
-                      Blocked
-                    </div>
+                    <div className="text-xs font-medium text-slate-600">Blocked</div>
                   )}
 
                   {dayStatus.status === 'non-working' && (
-                    <div className="text-[10px] sm:text-xs font-medium text-slate-400 inline-flex self-start">
-                      Off Day
+                    <div className="text-xs font-medium text-slate-500">Off</div>
+                  )}
+
+                  {dayStatus.bookedSlots > 0 && dayStatus.status !== 'blocked' && dayStatus.status !== 'non-working' && (
+                    <div
+                      className={`text-xs font-semibold ${
+                        dayStatus.status === 'full'
+                          ? 'text-rose-600'
+                          : dayStatus.status === 'partial'
+                          ? 'text-amber-600'
+                          : 'text-emerald-600'
+                      }`}
+                    >
+                      {dayStatus.bookedSlots}/{dayStatus.totalSlots}
                     </div>
                   )}
                 </div>
