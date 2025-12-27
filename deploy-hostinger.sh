@@ -194,7 +194,7 @@ log() {
 # Check if container is running
 if ! docker ps --format \"{{.Names}}\" | grep -q \"^zenyourlife-app\$\"; then
     log \"WARNING: zenyourlife-app not running. Restarting...\"
-    cd $APP_DIR && docker compose up -d
+    cd $APP_DIR && /usr/local/bin/docker-compose up -d
 else
     # Check if backend is healthy
     if ! curl -sf http://localhost:5001/api/health > /dev/null 2>&1; then
@@ -250,11 +250,11 @@ echo "  Admin:     https://$DOMAIN/admin"
 echo "  API:       https://$DOMAIN/api"
 echo ""
 echo "Container Status:"
-ssh_exec "cd $APP_DIR && docker compose ps"
+ssh_exec "cd $APP_DIR && docker-compose ps"
 echo ""
 echo "Useful Commands:"
-echo "  View logs:        ssh root@$VPS_IP 'cd $APP_DIR && docker compose logs -f'"
-echo "  Restart:          ssh root@$VPS_IP 'cd $APP_DIR && docker compose restart'"
+echo "  View logs:        ssh root@$VPS_IP 'cd $APP_DIR && docker-compose logs -f'"
+echo "  Restart:          ssh root@$VPS_IP 'cd $APP_DIR && docker-compose restart'"
 echo "  Monitor logs:     ssh root@$VPS_IP 'tail -f /var/log/zenyourlife/monitor.log'"
 echo "  Container stats:  ssh root@$VPS_IP 'docker stats --no-stream'"
 echo ""
