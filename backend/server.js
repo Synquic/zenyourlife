@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Serve static files for frontend and admin (in production)
-if (process.env.NODE_ENV === 'production') {
+if (process.env.SERVER_ENV === 'production') {
   // Serve admin panel at /admin
   app.use('/admin', express.static(path.join(__dirname, '../admin/dist')));
 
@@ -131,7 +131,7 @@ app.get('/api', (req, res) => {
     message: 'ZenYourLife API Server',
     status: 'healthy',
     version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.SERVER_ENV || 'development',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     endpoints: {
@@ -185,7 +185,7 @@ app.use('/uploads', (req, res) => {
 });
 
 // Catch-all routes for SPA (must be after API routes) - Only in production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.SERVER_ENV === 'production') {
   // Admin panel catch-all route
   app.get('/admin/*', (req, res) => {
     res.sendFile(path.join(__dirname, '../admin/dist/index.html'));
@@ -204,12 +204,12 @@ app.use((err, req, res, next) => {
   res.status(500).json({
     success: false,
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : {}
+    error: process.env.SERVER_ENV === 'development' ? err.message : {}
   });
 });
 
 // Start Server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`📍 API Base URL: http://localhost:${PORT}`);

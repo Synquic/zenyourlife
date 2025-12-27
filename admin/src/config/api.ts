@@ -2,10 +2,10 @@
 // This file centralizes the API base URL for the entire admin application
 // URLs are loaded from environment variables (.env.development or .env.production)
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://zenyourlife.synquic.in/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://zenyourlife.be/api';
 
 // Server base URL (without /api) for serving static files like images
-export const SERVER_BASE_URL = import.meta.env.VITE_SERVER_URL || 'https://zenyourlife.synquic.in';
+export const SERVER_BASE_URL = import.meta.env.VITE_SERVER_URL || 'https://zenyourlife.be';
 
 // Helper function to get full image URL from backend paths
 export const getImageUrl = (imagePath: string | undefined): string | null => {

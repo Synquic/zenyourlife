@@ -8,7 +8,7 @@
     "build:frontend": "npm run build --prefix frontend",
     "build:admin": "npm run build --prefix admin",
     "build": "npm run build:frontend && npm run build:admin",
-    "start": "NODE_ENV=production node backend/server.js",
+    "start": "SERVER_ENV=production node backend/server.js",
     "dev:backend": "npm run dev --prefix backend",
     "dev:frontend": "npm run dev --prefix frontend",
     "dev:admin": "npm run dev --prefix admin"
