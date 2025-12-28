@@ -3,7 +3,7 @@ import tp1 from '../../assets/tp1.jpg';
 import tp2 from '../../assets/tp2.jpg';
 import tp3 from '../../assets/tp3.jpg';
 import tp4 from '../../assets/tp4.jpg';
-import frame7 from '../../assets/frame7.png';
+import villa0001 from '../../assets/villa0001.jpg';
 import { useTranslation } from "react-i18next";
 import RBooking from './RBooking';
 
@@ -36,7 +36,7 @@ const RHeroSection = () => {
       <div
         className="relative min-h-[350px] sm:min-h-[400px] md:min-h-[550px] bg-cover bg-center bg-no-repeat overflow-visible rounded-3xl sm:rounded-[32px]"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${frame7})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${villa0001})`,
           marginTop: '24px'
         }}
       >

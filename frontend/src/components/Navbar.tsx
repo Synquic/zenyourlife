@@ -1,6 +1,7 @@
 import React from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import znlogo from "../assets/znlogo.png";
+import villa0001 from "../assets/villa0001.jpg";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { API_BASE_URL } from "../config/api";
@@ -154,7 +155,12 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   return (
-    <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
+    <nav
+      className="shadow-sm fixed w-full top-0 z-50 bg-cover bg-center"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), url(${villa0001})`
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="flex items-center gap-2">
