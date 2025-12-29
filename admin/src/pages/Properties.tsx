@@ -616,7 +616,7 @@ const Properties = () => {
   }
 
   // Handle place image upload for location section
-  const handlePlaceImageUpload = useCallback(async (files: FileList | null, placeIndex: number) => {
+  const handlePlaceImageUpload = useCallback(async (files: FileList | null, placeIndex: number, event?: React.ChangeEvent<HTMLInputElement>) => {
     if (!files || files.length === 0) return
 
     const file = files[0]
@@ -630,11 +630,30 @@ const Properties = () => {
     formDataUpload.append('image', file)
 
     try {
+      console.log('Uploading place image to:', `${API_BASE_URL}/upload/image`)
+      console.log('File details:', { name: file.name, size: file.size, type: file.type })
       const response = await fetch(`${API_BASE_URL}/upload/image`, {
         method: 'POST',
         body: formDataUpload
       })
+
+      if (!response.ok) {
+        let errorMessage = `Server returned ${response.status}`
+        try {
+          const errorData = await response.json()
+          console.error('Upload response not OK:', response.status, errorData)
+          errorMessage = errorData.message || errorMessage
+        } catch {
+          const errorText = await response.text()
+          console.error('Upload response not OK:', response.status, errorText)
+        }
+        alert(`Failed to upload image: ${errorMessage}`)
+        return
+      }
+
       const data = await response.json()
+      console.log('Upload response:', data)
+
       if (data.success && data.data?.url) {
         setFormData(prev => {
           const newPlaces = [...prev.location.places]
@@ -644,11 +663,22 @@ const Properties = () => {
       } else {
         alert('Failed to upload image: ' + (data.message || 'Unknown error'))
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading place image:', error)
-      alert('Failed to upload image')
+      // Provide more details about the error
+      let errorMessage = 'Something went wrong!'
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        errorMessage = 'Cannot connect to server. Is the backend running on port 5000?'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      alert('Failed to upload image: ' + errorMessage)
     } finally {
       setUploadingPlaceImage(null)
+      // Reset the input value to allow re-uploading the same file
+      if (event?.target) {
+        event.target.value = ''
+      }
     }
   }, [])
 
@@ -2025,21 +2055,32 @@ const Properties = () => {
                                     className="flex-1 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
                                     placeholder="Image URL or paste link"
                                   />
-                                  <label className="flex items-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-xs cursor-pointer transition-colors shrink-0">
+                                  <input
+                                    type="file"
+                                    id={`place-image-upload-${idx}`}
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                      handlePlaceImageUpload(e.target.files, idx, e)
+                                    }}
+                                    className="hidden"
+                                    disabled={uploadingPlaceImage === idx}
+                                  />
+                                  <button
+                                    type="button"
+                                    className="flex items-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-xs cursor-pointer transition-colors shrink-0"
+                                    onClick={() => {
+                                      const input = document.getElementById(`place-image-upload-${idx}`) as HTMLInputElement
+                                      if (input) input.click()
+                                    }}
+                                    disabled={uploadingPlaceImage === idx}
+                                  >
                                     {uploadingPlaceImage === idx ? (
                                       <Loader2 className="w-3 h-3 animate-spin" />
                                     ) : (
                                       <Upload className="w-3 h-3" />
                                     )}
                                     <span className="hidden sm:inline">Upload</span>
-                                    <input
-                                      type="file"
-                                      accept="image/*"
-                                      onChange={(e) => handlePlaceImageUpload(e.target.files, idx)}
-                                      className="hidden"
-                                      disabled={uploadingPlaceImage === idx}
-                                    />
-                                  </label>
+                                  </button>
                                 </div>
                               )}
                             </div>

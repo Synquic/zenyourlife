@@ -82,33 +82,58 @@ router.get('/', (req, res) => {
 });
 
 // Upload single image
-router.post('/image', upload.single('image'), (req, res) => {
-  try {
-    if (!req.file) {
+router.post('/image', (req, res) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('[Upload Error]', err);
+      if (err instanceof multer.MulterError) {
+        // Multer-specific errors
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({
+            success: false,
+            message: 'File too large. Maximum size is 5MB'
+          });
+        }
+        return res.status(400).json({
+          success: false,
+          message: `Upload error: ${err.message}`
+        });
+      }
+      // Other errors (like file type validation)
       return res.status(400).json({
         success: false,
-        message: 'No file uploaded'
+        message: err.message || 'Error uploading image'
       });
     }
 
-    // Return relative path - frontend will construct full URL based on environment
-    const imageUrl = `/uploads/${req.file.filename}`;
-
-    res.status(200).json({
-      success: true,
-      message: 'Image uploaded successfully',
-      data: {
-        url: imageUrl,
-        filename: req.file.filename
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'No file uploaded'
+        });
       }
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error uploading image',
-      error: error.message
-    });
-  }
+
+      // Return relative path - frontend will construct full URL based on environment
+      const imageUrl = `/uploads/${req.file.filename}`;
+
+      res.status(200).json({
+        success: true,
+        message: 'Image uploaded successfully',
+        data: {
+          url: imageUrl,
+          filename: req.file.filename
+        }
+      });
+    } catch (error) {
+      console.error('[Upload Error]', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error uploading image',
+        error: error.message
+      });
+    }
+  });
 });
 
 // Upload multiple images (max 4)

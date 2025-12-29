@@ -695,7 +695,7 @@ const ParticularProperty = () => {
                     </div>
                     <div className="relative h-44 mx-3 mb-3 rounded-xl overflow-hidden">
                       <img
-                        src={place.imageUrl || lo1}
+                        src={getImageUrl(place.imageUrl) || lo1}
                         alt={place.title}
                         className="w-full h-full object-cover"
                       />
