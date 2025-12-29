@@ -295,14 +295,9 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
         <div className="max-w-5xl mx-auto">
           {/* Main Heading */}
           <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
-            <div className="flex justify-between items-center">
-              <h1 className="text-xl font-semibold text-gray-900">
-                {t('booking.title')}
-              </h1>
-              <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
-                <X className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
+            <h1 className="text-xl font-semibold text-gray-900">
+              {t('booking.title')}
+            </h1>
           </div>
 
           {/* Header */}

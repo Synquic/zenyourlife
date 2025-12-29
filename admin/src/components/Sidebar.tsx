@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { LayoutDashboard, MessageSquare, Building2, Sparkles, Users, LogOut, Quote, Flower2, X, Settings2, CalendarDays } from 'lucide-react'
+import { LayoutDashboard, MessageSquare, Building2, Sparkles, Users, LogOut, Quote, Flower2, X, Settings2, CalendarDays, HelpCircle } from 'lucide-react'
 import znlogo from '../assets/znlogo.png'
 import { destroyAdminSession } from '../utils/cookies'
 
@@ -29,6 +29,7 @@ const Sidebar = ({ isOpen = true, onClose }: SidebarProps) => {
     { name: 'Properties', icon: <Building2 className="w-5 h-5" />, path: '/properties' },
     { name: 'Services', icon: <Sparkles className="w-5 h-5" />, path: '/services' },
     { name: 'Testimonials', icon: <Quote className="w-5 h-5" />, path: '/testimonials' },
+    { name: 'FAQ', icon: <HelpCircle className="w-5 h-5" />, path: '/faq' },
     { name: 'Users', icon: <Users className="w-5 h-5" />, path: '/users' },
     // { name: 'Health Check', icon: <Activity className="w-5 h-5" />, path: '/health' },
   ]

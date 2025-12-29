@@ -141,6 +141,15 @@ const Properties = () => {
   const overviewImageRef3 = useRef<HTMLInputElement>(null)
   const overviewImageRef4 = useRef<HTMLInputElement>(null)
   const overviewImageRefs = [overviewImageRef1, overviewImageRef2, overviewImageRef3, overviewImageRef4]
+
+  // Feature card image upload refs and state
+  const [uploadingFeatureImage, setUploadingFeatureImage] = useState<number | null>(null)
+  const featureImageRef1 = useRef<HTMLInputElement>(null)
+  const featureImageRef2 = useRef<HTMLInputElement>(null)
+  const featureImageRef3 = useRef<HTMLInputElement>(null)
+  const featureImageRef4 = useRef<HTMLInputElement>(null)
+  const featureImageRefs = [featureImageRef1, featureImageRef2, featureImageRef3, featureImageRef4]
+
   const [editingProperty, setEditingProperty] = useState<PropertyData | null>(null)
   const [saving, setSaving] = useState(false)
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
@@ -153,6 +162,7 @@ const Properties = () => {
   const [uploadingImage, setUploadingImage] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [imageUrlInput, setImageUrlInput] = useState('')
+  const [uploadingPlaceImage, setUploadingPlaceImage] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const galleryFileInputRef = useRef<HTMLInputElement>(null)
 
@@ -377,6 +387,46 @@ const Properties = () => {
     }
   }
 
+  // Handle feature card image upload for property overview
+  const handleFeatureImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, featureIndex: number) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file')
+      return
+    }
+
+    setUploadingFeatureImage(featureIndex)
+
+    const uploadFormData = new FormData()
+    uploadFormData.append('image', file)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: 'POST',
+        body: uploadFormData
+      })
+
+      const data = await response.json()
+      console.log('Feature image upload response:', data)
+
+      if (data.success && data.data?.url) {
+        const newFeatures = [...formData.overview.features]
+        newFeatures[featureIndex] = { ...newFeatures[featureIndex], imageUrl: data.data.url }
+        setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+        console.log('Updated feature card with image:', data.data.url)
+      } else {
+        alert('Failed to upload image: ' + (data.message || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Error uploading feature image:', error)
+      alert('Failed to upload image')
+    } finally {
+      setUploadingFeatureImage(null)
+    }
+  }
+
   // Toggle property visibility
   const handleToggleStatus = async (property: PropertyData) => {
     try {
@@ -564,6 +614,43 @@ const Properties = () => {
   const removeCustomImage = () => {
     setFormData({ ...formData, imageUrl: '' })
   }
+
+  // Handle place image upload for location section
+  const handlePlaceImageUpload = useCallback(async (files: FileList | null, placeIndex: number) => {
+    if (!files || files.length === 0) return
+
+    const file = files[0]
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file')
+      return
+    }
+
+    setUploadingPlaceImage(placeIndex)
+    const formDataUpload = new FormData()
+    formDataUpload.append('image', file)
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: 'POST',
+        body: formDataUpload
+      })
+      const data = await response.json()
+      if (data.success && data.data?.url) {
+        setFormData(prev => {
+          const newPlaces = [...prev.location.places]
+          newPlaces[placeIndex].imageUrl = data.data.url
+          return { ...prev, location: { ...prev.location, places: newPlaces } }
+        })
+      } else {
+        alert('Failed to upload image: ' + (data.message || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Error uploading place image:', error)
+      alert('Failed to upload image')
+    } finally {
+      setUploadingPlaceImage(null)
+    }
+  }, [])
 
   // Handle gallery image upload
   const handleGalleryImageUpload = useCallback(async (files: FileList | null) => {
@@ -1592,8 +1679,8 @@ const Properties = () => {
                     <textarea
                       value={formData.overview.description1}
                       onChange={(e) => setFormData({ ...formData, overview: { ...formData.overview, description1: e.target.value } })}
-                      rows={2}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-none"
+                      rows={4}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-y"
                       placeholder="First paragraph of the overview description..."
                     />
                   </div>
@@ -1603,8 +1690,8 @@ const Properties = () => {
                     <textarea
                       value={formData.overview.description2}
                       onChange={(e) => setFormData({ ...formData, overview: { ...formData.overview, description2: e.target.value } })}
-                      rows={2}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-none"
+                      rows={4}
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-xs sm:text-sm resize-y"
                       placeholder="Second paragraph of the overview description..."
                     />
                   </div>
@@ -1643,7 +1730,7 @@ const Properties = () => {
                       </button>
                     </div>
                     {formData.overview.highlights.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 p-3 bg-slate-50 rounded-lg border border-slate-200 max-h-40 overflow-y-auto">
                         {formData.overview.highlights.map((highlight, idx) => (
                           <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
                             {highlight}
@@ -1661,52 +1748,140 @@ const Properties = () => {
                   </div>
 
                   {/* Features */}
-                  <div>
-                    <label className="block text-[10px] sm:text-xs font-medium text-slate-600 mb-2">Feature Cards (max 4)</label>
-                    <div className="space-y-3">
+                  <div className="mt-4 p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
+                    <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                      <span className="w-6 h-6 bg-blue-500 text-white rounded-lg flex items-center justify-center text-xs">
+                        📸
+                      </span>
+                      Feature Cards with Images (max 4)
+                    </label>
+                    <div className="space-y-4">
                       {formData.overview.features.map((feature, idx) => (
-                        <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3 relative">
-                          <button
-                            type="button"
-                            onClick={() => setFormData({ ...formData, overview: { ...formData.overview, features: formData.overview.features.filter((_, i) => i !== idx) } })}
-                            className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                          <div className="grid grid-cols-1 gap-2 pr-6">
-                            <input
-                              type="text"
-                              value={feature.title}
-                              onChange={(e) => {
-                                const newFeatures = [...formData.overview.features]
-                                newFeatures[idx].title = e.target.value
-                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
-                              }}
-                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
-                              placeholder="Feature title (e.g., Private Terrace)"
-                            />
-                            <input
-                              type="text"
-                              value={feature.description}
-                              onChange={(e) => {
-                                const newFeatures = [...formData.overview.features]
-                                newFeatures[idx].description = e.target.value
-                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
-                              }}
-                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
-                              placeholder="Feature description"
-                            />
-                            <input
-                              type="text"
-                              value={feature.imageUrl}
-                              onChange={(e) => {
-                                const newFeatures = [...formData.overview.features]
-                                newFeatures[idx].imageUrl = e.target.value
-                                setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
-                              }}
-                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
-                              placeholder="Image URL"
-                            />
+                        <div key={idx} className="bg-white border-2 border-slate-200 rounded-xl p-4 relative shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded">Card {idx + 1}</span>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, overview: { ...formData.overview, features: formData.overview.features.filter((_, i) => i !== idx) } })}
+                              className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-medium text-slate-600 mb-1">Card Title</label>
+                              <input
+                                type="text"
+                                value={feature.title}
+                                onChange={(e) => {
+                                  const newFeatures = [...formData.overview.features]
+                                  newFeatures[idx].title = e.target.value
+                                  setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                                }}
+                                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                placeholder="e.g., Private Terrace, Ocean Views"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-slate-600 mb-1">Card Description</label>
+                              <textarea
+                                value={feature.description}
+                                onChange={(e) => {
+                                  const newFeatures = [...formData.overview.features]
+                                  newFeatures[idx].description = e.target.value
+                                  setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                                }}
+                                rows={2}
+                                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-y"
+                                placeholder="Brief description of this feature..."
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-slate-600 mb-2">Card Image</label>
+
+                              {/* Image Preview or Upload Area */}
+                              <div className="flex items-start gap-3">
+                                {feature.imageUrl && feature.imageUrl.trim() !== '' ? (
+                                  <div className="relative w-24 h-20 rounded-lg overflow-hidden border-2 border-slate-200 flex-shrink-0">
+                                    <img
+                                      src={getImageUrl(feature.imageUrl) || ''}
+                                      alt={feature.title}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23f1f5f9" width="100" height="100"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" fill="%2394a3b8" font-size="10"%3EInvalid%3C/text%3E%3C/svg%3E'
+                                      }}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const newFeatures = [...formData.overview.features]
+                                        newFeatures[idx].imageUrl = ''
+                                        setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                                      }}
+                                      className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                      title="Remove image"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="w-24 h-20 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 flex-shrink-0">
+                                    <ImageIcon className="w-6 h-6 text-slate-400" />
+                                  </div>
+                                )}
+
+                                {/* Upload and URL Input */}
+                                <div className="flex-1 space-y-2">
+                                  {/* Upload Button */}
+                                  <input
+                                    type="file"
+                                    ref={featureImageRefs[idx]}
+                                    onChange={(e) => handleFeatureImageUpload(e, idx)}
+                                    accept="image/*"
+                                    className="hidden"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => featureImageRefs[idx]?.current?.click()}
+                                    disabled={uploadingFeatureImage === idx}
+                                    className="w-full px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-xs font-medium text-blue-600 hover:bg-blue-100 flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                                  >
+                                    {uploadingFeatureImage === idx ? (
+                                      <>
+                                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        Uploading...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Upload className="w-3.5 h-3.5" />
+                                        Upload Image
+                                      </>
+                                    )}
+                                  </button>
+
+                                  {/* Or divider */}
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex-1 h-px bg-slate-200"></div>
+                                    <span className="text-xs text-slate-400">or</span>
+                                    <div className="flex-1 h-px bg-slate-200"></div>
+                                  </div>
+
+                                  {/* URL Input */}
+                                  <input
+                                    type="text"
+                                    value={feature.imageUrl}
+                                    onChange={(e) => {
+                                      const newFeatures = [...formData.overview.features]
+                                      newFeatures[idx].imageUrl = e.target.value
+                                      setFormData({ ...formData, overview: { ...formData.overview, features: newFeatures } })
+                                    }}
+                                    placeholder="Paste image URL"
+                                    className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                  />
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -1714,9 +1889,10 @@ const Properties = () => {
                         <button
                           type="button"
                           onClick={() => setFormData({ ...formData, overview: { ...formData.overview, features: [...formData.overview.features, { title: '', description: '', imageUrl: '' }] } })}
-                          className="w-full py-2 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 text-xs hover:border-blue-400 hover:text-blue-500 transition-all"
+                          className="w-full py-3 border-2 border-dashed border-blue-300 rounded-xl text-blue-600 text-sm font-medium hover:border-blue-400 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
                         >
-                          + Add Feature Card
+                          <Plus className="w-4 h-4" />
+                          Add Feature Card ({formData.overview.features.length}/4)
                         </button>
                       )}
                     </div>
@@ -1798,7 +1974,7 @@ const Properties = () => {
                           <button
                             type="button"
                             onClick={() => setFormData({ ...formData, location: { ...formData.location, places: formData.location.places.filter((_, i) => i !== idx) } })}
-                            className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded"
+                            className="absolute top-2 right-2 p-1 text-red-500 hover:bg-red-50 rounded z-10"
                           >
                             <X className="w-3.5 h-3.5" />
                           </button>
@@ -1814,17 +1990,59 @@ const Properties = () => {
                               className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
                               placeholder="Place name (e.g., Playa del Reducto)"
                             />
-                            <input
-                              type="text"
-                              value={place.imageUrl}
-                              onChange={(e) => {
-                                const newPlaces = [...formData.location.places]
-                                newPlaces[idx].imageUrl = e.target.value
-                                setFormData({ ...formData, location: { ...formData.location, places: newPlaces } })
-                              }}
-                              className="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
-                              placeholder="Image URL or paste link"
-                            />
+                            {/* Image Upload/URL Section */}
+                            <div className="space-y-2">
+                              {place.imageUrl ? (
+                                <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                                  <img
+                                    src={getImageUrl(place.imageUrl) || place.imageUrl}
+                                    alt={place.title || 'Place image'}
+                                    className="w-10 h-10 object-cover rounded"
+                                  />
+                                  <span className="text-xs text-green-700 flex-1 truncate">{place.imageUrl}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const newPlaces = [...formData.location.places]
+                                      newPlaces[idx].imageUrl = ''
+                                      setFormData({ ...formData, location: { ...formData.location, places: newPlaces } })
+                                    }}
+                                    className="p-1 text-red-500 hover:bg-red-100 rounded"
+                                  >
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ) : (
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    value={place.imageUrl}
+                                    onChange={(e) => {
+                                      const newPlaces = [...formData.location.places]
+                                      newPlaces[idx].imageUrl = e.target.value
+                                      setFormData({ ...formData, location: { ...formData.location, places: newPlaces } })
+                                    }}
+                                    className="flex-1 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs"
+                                    placeholder="Image URL or paste link"
+                                  />
+                                  <label className="flex items-center gap-1 px-2 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded text-xs cursor-pointer transition-colors shrink-0">
+                                    {uploadingPlaceImage === idx ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                      <Upload className="w-3 h-3" />
+                                    )}
+                                    <span className="hidden sm:inline">Upload</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => handlePlaceImageUpload(e.target.files, idx)}
+                                      className="hidden"
+                                      disabled={uploadingPlaceImage === idx}
+                                    />
+                                  </label>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}

@@ -133,6 +133,59 @@ router.post('/seed', async (req, res) => {
   }
 });
 
+// POST - Seed default highlights for existing properties
+router.post('/seed-highlights', async (req, res) => {
+  try {
+    // Default highlights that match frontend fallback
+    const defaultHighlights = [
+      'Fully equipped modern kitchen',
+      'High-speed Wi-Fi throughout',
+      'Premium linens and towels provided',
+      'Walking distance to beach and restaurants',
+      'Private terrace with stunning views',
+      'Air conditioning in all rooms',
+      'Free parking available',
+      'Weekly cleaning service included'
+    ];
+
+    // Find all properties
+    const properties = await Property.find({});
+    let updated = 0;
+
+    for (const property of properties) {
+      // Only update if highlights are empty or don't exist
+      if (!property.overview || !property.overview.highlights || property.overview.highlights.length === 0) {
+        await Property.findByIdAndUpdate(property._id, {
+          $set: {
+            'overview.highlights': defaultHighlights,
+            'overview.title': property.overview?.title || 'Property Overview',
+            'overview.description1': property.overview?.description1 || property.description,
+            'overview.description2': property.overview?.description2 || '',
+            'overview.features': property.overview?.features || []
+          }
+        });
+        updated++;
+      }
+    }
+
+    console.log(`✅ Seeded highlights for ${updated} properties`);
+
+    res.status(200).json({
+      success: true,
+      message: `Default highlights seeded successfully for ${updated} properties`,
+      totalProperties: properties.length,
+      updatedProperties: updated
+    });
+  } catch (error) {
+    console.error('❌ Error seeding highlights:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to seed highlights',
+      error: error.message
+    });
+  }
+});
+
 // GET section settings (with optional translation from DB)
 router.get('/section-settings/:type', async (req, res) => {
   try {
@@ -294,7 +347,7 @@ router.post('/', async (req, res) => {
     const {
       name, description, price, currency, priceUnit,
       guests, bedrooms, parking, image, imageUrl, galleryImages,
-      cleanliness, amenities, hostName, displayOrder
+      cleanliness, amenities, hostName, overview, location, mapUrl, displayOrder
     } = req.body;
 
     // Auto-translate content to all languages and store in DB
@@ -310,12 +363,15 @@ router.post('/', async (req, res) => {
       guests,
       bedrooms,
       parking,
+      mapUrl,
       image,
       imageUrl,
       galleryImages: galleryImages || [],
       cleanliness,
       amenities,
       hostName,
+      overview,
+      location,
       displayOrder,
       translations
     });

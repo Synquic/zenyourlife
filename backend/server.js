@@ -94,6 +94,7 @@ const legalPageRoutes = require('./routes/legalPageRoutes');
 const reminderTestRoutes = require('./routes/reminderTestRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const rentalPageRoutes = require('./routes/rentalPageRoutes');
+const faqRoutes = require('./routes/faqRoutes');
 
 // Use Routes
 app.use('/api/services', serviceRoutes);
@@ -114,6 +115,7 @@ app.use('/api/legal-pages', legalPageRoutes);
 app.use('/api/reminder-test', reminderTestRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/rental-page', rentalPageRoutes);
+app.use('/api/faqs', faqRoutes);
 
 // Health Check Routes
 app.get('/', (req, res) => {

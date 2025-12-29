@@ -379,10 +379,7 @@ const ParticularProperty = () => {
               <p className="text-gray-600 text-xs sm:text-sm leading-relaxed mb-3 line-clamp-4">
                 {property.description}
               </p>
-              <button className="text-blue-600 font-medium text-xs sm:text-sm hover:text-blue-700 transition-colors flex items-center gap-1">
-                {t("rental.apartments.meet_host")}{" "}
-                <span className="text-sm">↗</span>
-              </button>
+              
             </div>
 
             {/* Middle Section - Icons/Stats */}
@@ -534,28 +531,37 @@ const ParticularProperty = () => {
 
             {/* RIGHT - Cards Grid */}
             <div>
-              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:gap-5">
                 {property?.overview?.features && property.overview.features.length > 0 ? (
-                  property.overview.features.map((feature, idx) => (
-                    <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                      <div className="p-3 sm:p-4">
-                        <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
-                          {feature.title}
-                        </h3>
-                        <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
-                          {feature.description}
-                        </p>
+                  property.overview.features.map((feature, idx) => {
+                    // Default images for fallback
+                    const defaultImages = [ov1, ov2, ov3, ov4];
+                    const fallbackImage = defaultImages[idx % defaultImages.length];
+
+                    // Use uploaded image if available, otherwise use fallback
+                    const imageUrl = feature.imageUrl ? getImageUrl(feature.imageUrl) : fallbackImage;
+
+                    return (
+                      <div key={idx} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                        <div className="p-3 sm:p-4">
+                          <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1">
+                            {feature.title}
+                          </h3>
+                          <p className="text-gray-500 text-[10px] sm:text-xs leading-relaxed line-clamp-2 sm:line-clamp-3">
+                            {feature.description}
+                          </p>
+                        </div>
+                        <div className="relative h-36 sm:h-48 lg:h-52 overflow-hidden">
+                          <img
+                            src={imageUrl || fallbackImage}
+                            alt={feature.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                        </div>
                       </div>
-                      <div className="relative h-24 sm:h-36 overflow-hidden">
-                        <img
-                          src={feature.imageUrl || ov1}
-                          alt={feature.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <>
                     {/* Default Card 1 - Private terrace */}
@@ -568,9 +574,9 @@ const ParticularProperty = () => {
                           {t("rental.property_overview.private_terrace_desc")}
                         </p>
                       </div>
-                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                      <div className="relative h-36 sm:h-48 lg:h-52 overflow-hidden">
                         <img src={ov1} alt={t("rental.property_overview.private_terrace")} className="w-full h-full object-cover" />
-                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                        <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
                       </div>
                     </div>
                     {/* Default Card 2 - Airy bedroom */}
@@ -583,9 +589,9 @@ const ParticularProperty = () => {
                           {t("rental.property_overview.airy_bedroom_desc")}
                         </p>
                       </div>
-                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                      <div className="relative h-36 sm:h-48 lg:h-52 overflow-hidden">
                         <img src={ov2} alt={t("rental.property_overview.airy_bedroom")} className="w-full h-full object-cover" />
-                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                        <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
                       </div>
                     </div>
                     {/* Default Card 3 - Living room */}
@@ -598,9 +604,9 @@ const ParticularProperty = () => {
                           {t("rental.property_overview.living_room_desc")}
                         </p>
                       </div>
-                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                      <div className="relative h-36 sm:h-48 lg:h-52 overflow-hidden">
                         <img src={ov3} alt={t("rental.property_overview.living_room")} className="w-full h-full object-cover" />
-                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                        <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
                       </div>
                     </div>
                     {/* Default Card 4 - Kitchen */}
@@ -613,9 +619,9 @@ const ParticularProperty = () => {
                           {t("rental.property_overview.kitchen_desc")}
                         </p>
                       </div>
-                      <div className="relative h-24 sm:h-36 overflow-hidden">
+                      <div className="relative h-36 sm:h-48 lg:h-52 overflow-hidden">
                         <img src={ov4} alt={t("rental.property_overview.kitchen")} className="w-full h-full object-cover" />
-                        <div className="absolute top-0 left-0 right-0 h-12 sm:h-20 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
+                        <div className="absolute top-0 left-0 right-0 h-16 sm:h-24 z-10 pointer-events-none bg-gradient-to-b from-white via-white/70 to-transparent"></div>
                       </div>
                     </div>
                   </>
@@ -627,23 +633,25 @@ const ParticularProperty = () => {
 
         {/* Amenities Grid Section - Dynamic */}
         {property.amenities && property.amenities.length > 0 && (
-          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-6 sm:p-8 mt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-lg p-4 sm:p-8 mt-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
               {property.amenities.map((amenityId, index) => {
                 // Check if it's a predefined amenity with an icon
                 const icon = amenityIcons[amenityId];
                 const label = amenityLabels[amenityId] || amenityId;
 
                 return (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      {icon || (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div key={index} className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      {icon ? (
+                        <span className="[&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5">{icon}</span>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </div>
-                    <span className="text-gray-700 text-sm">{label}</span>
+                    <span className="text-gray-700 text-xs sm:text-sm">{label}</span>
                   </div>
                 );
               })}
@@ -770,7 +778,7 @@ const ParticularProperty = () => {
         </div>
 
         <div className="mt-12 relative z-0">
-          <Testimonial/>
+          <Testimonial propertyId={property?._id} propertyName={property?.name} />
         </div>
 
         {/* Still Have Questions Section */}

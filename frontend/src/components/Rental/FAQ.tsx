@@ -1,34 +1,47 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import blueArrow from '../../assets/bluearrow.png';
 import lock2 from '../../assets/lock2.png';
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from '../../config/api';
 
 interface FAQProps {
   onContactClick?: () => void;
 }
 
-const FAQ = ({ onContactClick }: FAQProps) => {
-  const { t } = useTranslation();
-  const [openIndex, setOpenIndex] = useState<number | null>(1);
+interface FAQData {
+  _id: string;
+  question: string;
+  answer: string;
+}
 
-  const faqs = [
-    {
-      question: t('rental.faq.q1'),
-      answer: t('rental.faq.a1')
-    },
-    {
-      question: t('rental.faq.q2'),
-      answer: t('rental.faq.a2')
-    },
-    {
-      question: t('rental.faq.q3'),
-      answer: t('rental.faq.a3')
-    },
-    {
-      question: t('rental.faq.q4'),
-      answer: t('rental.faq.a4')
-    }
-  ];
+const FAQ = ({ onContactClick }: FAQProps) => {
+  const { t, i18n } = useTranslation();
+  const [openIndex, setOpenIndex] = useState<number | null>(1);
+  const [faqs, setFaqs] = useState<FAQData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
+  const currentLang = i18n.language?.split('-')[0] || 'en';
+
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/faqs?category=rental&lang=${currentLang}`);
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+          setFaqs(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+        // Keep empty array on error
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, [currentLang]);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -76,68 +89,78 @@ const FAQ = ({ onContactClick }: FAQProps) => {
 
           {/* Right Side - FAQ Items */}
           <div className="space-y-3 sm:space-y-4">
-            {faqs.map((faq, index) => (
-              <div
-                key={index}
-                className="border-b border-gray-200 pb-3 sm:pb-4"
-              >
-                <button
-                  onClick={() => toggleFAQ(index)}
-                  className="w-full flex items-start justify-between text-left py-3 sm:py-4 focus:outline-none group"
-                >
-                  <div className="flex items-start gap-2 sm:gap-4 flex-1">
-                    <span className="text-gray-400 font-medium text-sm sm:text-lg mt-0.5 sm:mt-1">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className={`font-semibold text-sm sm:text-lg transition-colors ${
-                      openIndex === index ? 'text-blue-600' : 'text-gray-900'
-                    }`}>
-                      {faq.question}
-                    </span>
-                  </div>
-
-                  <div className="ml-2 sm:ml-4 flex-shrink-0">
-                    {openIndex === index ? (
-                      <svg
-                        className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v12m6-6H6"
-                        />
-                      </svg>
-                    )}
-                  </div>
-                </button>
-
-                {openIndex === index && (
-                  <div className="pl-8 sm:pl-14 pr-4 sm:pr-10 pb-3 sm:pb-4 animate-fadeIn">
-                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                      {faq.answer}
-                    </p>
-                  </div>
-                )}
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
               </div>
-            ))}
+            ) : faqs.length > 0 ? (
+              faqs.map((faq, index) => (
+                <div
+                  key={faq._id}
+                  className="border-b border-gray-200 pb-3 sm:pb-4"
+                >
+                  <button
+                    onClick={() => toggleFAQ(index)}
+                    className="w-full flex items-start justify-between text-left py-3 sm:py-4 focus:outline-none group"
+                  >
+                    <div className="flex items-start gap-2 sm:gap-4 flex-1">
+                      <span className="text-gray-400 font-medium text-sm sm:text-lg mt-0.5 sm:mt-1">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className={`font-semibold text-sm sm:text-lg transition-colors ${
+                        openIndex === index ? 'text-blue-600' : 'text-gray-900'
+                      }`}>
+                        {faq.question}
+                      </span>
+                    </div>
+
+                    <div className="ml-2 sm:ml-4 flex-shrink-0">
+                      {openIndex === index ? (
+                        <svg
+                          className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v12m6-6H6"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+
+                  {openIndex === index && (
+                    <div className="pl-8 sm:pl-14 pr-4 sm:pr-10 pb-3 sm:pb-4 animate-fadeIn">
+                      <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500 text-sm">
+                {t('rental.faq.no_faqs', 'No FAQs available at the moment.')}
+              </div>
+            )}
           </div>
         </div>
       </div>

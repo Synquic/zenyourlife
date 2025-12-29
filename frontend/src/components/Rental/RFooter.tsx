@@ -213,9 +213,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
             <p className="text-gray-400 text-sm leading-relaxed mb-4 w-62">
               {t('rental.footer.about_description')}
             </p>
-            <button className="text-yellow-400 hover:text-yellow-300">
-              {t('rental.footer.see_about')} →
-            </button>
+           
           </div>
 
           <div>

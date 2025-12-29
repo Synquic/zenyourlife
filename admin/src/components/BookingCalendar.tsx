@@ -195,7 +195,8 @@ const BookingCalendar = () => {
   }
 
   const calendarDays = generateCalendarDays()
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
+  const weekDaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
   const today = new Date()
 
   // Calculate stats
@@ -220,59 +221,57 @@ const BookingCalendar = () => {
       {/* Calendar Container - Clean White Design */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         {/* Calendar Header */}
-        <div className="px-6 py-5 border-b border-slate-100">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="px-3 sm:px-6 py-3 sm:py-5 border-b border-slate-100">
+          <div className="flex items-center justify-between gap-2">
             {/* Month Navigation */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center bg-slate-100 rounded-xl p-1">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center bg-slate-100 rounded-lg sm:rounded-xl p-0.5 sm:p-1">
                 <button
                   onClick={prevMonth}
-                  className="w-9 h-9 rounded-lg hover:bg-white hover:shadow-sm flex items-center justify-center transition-all"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-white hover:shadow-sm flex items-center justify-center transition-all"
                 >
-                  <ChevronLeft className="w-5 h-5 text-slate-600" />
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
                 </button>
                 <button
                   onClick={nextMonth}
-                  className="w-9 h-9 rounded-lg hover:bg-white hover:shadow-sm flex items-center justify-center transition-all"
+                  className="w-7 h-7 sm:w-9 sm:h-9 rounded-md sm:rounded-lg hover:bg-white hover:shadow-sm flex items-center justify-center transition-all"
                 >
-                  <ChevronRight className="w-5 h-5 text-slate-600" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
                 </button>
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  {currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                <h2 className="text-sm sm:text-xl font-bold text-slate-900">
+                  {currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </h2>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={goToToday}
-                className="px-4 py-2.5 bg-slate-900 text-white rounded-xl font-medium text-sm hover:bg-slate-800 transition-all"
-              >
-                Today
-              </button>
-            </div>
+            <button
+              onClick={goToToday}
+              className="px-3 sm:px-4 py-1.5 sm:py-2.5 bg-slate-900 text-white rounded-lg sm:rounded-xl font-medium text-xs sm:text-sm hover:bg-slate-800 transition-all"
+            >
+              Today
+            </button>
           </div>
 
           {/* Legend - Horizontal */}
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 mt-4 pt-4 border-t border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-              <span className="text-slate-600 text-sm">Available</span>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-6 mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-slate-100">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></div>
+              <span className="text-slate-600 text-[10px] sm:text-sm">Available</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-              <span className="text-slate-600 text-sm">Partial</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-amber-500"></div>
+              <span className="text-slate-600 text-[10px] sm:text-sm">Partial</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rose-500"></div>
-              <span className="text-slate-600 text-sm">Full</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-rose-500"></div>
+              <span className="text-slate-600 text-[10px] sm:text-sm">Full</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-slate-300"></div>
-              <span className="text-slate-600 text-sm">Blocked/Off</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-slate-300"></div>
+              <span className="text-slate-600 text-[10px] sm:text-sm">Blocked/Off</span>
             </div>
           </div>
         </div>
@@ -282,11 +281,12 @@ const BookingCalendar = () => {
           {weekDays.map((day, idx) => (
             <div
               key={day}
-              className={`py-3 text-center text-sm font-bold uppercase tracking-wide ${
+              className={`py-2 sm:py-3 text-center text-[10px] sm:text-sm font-bold uppercase tracking-wide ${
                 idx === 0 || idx === 6 ? 'text-slate-400' : 'text-white'
               }`}
             >
-              {day}
+              <span className="hidden sm:inline">{day}</span>
+              <span className="sm:hidden">{weekDaysShort[idx]}</span>
             </div>
           ))}
         </div>
@@ -298,7 +298,7 @@ const BookingCalendar = () => {
               return (
                 <div
                   key={index}
-                  className="min-h-[90px] sm:min-h-[110px] bg-slate-50/50 border-b border-r border-slate-200"
+                  className="min-h-[52px] sm:min-h-[110px] bg-slate-50/50 border-b border-r border-slate-200"
                 />
               )
             }
@@ -311,14 +311,14 @@ const BookingCalendar = () => {
               <button
                 key={index}
                 onClick={() => handleDayClick(dayStatus)}
-                className={`min-h-[90px] border-b border-r border-slate-200 p-3 transition-all hover:bg-slate-50 relative ${
+                className={`min-h-[52px] sm:min-h-[110px] border-b border-r border-slate-200 p-1.5 sm:p-3 transition-all hover:bg-slate-50 relative ${
                   isPast ? 'opacity-50' : ''
                 } bg-white ${isToday ? 'ring-2 ring-inset ring-[#DFB13B]' : ''}`}
               >
-                {/* Status Indicator Dot - Larger, More Visible */}
-                <div className="absolute top-2 right-2">
+                {/* Status Indicator Dot */}
+                <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
                   <div
-                    className={`w-3 h-3 rounded-full ${
+                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
                       dayStatus.status === 'available'
                         ? 'bg-emerald-500'
                         : dayStatus.status === 'partial'
@@ -330,9 +330,9 @@ const BookingCalendar = () => {
                   />
                 </div>
 
-                {/* Date Number - More Prominent */}
+                {/* Date Number */}
                 <div
-                  className={`text-xl sm:text-2xl font-bold mb-2 ${
+                  className={`text-sm sm:text-2xl font-bold mb-0.5 sm:mb-2 ${
                     isToday
                       ? 'text-[#DFB13B]'
                       : isWeekend
@@ -343,19 +343,19 @@ const BookingCalendar = () => {
                   {dayStatus.date.getDate()}
                 </div>
 
-                {/* Status Text - Larger and More Readable */}
-                <div className="space-y-1 text-left">
+                {/* Status Text */}
+                <div className="space-y-0.5 sm:space-y-1 text-left">
                   {dayStatus.status === 'blocked' && (
-                    <div className="text-xs font-medium text-slate-600">Blocked</div>
+                    <div className="text-[8px] sm:text-xs font-medium text-slate-600 hidden sm:block">Blocked</div>
                   )}
 
                   {dayStatus.status === 'non-working' && (
-                    <div className="text-xs font-medium text-slate-500">Off</div>
+                    <div className="text-[8px] sm:text-xs font-medium text-slate-500">Off</div>
                   )}
 
                   {dayStatus.bookedSlots > 0 && dayStatus.status !== 'blocked' && dayStatus.status !== 'non-working' && (
                     <div
-                      className={`text-xs font-semibold ${
+                      className={`text-[9px] sm:text-xs font-semibold ${
                         dayStatus.status === 'full'
                           ? 'text-rose-600'
                           : dayStatus.status === 'partial'
@@ -374,34 +374,34 @@ const BookingCalendar = () => {
       </div>
 
       {/* Stats Cards - Below Calendar */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <Calendar className="w-6 h-6 text-emerald-600" />
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-5 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-600" />
           </div>
-          <div>
-            <p className="text-2xl font-bold text-slate-900">{availableDays}</p>
-            <p className="text-sm text-slate-500">Available Days</p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-amber-600" />
-          </div>
-          <div>
-            <p className="text-2xl font-bold text-slate-900">{totalBookingsThisMonth}</p>
-            <p className="text-sm text-slate-500">Total Bookings</p>
+          <div className="text-center sm:text-left">
+            <p className="text-lg sm:text-2xl font-bold text-slate-900">{availableDays}</p>
+            <p className="text-[10px] sm:text-sm text-slate-500">Available Days</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
-            <Sparkles className="w-6 h-6 text-rose-600" />
+        <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-5 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-amber-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-amber-600" />
           </div>
-          <div>
-            <p className="text-2xl font-bold text-slate-900">{fullyBookedDays}</p>
-            <p className="text-sm text-slate-500">Fully Booked Days</p>
+          <div className="text-center sm:text-left">
+            <p className="text-lg sm:text-2xl font-bold text-slate-900">{totalBookingsThisMonth}</p>
+            <p className="text-[10px] sm:text-sm text-slate-500">Bookings</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-5 flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-4">
+          <div className="w-9 h-9 sm:w-12 sm:h-12 bg-rose-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+            <Sparkles className="w-4 h-4 sm:w-6 sm:h-6 text-rose-600" />
+          </div>
+          <div className="text-center sm:text-left">
+            <p className="text-lg sm:text-2xl font-bold text-slate-900">{fullyBookedDays}</p>
+            <p className="text-[10px] sm:text-sm text-slate-500">Fully Booked</p>
           </div>
         </div>
       </div>

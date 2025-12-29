@@ -1,4 +1,4 @@
-import { Filter, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import BookingDate from "./BookingDate";
@@ -127,19 +127,9 @@ const Booking = ({ onClose }: BookingProps) => {
             <>
               {/* Header */}
               <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-xl font-semibold text-gray-900">
-                    {t('booking.title')}
-                  </h1>
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
-                      <Filter className="w-4 h-4 text-gray-600" />
-                    </button>
-                    <button className="p-1.5 hover:bg-gray-100 rounded-lg transition">
-                      <X className="w-4 h-4 text-gray-600" />
-                    </button>
-                  </div>
-                </div>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  {t('booking.title')}
+                </h1>
               </div>
 
               {/* Loading State */}

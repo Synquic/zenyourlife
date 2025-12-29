@@ -111,7 +111,7 @@ const Overview = () => {
             const imageUrl = card.imageUrl ? getImageUrl(card.imageUrl) : defaultImages[index % defaultImages.length];
 
             return (
-              <div key={index} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+              <div key={index} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col">
                 <div className="p-6 text-center">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     {card.title}
@@ -120,7 +120,7 @@ const Overview = () => {
                     {card.description}
                   </p>
                 </div>
-                <div className="relative h-52 overflow-hidden">
+                <div className="relative flex-1 overflow-hidden">
                   <img
                     src={imageUrl || defaultImages[index % defaultImages.length]}
                     alt={card.title}

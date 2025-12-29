@@ -11,6 +11,7 @@ import Users from './pages/Users'
 import BookingManagement from './pages/BookingManagement'
 import CalendarView from './pages/CalendarView'
 import HealthCheck from './pages/HealthCheck'
+import FAQs from './pages/FAQs'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/inquiries" element={<ProtectedRoute><Inquiries /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute><Services /></ProtectedRoute>} />
         <Route path="/testimonials" element={<ProtectedRoute><Testimonials /></ProtectedRoute>} />
+        <Route path="/faq" element={<ProtectedRoute><FAQs /></ProtectedRoute>} />
         <Route path="/properties" element={<ProtectedRoute><Properties /></ProtectedRoute>} />
         <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/health" element={<ProtectedRoute><HealthCheck /></ProtectedRoute>} />

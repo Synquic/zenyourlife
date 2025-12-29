@@ -860,48 +860,48 @@ const MassageBooking = () => {
                 </div>
 
                 {/* Action Buttons - Modern Gradient Design */}
-                <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 -mx-4 sm:mx-0 px-4 sm:px-0 sm:flex-wrap [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                   {selectedBooking.status === 'pending' && (
                     <button
                       onClick={() => updateBookingStatus(selectedBooking._id, 'confirmed')}
                       disabled={actionLoading === 'confirmed'}
-                      className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs sm:text-sm"
+                      className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs whitespace-nowrap shrink-0"
                     >
-                      {actionLoading === 'confirmed' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                      <span>Confirm</span>
+                      {actionLoading === 'confirmed' ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                      Confirm
                     </button>
                   )}
                   {selectedBooking.status === 'confirmed' && (
                     <button
                       onClick={() => updateBookingStatus(selectedBooking._id, 'completed')}
                       disabled={actionLoading === 'completed'}
-                      className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs sm:text-sm"
+                      className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-blue-500/30 transition-all font-semibold shadow-md disabled:opacity-50 text-xs whitespace-nowrap shrink-0"
                     >
-                      {actionLoading === 'completed' ? <Loader2 className="w-4 h-4 animate-spin" /> : <CalendarCheck className="w-4 h-4" />}
-                      <span className="hidden sm:inline">Mark</span> Complete
+                      {actionLoading === 'completed' ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin" /> : <CalendarCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+                      Complete
                     </button>
                   )}
                   <button
                     onClick={openMessageModal}
-                    className="flex items-center gap-2 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition-all font-semibold shadow-md text-xs sm:text-sm"
+                    className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-[#DFB13B]/30 transition-all font-semibold shadow-md text-xs whitespace-nowrap shrink-0"
                   >
-                    <Send className="w-4 h-4" />
-                    <span className="hidden sm:inline">Send</span> Message
+                    <Send className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    Message
                   </button>
                   {selectedBooking.status !== 'cancelled' && selectedBooking.status !== 'completed' && (
                     <button
                       onClick={() => setShowCancelConfirm(selectedBooking._id)}
-                      className="flex items-center gap-2 bg-white text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-50 transition-all font-semibold border-2 border-red-200 text-xs sm:text-sm"
+                      className="flex items-center gap-1.5 sm:gap-2 bg-white text-red-600 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:bg-red-50 transition-all font-semibold border-2 border-red-200 text-xs whitespace-nowrap shrink-0"
                     >
-                      <XCircle className="w-4 h-4" />
+                      <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       Cancel
                     </button>
                   )}
                   <button
                     onClick={() => setShowDeleteConfirm(selectedBooking._id)}
-                    className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-rose-500 text-white px-4 py-2.5 rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all font-semibold shadow-md text-xs sm:text-sm"
+                    className="flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-red-500 to-rose-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all font-semibold shadow-md text-xs whitespace-nowrap shrink-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     Delete
                   </button>
                 </div>

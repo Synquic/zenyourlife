@@ -133,16 +133,33 @@ const Footer = () => {
           </div>
 
           {/* Contact */}
-          <div>
+          <div id="footer-contact">
             <h4 className="font-semibold mb-4 text-base">{t('contact.title')}</h4>
             <ul className="space-y-3 text-gray-400 text-sm">
-              <li className="flex items-center">
-                <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span>0476 66 71 15</span>
+              <li className="relative group">
+                <a
+                  href="tel:+32476667115"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = 'tel:+32476667115';
+                  }}
+                  className="flex items-center hover:text-white transition-colors py-2 -my-2 cursor-pointer active:text-yellow-400"
+                >
+                  <Phone className="w-4 h-4 mr-2 shrink-0" />
+                  <span className="underline">0476 66 71 15</span>
+                </a>
+                <span className="absolute left-0 -top-8 bg-white text-gray-900 px-3 py-1 rounded-md text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg">
+                  Call
+                </span>
               </li>
-              <li className="flex items-center">
-                <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                <a href="mailto:info@zenyourlife.be" className="hover:text-white transition-colors">info@zenyourlife.be</a>
+              <li>
+                <a
+                  href="mailto:info@zenyourlife.be"
+                  className="flex items-center hover:text-white transition-colors py-2 -my-2 cursor-pointer"
+                >
+                  <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span>info@zenyourlife.be</span>
+                </a>
               </li>
               <li className="flex items-center">
                 <span className="text-xs mr-2 flex-shrink-0 font-medium">BTW:</span>

@@ -22,6 +22,7 @@ import NavbarHome from "../components/NavbarHome";
 import Testimonial from "../components/Testimonial";
 import Expert from "../components/Expert";
 import Booking from "../components/Booking";
+import RContact from "../components/Rental/RContact";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import FloatingBookButton from "../components/FloatingBookButton";
@@ -30,13 +31,14 @@ import FloatingBookButton from "../components/FloatingBookButton";
 const Home = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(2);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const { t } = useTranslation();
 
   const navigate=useNavigate();
 
   // Disable background scroll when modal is open
   useEffect(() => {
-    if (isBookingModalOpen) {
+    if (isBookingModalOpen || isContactModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -44,7 +46,7 @@ const Home = () => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isBookingModalOpen]);
+  }, [isBookingModalOpen, isContactModalOpen]);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -637,7 +639,10 @@ const Home = () => {
                 <p className="text-gray-600 text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed">
                   {t('home.faq_help')}
                 </p>
-                <button className="bg-white/20 backdrop-blur-md border-2 border-[#B8860B] text-gray-900 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-white/30 transition flex items-center gap-2 shadow-lg text-sm sm:text-base">
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="bg-white/20 backdrop-blur-md border-2 border-[#B8860B] text-gray-900 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg hover:bg-white/30 transition flex items-center gap-2 shadow-lg text-sm sm:text-base"
+                >
                   <span className="font-medium">{t('home.contact_us')}</span>
                   <img
                     src={MasterPrimaryButton}
@@ -941,6 +946,24 @@ const Home = () => {
             <div className="relative">
               <Booking onClose={() => setIsBookingModalOpen(false)} />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Contact Modal */}
+      {isContactModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsContactModalOpen(false)}
+              className="absolute top-4 right-4 bg-white hover:bg-gray-100 rounded-full p-2 transition z-50 shadow-md"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
+
+            {/* Contact Component */}
+            <RContact isModal={true} onClose={() => setIsContactModalOpen(false)} />
           </div>
         </div>
       )}

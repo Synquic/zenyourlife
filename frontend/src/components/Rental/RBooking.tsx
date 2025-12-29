@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, SlidersHorizontal, Users, BedDouble, ParkingCircle } from 'lucide-react';
+import { X, Users, BedDouble, ParkingCircle } from 'lucide-react';
 import Apat1 from '../../assets/Apat1.png';
 import Apat2 from '../../assets/Apat2.png';
 import RBookingDate from './RBookingDate';
@@ -86,19 +86,14 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200">
           <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Check Availability</h2>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <button className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Properties List */}

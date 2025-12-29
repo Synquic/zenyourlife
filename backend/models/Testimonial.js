@@ -43,6 +43,24 @@ const testimonialSchema = new mongoose.Schema({
     max: 5,
     default: 5
   },
+  // Property reference - links testimonial to specific property
+  propertyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Property',
+    default: null
+  },
+  // Property name for easier filtering (denormalized for performance)
+  propertyName: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  // Category - massage or rental
+  category: {
+    type: String,
+    enum: ['massage', 'rental'],
+    default: 'massage'
+  },
   isActive: {
     type: Boolean,
     default: true

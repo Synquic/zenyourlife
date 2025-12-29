@@ -12,6 +12,22 @@ const availablePhotos = [
   { name: 'profile4.png', label: 'Avatar 4', color: 'from-amber-400 to-amber-600' },
 ]
 
+// Color palette for dynamic property tabs
+const propertyColors = [
+  { gradient: 'from-blue-600 to-blue-500', bg: 'bg-blue-100', text: 'text-blue-600' },
+  { gradient: 'from-emerald-600 to-emerald-500', bg: 'bg-emerald-100', text: 'text-emerald-600' },
+  { gradient: 'from-purple-600 to-purple-500', bg: 'bg-purple-100', text: 'text-purple-600' },
+  { gradient: 'from-rose-600 to-rose-500', bg: 'bg-rose-100', text: 'text-rose-600' },
+  { gradient: 'from-cyan-600 to-cyan-500', bg: 'bg-cyan-100', text: 'text-cyan-600' },
+  { gradient: 'from-orange-600 to-orange-500', bg: 'bg-orange-100', text: 'text-orange-600' },
+]
+
+interface Property {
+  _id: string
+  name: string
+  isActive?: boolean
+}
+
 interface Testimonial {
   _id: string
   name: string
@@ -20,6 +36,9 @@ interface Testimonial {
   photo: string
   photoUrl?: string
   rating: number
+  propertyId?: string
+  propertyName?: string
+  category?: string
   isActive: boolean
   displayOrder: number
   createdAt?: string
@@ -32,6 +51,9 @@ interface TestimonialFormData {
   photo: string
   photoUrl: string
   rating: number
+  propertyId: string
+  propertyName: string
+  category: string
   isActive: boolean
 }
 
@@ -42,16 +64,19 @@ const initialFormData: TestimonialFormData = {
   photo: 'profile1.png',
   photoUrl: '',
   rating: 5,
+  propertyId: '',
+  propertyName: '',
+  category: 'massage',
   isActive: true
 }
 
-type TabType = 'massage' | 'rental'
-
 const Testimonials = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<TabType>('massage')
+  const [activeTab, setActiveTab] = useState<string>('massage') // 'massage' or property ID
   const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
+  const [propertiesLoading, setPropertiesLoading] = useState(true)
   const [error, setError] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [editingTestimonial, setEditingTestimonial] = useState<Testimonial | null>(null)
@@ -61,9 +86,55 @@ const Testimonials = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
 
-  // Get API endpoint based on active tab
+  // Fetch properties for tabs and dropdown
+  useEffect(() => {
+    fetchProperties()
+  }, [])
+
+  const fetchProperties = async () => {
+    try {
+      setPropertiesLoading(true)
+      const response = await fetch(`${API_BASE_URL}/properties?all=true`)
+      const data = await response.json()
+      if (data.success) {
+        setProperties(data.data)
+      }
+    } catch (err) {
+      console.error('Error fetching properties:', err)
+    } finally {
+      setPropertiesLoading(false)
+    }
+  }
+
+  // Get API endpoint
   const getApiEndpoint = () => {
-    return activeTab === 'massage' ? 'testimonials' : 'rental-testimonials'
+    return 'testimonials'
+  }
+
+  // Get API query params based on active tab
+  const getQueryParams = () => {
+    if (activeTab === 'massage') return '?category=massage'
+    // For property tabs, use propertyName
+    const property = properties.find(p => p._id === activeTab)
+    if (property) return `?propertyName=${encodeURIComponent(property.name)}`
+    return ''
+  }
+
+  // Get current tab info
+  const getCurrentTabInfo = () => {
+    if (activeTab === 'massage') {
+      return { name: 'Massage', category: 'massage', propertyName: '', propertyId: '' }
+    }
+    const property = properties.find(p => p._id === activeTab)
+    if (property) {
+      return { name: property.name, category: 'rental', propertyName: property.name, propertyId: property._id }
+    }
+    return { name: 'Unknown', category: 'massage', propertyName: '', propertyId: '' }
+  }
+
+  // Get color for property tab (by index)
+  const getPropertyColor = (index: number) => {
+    return propertyColors[index % propertyColors.length]
   }
 
   // Fetch testimonials
@@ -75,7 +146,8 @@ const Testimonials = () => {
     try {
       setLoading(true)
       setError('')
-      const response = await fetch(`${API_BASE_URL}/${getApiEndpoint()}/admin`)
+      const queryParams = getQueryParams()
+      const response = await fetch(`${API_BASE_URL}/testimonials/admin${queryParams}`)
       const data = await response.json()
 
       if (data.success) {
@@ -94,7 +166,14 @@ const Testimonials = () => {
   // Open modal for adding new testimonial
   const handleAddNew = () => {
     setEditingTestimonial(null)
-    setFormData(initialFormData)
+    const tabInfo = getCurrentTabInfo()
+
+    setFormData({
+      ...initialFormData,
+      category: tabInfo.category,
+      propertyName: tabInfo.propertyName,
+      propertyId: tabInfo.propertyId
+    })
     setShowModal(true)
   }
 
@@ -108,6 +187,9 @@ const Testimonials = () => {
       photo: testimonial.photo,
       photoUrl: testimonial.photoUrl || '',
       rating: testimonial.rating,
+      propertyId: testimonial.propertyId || '',
+      propertyName: testimonial.propertyName || '',
+      category: testimonial.category || 'massage',
       isActive: testimonial.isActive
     })
     setShowModal(true)
@@ -255,7 +337,7 @@ const Testimonials = () => {
         {/* Header - Clean Design like Dashboard */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
           {/* Top row */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-3 sm:mb-0">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSidebarOpen(true)}
@@ -269,11 +351,12 @@ const Testimonials = () => {
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex items-center gap-2">
+            {/* Tabs - Desktop only in header */}
+            <div className="hidden sm:flex items-center gap-2 flex-wrap">
+              {/* Massage Tab (always first) */}
               <button
                 onClick={() => setActiveTab('massage')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                   activeTab === 'massage'
                     ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-md'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -282,18 +365,65 @@ const Testimonials = () => {
                 <Sparkles className="w-3.5 h-3.5" />
                 Massage
               </button>
-              <button
-                onClick={() => setActiveTab('rental')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === 'rental'
-                    ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-md'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <Home className="w-3.5 h-3.5" />
-                Rental
-              </button>
+              {/* Dynamic Property Tabs */}
+              {properties.map((property, index) => {
+                const color = getPropertyColor(index)
+                return (
+                  <button
+                    key={property._id}
+                    onClick={() => setActiveTab(property._id)}
+                    title={property.name}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                      activeTab === property._id
+                        ? `bg-gradient-to-r ${color.gradient} text-white shadow-md`
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Home className="w-3.5 h-3.5 flex-shrink-0" />
+                    {property.name}
+                  </button>
+                )
+              })}
+              {propertiesLoading && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />
+                </div>
+              )}
             </div>
+          </div>
+
+          {/* Tabs - Mobile only (below title) */}
+          <div className="flex sm:hidden items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+            {/* Massage Tab (always first) */}
+            <button
+              onClick={() => setActiveTab('massage')}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                activeTab === 'massage'
+                  ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-md'
+                  : 'bg-slate-100 text-slate-600'
+              }`}
+            >
+              <Sparkles className="w-3 h-3" />
+              Massage
+            </button>
+            {/* Dynamic Property Tabs */}
+            {properties.map((property, index) => {
+              const color = getPropertyColor(index)
+              return (
+                <button
+                  key={property._id}
+                  onClick={() => setActiveTab(property._id)}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    activeTab === property._id
+                      ? `bg-gradient-to-r ${color.gradient} text-white shadow-md`
+                      : 'bg-slate-100 text-slate-600'
+                  }`}
+                >
+                  <Home className="w-3 h-3 flex-shrink-0" />
+                  {property.name}
+                </button>
+              )
+            })}
           </div>
 
           {/* Stats row - Compact gradient cards like Dashboard */}
@@ -551,7 +681,9 @@ const Testimonials = () => {
                   <h2 className="font-bold text-slate-800">
                     {editingTestimonial ? 'Edit Testimonial' : 'Add Testimonial'}
                   </h2>
-                  <p className="text-xs text-slate-500">{activeTab === 'massage' ? 'Massage' : 'Rental'}</p>
+                  <p className="text-xs text-slate-500">
+                    {getCurrentTabInfo().name}
+                  </p>
                 </div>
               </div>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-100 rounded-lg transition">
@@ -583,6 +715,32 @@ const Testimonials = () => {
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] outline-none transition"
                   />
                 </div>
+              </div>
+
+              {/* Property Selection */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Property</label>
+                <select
+                  value={formData.propertyId}
+                  onChange={(e) => {
+                    const selectedProperty = properties.find(p => p._id === e.target.value)
+                    setFormData({
+                      ...formData,
+                      propertyId: e.target.value,
+                      propertyName: selectedProperty?.name || '',
+                      category: e.target.value ? 'rental' : 'massage'
+                    })
+                  }}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] outline-none transition"
+                >
+                  <option value="">General (Massage)</option>
+                  {properties.map(property => (
+                    <option key={property._id} value={property._id}>
+                      {property.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-slate-500 mt-1">Leave as "General" for massage testimonials</p>
               </div>
 
               {/* Text */}

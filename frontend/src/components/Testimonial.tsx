@@ -127,11 +127,16 @@ const Testimonial = () => {
     },
   ];
 
-  // Fetch testimonials from backend (with translation)
+  // Fetch testimonials from backend (with translation) - Only massage category
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/testimonials?lang=${currentLang}`);
+        // Build query params for massage testimonials only
+        const params = new URLSearchParams();
+        params.append('lang', currentLang);
+        params.append('category', 'massage');
+
+        const response = await fetch(`${API_BASE_URL}/testimonials?${params.toString()}`);
         const data = await response.json();
 
         if (data.success && data.data.length > 0) {

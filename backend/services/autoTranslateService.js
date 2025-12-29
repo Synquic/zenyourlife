@@ -353,6 +353,41 @@ async function autoTranslateSectionSettings(settingsData) {
   }
 }
 
+/**
+ * Auto-translate FAQ content and return translations object for DB storage
+ * @param {Object} faqData - FAQ data with English content
+ * @returns {Promise<Object>} - Translations object { fr: {...}, de: {...}, nl: {...} }
+ */
+async function autoTranslateFAQ(faqData) {
+  console.log('[AutoTranslate] Translating FAQ:', faqData.question?.substring(0, 50));
+
+  const translations = { fr: {}, de: {}, nl: {} };
+
+  try {
+    // Translate question
+    if (faqData.question) {
+      const questionTranslations = await translateToAllLanguages(faqData.question);
+      for (const lang of TARGET_LANGUAGES) {
+        translations[lang].question = questionTranslations[lang];
+      }
+    }
+
+    // Translate answer
+    if (faqData.answer) {
+      const answerTranslations = await translateToAllLanguages(faqData.answer);
+      for (const lang of TARGET_LANGUAGES) {
+        translations[lang].answer = answerTranslations[lang];
+      }
+    }
+
+    console.log('[AutoTranslate] FAQ translation complete');
+    return translations;
+  } catch (error) {
+    console.error('[AutoTranslate] Error translating FAQ:', error.message);
+    return translations;
+  }
+}
+
 module.exports = {
   TARGET_LANGUAGES,
   translateToAllLanguages,
@@ -360,5 +395,6 @@ module.exports = {
   autoTranslateService,
   autoTranslateTestimonial,
   autoTranslateProperty,
-  autoTranslateSectionSettings
+  autoTranslateSectionSettings,
+  autoTranslateFAQ
 };

@@ -3,7 +3,6 @@ import profile1 from "../../assets/profile1.png";
 import profile2 from "../../assets/profile2.png";
 import profile3 from "../../assets/profile3.png";
 import profile4 from "../../assets/profile4.png";
-import blueArrow from "../../assets/bluearrow.png";
 import { useTranslation } from "react-i18next";
 
 import { API_BASE_URL } from '../../config/api';
@@ -18,6 +17,13 @@ interface TestimonialData {
   rating: number;
   isActive: boolean;
 }
+
+interface TestimonialProps {
+  propertyId?: string;
+  propertyName?: string;
+}
+
+type TabType = 'villa' | 'casa';
 
 // Photo mapping for local assets
 const photoMap: { [key: string]: string } = {
@@ -61,15 +67,16 @@ const defaultTestimonials = [
     name: "Piero Madu",
     role: "@pieromadu",
     text: "This has revolutionized my vacation planning. Utilizing their services is essential for a perfect getaway experience!",
-    photo: "profile3.png",
+    photo: "profile3.png",  
     rating: 5,
     isActive: true,
   },
 ];
 
-const Testimonial = () => {
+const Testimonial = ({ propertyId, propertyName }: TestimonialProps = {}) => {
   const { t, i18n } = useTranslation();
   const [testimonials, setTestimonials] = useState<TestimonialData[]>(defaultTestimonials);
+  const [activeTab, setActiveTab] = useState<TabType>('villa');
 
   // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
   const currentLang = i18n.language?.split('-')[0] || 'en';
@@ -77,7 +84,18 @@ const Testimonial = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/rental-testimonials?lang=${currentLang}`);
+        // Build query params
+        const params = new URLSearchParams();
+        params.append('lang', currentLang);
+
+        // Tab-based filtering - only Villa or Casa
+        if (activeTab === 'villa') {
+          params.append('propertyName', 'Villa Zen Your Life');
+        } else if (activeTab === 'casa') {
+          params.append('propertyName', 'Casa Artevista');
+        }
+
+        const response = await fetch(`${API_BASE_URL}/testimonials?${params.toString()}`);
         const data = await response.json();
         if (data.success && data.data.length > 0) {
           setTestimonials(data.data);
@@ -89,7 +107,7 @@ const Testimonial = () => {
     };
 
     fetchTestimonials();
-  }, [currentLang]);
+  }, [currentLang, propertyId, propertyName, activeTab]);
 
   const getPhotoSrc = (testimonial: TestimonialData) => {
     if (testimonial.photoUrl) return testimonial.photoUrl;
@@ -120,12 +138,29 @@ const Testimonial = () => {
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-inter text-gray-900 leading-tight max-w-full sm:max-w-[600px]">
             {t('rental.testimonial.title')}
           </h2>
+        </div>
 
-          <button className="bg-white/30 backdrop-blur-md border-2 border-[#6F7BF8] text-gray-900 px-4 sm:px-6 py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-semibold flex items-center gap-2 sm:gap-3 hover:bg-white/40 transition-all shadow-lg whitespace-nowrap">
-            {t('rental.testimonial.reserve_now')}
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-md flex items-center justify-center">
-              <img src={blueArrow} alt="arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
+        {/* Property Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('villa')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === 'villa'
+                ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Villa Zen Your Life
+          </button>
+          <button
+            onClick={() => setActiveTab('casa')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === 'casa'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Casa Artevista
           </button>
         </div>
 

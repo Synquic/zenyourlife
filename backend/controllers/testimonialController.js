@@ -22,13 +22,23 @@ const getTranslatedTestimonial = (testimonial, lang) => {
   };
 };
 
-// Get all active testimonials (with optional translation from DB)
+// Get all active testimonials (with optional translation from DB and property filtering)
 exports.getAllTestimonials = async (req, res) => {
   try {
-    const { lang = 'en' } = req.query;
-    console.log(`📖 [DB READ] Fetching testimonials for language: ${lang}`);
+    const { lang = 'en', propertyId, propertyName, category } = req.query;
+    console.log(`📖 [DB READ] Fetching testimonials for language: ${lang}, propertyId: ${propertyId || 'all'}, propertyName: ${propertyName || 'all'}, category: ${category || 'all'}`);
 
-    const testimonials = await Testimonial.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 });
+    // Build filter query
+    const filter = { isActive: true };
+    if (category) {
+      filter.category = category;
+    } else if (propertyId) {
+      filter.propertyId = propertyId;
+    } else if (propertyName) {
+      filter.propertyName = new RegExp(propertyName, 'i');
+    }
+
+    const testimonials = await Testimonial.find(filter).sort({ displayOrder: 1, createdAt: -1 });
 
     // If language is English or not supported, return original data
     if (lang === 'en' || !SUPPORTED_LANGUAGES.includes(lang)) {
@@ -66,10 +76,22 @@ exports.getAllTestimonials = async (req, res) => {
   }
 };
 
-// Get all testimonials (including inactive - for admin)
+// Get all testimonials (including inactive - for admin, with optional property filtering)
 exports.getAllTestimonialsAdmin = async (req, res) => {
   try {
-    const testimonials = await Testimonial.find({}).sort({ displayOrder: 1, createdAt: -1 });
+    const { propertyId, propertyName, category } = req.query;
+
+    // Build filter query
+    const filter = {};
+    if (category) {
+      filter.category = category;
+    } else if (propertyId) {
+      filter.propertyId = propertyId;
+    } else if (propertyName) {
+      filter.propertyName = new RegExp(propertyName, 'i');
+    }
+
+    const testimonials = await Testimonial.find(filter).sort({ displayOrder: 1, createdAt: -1 });
     res.status(200).json({
       success: true,
       count: testimonials.length,
@@ -114,7 +136,14 @@ exports.createTestimonial = async (req, res) => {
   try {
     // Auto-translate content to all languages and store in DB
     console.log('[Testimonial Create] Auto-translating content...');
-    const translations = await autoTranslateTestimonial(req.body);
+    let translations = { fr: {}, de: {}, nl: {} };
+
+    try {
+      translations = await autoTranslateTestimonial(req.body);
+    } catch (translationError) {
+      // Log translation error but continue with create without translations
+      console.error('[Testimonial Create] Translation failed, continuing without translations:', translationError.message);
+    }
 
     // Create testimonial with translations
     const testimonialData = {
@@ -150,8 +179,13 @@ exports.updateTestimonial = async (req, res) => {
     // Auto-translate if translatable content is being updated
     if (hasTranslatableChanges) {
       console.log('[Testimonial Update] Auto-translating content...');
-      const translations = await autoTranslateTestimonial(req.body);
-      updateData.translations = translations;
+      try {
+        const translations = await autoTranslateTestimonial(req.body);
+        updateData.translations = translations;
+      } catch (translationError) {
+        // Log translation error but continue with update without translations
+        console.error('[Testimonial Update] Translation failed, continuing without translations:', translationError.message);
+      }
     }
 
     const testimonial = await Testimonial.findByIdAndUpdate(
@@ -173,6 +207,7 @@ exports.updateTestimonial = async (req, res) => {
       data: testimonial
     });
   } catch (error) {
+    console.error('[Testimonial Update] Error:', error);
     res.status(400).json({
       success: false,
       message: 'Error updating testimonial',
@@ -209,76 +244,181 @@ exports.deleteTestimonial = async (req, res) => {
 // Seed default testimonials
 exports.seedTestimonials = async (req, res) => {
   try {
-    const existingCount = await Testimonial.countDocuments();
+    console.log('[Seed] Starting testimonial seed process...');
 
-    if (existingCount > 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'Testimonials already exist',
-        count: existingCount
-      });
-    }
+    // Delete all existing testimonials first
+    const deleteResult = await Testimonial.deleteMany({});
+    console.log(`[Seed] Deleted ${deleteResult.deletedCount} existing testimonials`);
+
+    const existingCount = await Testimonial.countDocuments();
+    console.log(`[Seed] Existing testimonials count after deletion: ${existingCount}`);
 
     const defaultTestimonials = [
+      // Massage testimonials
       {
-        name: "Dave Nash",
-        role: "@once",
-        text: "After exploring the @ZenYourLife platform for a few months, I finally took the plunge. Wow, it's a game changer! Just give it a shot! You won't regret it! 🤘🏻",
+        name: "Maria Rodriguez",
+        role: "@maria_wellness",
+        text: "The best massage experience I've ever had! The therapist was incredibly skilled and the atmosphere was so relaxing. I left feeling completely rejuvenated!",
         photo: "profile1.png",
-        displayOrder: 0
+        displayOrder: 0,
+        propertyId: null,
+        propertyName: '',
+        category: 'massage',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
       },
       {
-        name: "Sebas",
-        role: "@sebasbedoya",
-        text: "Once you start using @ZenYourLife, there's no going back. It has completely transformed my wellness journey. Booking massages and treatments has never been easier! 🔥🔥",
+        name: "James Wilson",
+        role: "@jameswilson",
+        text: "Outstanding service! The deep tissue massage was exactly what I needed after a week of hiking. Professional, clean, and very relaxing environment.",
         photo: "profile2.png",
-        displayOrder: 1
+        displayOrder: 1,
+        propertyId: null,
+        propertyName: '',
+        category: 'massage',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
       },
       {
-        name: "Dylan Pearson",
-        role: "@dylanbusiness",
-        text: "ZenYourLife - The Tesla of wellness services. A brief session with their expert nearly doubled my relaxation. Just imagine what their platform can do for you! The future is bright. ☀",
-        photo: "profile1.png",
-        displayOrder: 2
-      },
-      {
-        name: "Piero Madu",
-        role: "@pieromadu",
-        text: "@ZenYourLife has revolutionized my self-care routine. Utilizing their services is essential for maintaining balance and navigating the stresses of daily life! ⚡",
+        name: "Sophie Laurent",
+        role: "@sophie_relax",
+        text: "Absolutely wonderful! The hot stone massage was divine. The therapist really understood my needs and created a perfect relaxing experience.",
         photo: "profile3.png",
-        displayOrder: 3
+        displayOrder: 2,
+        propertyId: null,
+        propertyName: '',
+        category: 'massage',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
       },
       {
-        name: "George Klein",
-        role: "@GeorgeBlue94",
-        text: "ZenYourLife is the culmination of wellness expertise and contributions from many professionals. Self-care is here to stay. ZenYourLife is the future of wellness! 💎",
+        name: "Carlos Mendez",
+        role: "@carlos_fit",
+        text: "Professional massage therapy at its finest! Great technique, peaceful ambiance, and excellent customer service. Highly recommend!",
         photo: "profile4.png",
-        displayOrder: 4
+        displayOrder: 3,
+        propertyId: null,
+        propertyName: '',
+        category: 'massage',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
       },
-      {
-        name: "Jordan Welch",
-        role: "@jrdn.w",
-        text: "I was part of the beta launch... absolutely mind-blowing. Managing my wellness appointments has never been easier. @ZenYourLife is by far my go-to platform",
-        photo: "profile2.png",
-        displayOrder: 5
-      },
-      {
-        name: "Faiz W",
-        role: "@Faiz",
-        text: "Incredible! @ZenYourLife elevates your wellness game. My stress levels dropped significantly in no time! 😱",
-        photo: "profile3.png",
-        displayOrder: 6
-      },
+      // Villa Zen Your Life testimonials
       {
         name: "Sarah Miller",
-        role: "@sarahm",
-        text: "The best decision I made this year was joining ZenYourLife. Their massage therapists are world-class and the booking system is so smooth! 🤘🏻",
+        role: "@sarahmiller",
+        text: "Villa Zen Your Life is absolutely stunning! The panoramic views of the volcanic landscape took our breath away. Perfect for families!",
         photo: "profile1.png",
-        displayOrder: 7
+        displayOrder: 0,
+        propertyId: null,
+        propertyName: 'Villa Zen Your Life',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "David Thompson",
+        role: "@david_explorer",
+        text: "Best villa experience ever! Modern amenities, spacious rooms, and the private pool was amazing. Close to all the best beaches in Lanzarote!",
+        photo: "profile2.png",
+        displayOrder: 1,
+        propertyId: null,
+        propertyName: 'Villa Zen Your Life',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "Emma Williams",
+        role: "@emmawanders",
+        text: "Villa Zen exceeded every expectation! The terrace is perfect for sunset dinners. Immaculate, luxurious, and the perfect Lanzarote getaway!",
+        photo: "profile3.png",
+        displayOrder: 2,
+        propertyId: null,
+        propertyName: 'Villa Zen Your Life',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "Robert Garcia",
+        role: "@robertg_travel",
+        text: "The villa is a dream come true! Contemporary design meets island charm. Everything was spotless and the location couldn't be better!",
+        photo: "profile4.png",
+        displayOrder: 3,
+        propertyId: null,
+        propertyName: 'Villa Zen Your Life',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      // Casa Artevista testimonials
+      {
+        name: "Isabella Martinez",
+        role: "@bella_travels",
+        text: "Casa Artevista is pure magic! The artistic design and ocean views create such a peaceful atmosphere. Perfect romantic retreat!",
+        photo: "profile1.png",
+        displayOrder: 0,
+        propertyId: null,
+        propertyName: 'Casa Artevista',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "Michael Anderson",
+        role: "@mike_adventures",
+        text: "We loved every moment at Casa Artevista! The unique artistic touches and stunning sunsets made this stay unforgettable. Highly recommend!",
+        photo: "profile2.png",
+        displayOrder: 1,
+        propertyId: null,
+        propertyName: 'Casa Artevista',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "Sophia Chen",
+        role: "@sophiachen",
+        text: "Casa Artevista is a masterpiece! Every corner tells a story. The perfect blend of art, comfort, and island beauty. Can't wait to return!",
+        photo: "profile3.png",
+        displayOrder: 2,
+        propertyId: null,
+        propertyName: 'Casa Artevista',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
+      },
+      {
+        name: "Thomas Brown",
+        role: "@thomasb_vacation",
+        text: "Absolutely phenomenal stay at Casa Artevista! The property is gorgeous, the views are breathtaking, and the artistic vibe is incredible!",
+        photo: "profile4.png",
+        displayOrder: 3,
+        propertyId: null,
+        propertyName: 'Casa Artevista',
+        category: 'rental',
+        isActive: true,
+        rating: 5,
+        photoUrl: ''
       }
     ];
 
-    await Testimonial.insertMany(defaultTestimonials);
+    // Use insertMany to bypass the auto-translation middleware
+    console.log(`[Seed] Attempting to insert ${defaultTestimonials.length} testimonials...`);
+    const result = await Testimonial.insertMany(defaultTestimonials);
+    console.log(`[Seed] Successfully inserted ${result.length} testimonials`);
 
     res.status(201).json({
       success: true,
@@ -286,10 +426,12 @@ exports.seedTestimonials = async (req, res) => {
       count: defaultTestimonials.length
     });
   } catch (error) {
+    console.error('[Seed] Error seeding testimonials:', error);
     res.status(500).json({
       success: false,
       message: 'Error seeding testimonials',
-      error: error.message
+      error: error.message,
+      details: error.toString()
     });
   }
 };
