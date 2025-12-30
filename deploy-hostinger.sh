@@ -99,6 +99,18 @@ log "Uploading configuration files..."
 scp_upload "docker-compose.yml" "$APP_DIR/" || error "Failed to upload docker-compose.yml"
 scp_upload "backend/.env" "$APP_DIR/.env" || error "Failed to upload .env file"
 
+log "Uploading backend uploads directory (images, files)..."
+if [ -d "backend/uploads" ] && [ "$(ls -A backend/uploads 2>/dev/null)" ]; then
+    if command -v rsync &> /dev/null; then
+        sshpass -p "$VPS_PASSWORD" rsync -avz --progress -e "ssh -o StrictHostKeyChecking=no" backend/uploads/ "$VPS_USER@$VPS_IP:$APP_DIR/backend/uploads/" || warn "Failed to upload some files from backend/uploads"
+        log "✅ Uploaded $(ls backend/uploads | wc -l | tr -d ' ') files from backend/uploads"
+    else
+        warn "rsync not available, skipping bulk upload. Use: brew install rsync"
+    fi
+else
+    log "No files in backend/uploads to upload"
+fi
+
 log "✅ All files uploaded successfully"
 
 # Clean up local tarball
@@ -235,6 +247,132 @@ ssh_exec "systemctl enable zenyourlife-monitor.timer"
 ssh_exec "systemctl start zenyourlife-monitor.timer"
 
 log "✅ Health monitoring configured (runs every 2 minutes)"
+
+# ============================================
+# Configure Nginx
+# ============================================
+log "Configuring Nginx..."
+
+ssh_exec "cat > /etc/nginx/sites-available/zenyourlife << 'EOF'
+upstream backend {
+    server localhost:5001;
+    keepalive 64;
+}
+
+limit_req_zone \\\$binary_remote_addr zone=api_limit:10m rate=100r/m;
+limit_req_zone \\\$binary_remote_addr zone=general_limit:10m rate=1000r/m;
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $DOMAIN www.$DOMAIN $VPS_IP;
+
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/html;
+        default_type \"text/plain\";
+    }
+
+    add_header X-Frame-Options \"SAMEORIGIN\" always;
+    add_header X-Content-Type-Options \"nosniff\" always;
+    add_header X-XSS-Protection \"1; mode=block\" always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    client_max_body_size 100M;
+
+    location /api/ {
+        limit_req zone=api_limit burst=20 nodelay;
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\\$scheme;
+        proxy_cache_bypass \\\$http_upgrade;
+        proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    location /uploads/ {
+        limit_req zone=general_limit burst=50 nodelay;
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\\$scheme;
+        expires 1y;
+        add_header Cache-Control \"public, immutable\";
+    }
+
+    location /admin {
+        limit_req zone=general_limit burst=50 nodelay;
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\\$scheme;
+        proxy_cache_bypass \\\$http_upgrade;
+    }
+
+    location / {
+        limit_req zone=general_limit burst=50 nodelay;
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \\\$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\\$scheme;
+        proxy_cache_bypass \\\$http_upgrade;
+
+        location ~* \\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\\\$ {
+            proxy_pass http://backend;
+            expires 1y;
+            add_header Cache-Control \"public, immutable\";
+        }
+    }
+
+    location /api/health {
+        access_log off;
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host \\\$host;
+        proxy_set_header X-Real-IP \\\$remote_addr;
+        proxy_set_header X-Forwarded-For \\\$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \\\$scheme;
+    }
+
+    location ~ /\\\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}
+EOF"
+
+# Enable nginx site
+ssh_exec "rm -f /etc/nginx/sites-enabled/default"
+ssh_exec "ln -sf /etc/nginx/sites-available/zenyourlife /etc/nginx/sites-enabled/"
+
+# Test and reload nginx
+if ssh_exec "nginx -t" &> /dev/null; then
+    ssh_exec "systemctl reload nginx"
+    log "✅ Nginx configured and reloaded"
+else
+    warn "Nginx configuration test failed. Please check manually."
+fi
 
 # ============================================
 # Display Summary
