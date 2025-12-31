@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Facebook,
@@ -18,10 +18,50 @@ import {
 import primaryMaster from '../assets/Master Primary Button (4).png';
 import Booking from './Booking';
 import znlogo from '../assets/znlogo.png';
+import { API_BASE_URL } from '../config/api';
+
+interface Service {
+  _id: string;
+  title: string;
+  category: string;
+}
 
 const Footer = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
+  // Fetch services to get the first service of each category
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/services`);
+        const data = await response.json();
+        if (data.success) {
+          setServices(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  // Navigate to first service of a category
+  const navigateToFirstService = (category: string) => {
+    const categoryServices = services.filter(s =>
+      s.category.toLowerCase() === category.toLowerCase()
+    );
+    if (categoryServices.length > 0) {
+      navigate(`/service/${categoryServices[0]._id}`);
+      // Scroll to top of page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Fallback to service page with category filter
+      navigate(`/Servicepage?category=${category}`);
+    }
+  };
 
   // Change language handler
   const changeLanguage = (langCode: string) => {
@@ -68,7 +108,7 @@ const Footer = () => {
                       d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                     />
                   </svg>
-                  <span className="text-white text-xs sm:text-sm font-medium">{t('nav.contact')}</span>
+                  <span className="text-white text-xs sm:text-sm font-medium">{t('nav.contact_us')}</span>
                 </div>
                 <h2 className="text-xl sm:text-3xl md:text-4xl font-medium text-white leading-tight">
                  {t('footer.booking_title')}
@@ -102,9 +142,7 @@ const Footer = () => {
           <p className="text-gray-400 text-sm leading-relaxed mb-4">
             Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
           </p>
-          <button className="text-yellow-400 hover:text-yellow-300 text-sm">
-            {t('footer.see_about')} →
-          </button>
+         
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
@@ -117,18 +155,37 @@ const Footer = () => {
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
               Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
             </p>
-            <button className="text-yellow-400 hover:text-yellow-300 text-sm">
-              {t('footer.see_about')} →
-            </button>
+            
           </div>
 
           {/* Services */}
           <div>
             <h4 className="font-semibold mb-4 text-base">{t('footer.services')}</h4>
             <ul className="space-y-2.5 text-gray-400 text-sm">
-              <li><Link to="/Servicepage?category=massage" className="hover:text-white transition-colors">{t('nav.massage')}</Link></li>
-              <li><Link to="/Servicepage?category=facial" className="hover:text-white transition-colors">{t('nav.facial_care')}</Link></li>
-              <li><Link to="/pmu" className="hover:text-white transition-colors">{t('nav.pmu')}</Link></li>
+              <li>
+                <button
+                  onClick={() => navigateToFirstService('massage')}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  {t('nav.massage')}
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigateToFirstService('facial')}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  {t('nav.facial_care')}
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => navigateToFirstService('pmu')}
+                  className="hover:text-white transition-colors text-left"
+                >
+                  {t('nav.pmu')}
+                </button>
+              </li>
             </ul>
           </div>
 

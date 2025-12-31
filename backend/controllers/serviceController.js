@@ -275,6 +275,104 @@ exports.assignUniqueImages = async (req, res) => {
   }
 };
 
+// Add gallery images to ALL services (massage, facial, and other categories)
+exports.addAllServicesGalleryImages = async (req, res) => {
+  try {
+    // Comprehensive gallery images for all service types
+    const allGalleryImages = {
+      // Massage/Therapy images
+      massage: [
+        { url: 'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800', caption: 'Professional massage therapy' },
+        { url: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800', caption: 'Relaxing spa environment' },
+        { url: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800', caption: 'Therapeutic massage treatment' },
+        { url: 'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800', caption: 'Peaceful wellness experience' }
+      ],
+      therapy: [
+        { url: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800', caption: 'Deep tissue therapy' },
+        { url: 'https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?w=800', caption: 'Therapeutic session' },
+        { url: 'https://images.unsplash.com/photo-1552693673-1bf958298935?w=800', caption: 'Professional bodywork' },
+        { url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800', caption: 'Spa relaxation room' }
+      ],
+      // Facial/Skincare images
+      facial: [
+        { url: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800', caption: 'Luxurious facial treatment' },
+        { url: 'https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=800', caption: 'Professional skincare session' },
+        { url: 'https://images.unsplash.com/photo-1487412912498-0447578fcca8?w=800', caption: 'Relaxing facial spa' },
+        { url: 'https://images.unsplash.com/photo-1552693673-1bf958298935?w=800', caption: 'Premium skincare experience' }
+      ],
+      // PMU/Beauty images
+      pmu: [
+        { url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800', caption: 'Professional beauty treatment' },
+        { url: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=800', caption: 'Permanent makeup artistry' },
+        { url: 'https://images.unsplash.com/photo-1571875257727-256c39da42af?w=800', caption: 'Beauty enhancement session' },
+        { url: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=800', caption: 'Expert beauty care' }
+      ],
+      // Default/General wellness images
+      default: [
+        { url: 'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800', caption: 'Wellness therapy session' },
+        { url: 'https://images.unsplash.com/photo-1591343395082-e120087004b4?w=800', caption: 'Calming spa atmosphere' },
+        { url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800', caption: 'Rejuvenating treatment' },
+        { url: 'https://images.unsplash.com/photo-1531299204812-e6d44d9a185c?w=800', caption: 'Luxury spa experience' }
+      ]
+    };
+
+    // Find ALL active services
+    const allServices = await Service.find({ isActive: true });
+
+    if (allServices.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No services found'
+      });
+    }
+
+    const results = [];
+
+    // Update each service with appropriate gallery images
+    for (const service of allServices) {
+      // Determine which image set to use based on category
+      let galleryImages;
+      const category = (service.category || '').toLowerCase();
+
+      if (category.includes('massage')) {
+        galleryImages = allGalleryImages.massage;
+      } else if (category.includes('therapy')) {
+        galleryImages = allGalleryImages.therapy;
+      } else if (category.includes('facial')) {
+        galleryImages = allGalleryImages.facial;
+      } else if (category.includes('pmu') || category.includes('beauty')) {
+        galleryImages = allGalleryImages.pmu;
+      } else {
+        galleryImages = allGalleryImages.default;
+      }
+
+      // Only update if service doesn't already have gallery images or force update is requested
+      if (!service.serviceImages || service.serviceImages.length === 0 || req.query.force === 'true') {
+        await Service.findByIdAndUpdate(
+          service._id,
+          { serviceImages: galleryImages },
+          { new: true }
+        );
+        results.push({ title: service.title, category: service.category, status: 'updated', imagesAdded: galleryImages.length });
+      } else {
+        results.push({ title: service.title, category: service.category, status: 'skipped', reason: 'already has images' });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Processed ${allServices.length} services`,
+      data: results
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error adding gallery images to all services',
+      error: error.message
+    });
+  }
+};
+
 // Add gallery images to all massage/therapy services
 exports.addMassageGalleryImages = async (req, res) => {
   try {

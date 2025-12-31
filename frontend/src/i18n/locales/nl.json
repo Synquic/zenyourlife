@@ -206,7 +206,8 @@
     "reminder": "Herinnering Voorkeur",
     "fill_required": "Vul alstublieft alle verplichte velden in",
     "submit_form": "Formulier Versturen",
-    "submitting": "Verzenden..."
+    "submitting": "Verzenden...",
+    "some_dates_blocked": "Sommige datums zijn niet beschikbaar voor boeking"
   },
   "footer": {
     "description": "Ervaar de kunst van ontspanning en verjonging bij Zen Your Life.",
@@ -404,7 +405,7 @@
       "checkin": "Zelf inchecken"
     },
     "location": {
-      "label": "Diensten",
+      "label": "Locatie",
       "title": "Locatie",
       "description": "Gelegen aan de rustige oostkust van Lanzarote, geeft de villa u direct toegang tot stranden, vulkaanpaden en lokale plekken zonder toeristendrukte.",
       "place1": "Vibrant Shopping Street",

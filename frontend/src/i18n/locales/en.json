@@ -206,7 +206,8 @@
     "reminder": "Reminder Preference",
     "fill_required": "Please fill in all required fields",
     "submit_form": "Submit Your Form",
-    "submitting": "Submitting..."
+    "submitting": "Submitting...",
+    "some_dates_blocked": "Some dates are unavailable for booking"
   },
   "footer": {
     "description": "Experience the art of relaxation and rejuvenation at Zen Your Life.",
@@ -404,7 +405,7 @@
       "checkin": "Self check-in"
     },
     "location": {
-      "label": "Services",
+      "label": "Location",
       "title": "Location",
       "description": "Nestled in the charming village of Tabayesco, Casa Artevista offers panoramic views of Lanzarote's stunning volcanic landscape. Experience authentic Canarian life while being just a short drive from beaches and local attractions.",
       "place1": "Tabayesco Village",

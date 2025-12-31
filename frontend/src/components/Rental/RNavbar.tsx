@@ -39,7 +39,8 @@ const RNavbar = ({ onContactClick }: RNavbarProps) => {
     { code: 'EN', name: 'English', flag: '🇬🇧' },
     { code: 'NL', name: 'Nederlands', flag: '🇳🇱' },
     { code: 'FR', name: 'Français', flag: '🇫🇷' },
-    { code: 'DE', name: 'Deutsch', flag: '🇩🇪' }
+    { code: 'DE', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'ES', name: 'Español', flag: '🇪🇸' }
   ];
 
   // Close dropdown when clicking outside

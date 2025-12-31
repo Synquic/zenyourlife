@@ -15,11 +15,11 @@ interface PropertyData {
 }
 
 interface DateInfo {
-  fullDate: string;
-  date: number;
-  month: number;
-  year: number;
-  day: string;
+  checkInDate: string;
+  checkOutDate: string;
+  checkInDateFormatted: string;
+  checkOutDateFormatted: string;
+  nights: number;
   checkInTime: string;
   checkOutTime: string;
 }
@@ -124,11 +124,11 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
             parking: propertyData.parking
           } : null,
           booking: dateInfo ? {
-            fullDate: dateInfo.fullDate,
-            date: dateInfo.date,
-            month: dateInfo.month,
-            year: dateInfo.year,
-            day: dateInfo.day,
+            checkInDate: dateInfo.checkInDate,
+            checkOutDate: dateInfo.checkOutDate,
+            checkInDateFormatted: dateInfo.checkInDateFormatted,
+            checkOutDateFormatted: dateInfo.checkOutDateFormatted,
+            nights: dateInfo.nights,
             checkInTime: dateInfo.checkInTime,
             checkOutTime: dateInfo.checkOutTime
           } : null

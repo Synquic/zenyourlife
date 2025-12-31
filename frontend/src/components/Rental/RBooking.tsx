@@ -25,13 +25,14 @@ interface Property {
 
 interface RBookingProps {
   onClose?: () => void;
+  preSelectedProperty?: Property; // Optional: Skip property selection if provided
 }
 
-const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
-  const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
-  const [showDateSelection, setShowDateSelection] = useState<boolean>(false);
+const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => {
+  const [selectedProperty, setSelectedProperty] = useState<string | null>(preSelectedProperty?._id || null);
+  const [showDateSelection, setShowDateSelection] = useState<boolean>(!!preSelectedProperty); // Skip to date if property pre-selected
   const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(!preSelectedProperty); // Don't load if property pre-selected
   const [error, setError] = useState<string | null>(null);
 
   // Helper function to get image source - prefer imageUrl from backend, fallback to mapped image
@@ -73,11 +74,11 @@ const RBooking: React.FC<RBookingProps> = ({ onClose }) => {
     }
   };
 
-  // Get selected property details
-  const selectedPropertyData = properties.find(p => p._id === selectedProperty);
+  // Get selected property details - use preSelectedProperty if available
+  const selectedPropertyData = preSelectedProperty || properties.find(p => p._id === selectedProperty);
 
   // If date selection is shown, render RBookingDate instead
-  if (showDateSelection) {
+  if (showDateSelection && selectedPropertyData) {
     return <RBookingDate onClose={onClose} propertyData={selectedPropertyData} />;
   }
 

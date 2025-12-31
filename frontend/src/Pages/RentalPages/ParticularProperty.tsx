@@ -665,10 +665,10 @@ const ParticularProperty = () => {
           style={{ background: 'linear-gradient(to bottom, #EAF7FF 0%, #F5FBFF 50%, #FFFFFF 100%)' }}
         >
           <div className="max-w-6xl mx-auto">
-            {/* Services Badge */}
+            {/* Location Badge */}
             <div className="flex justify-center mb-5">
               <div className="inline-flex items-center gap-2 bg-white border border-gray-100 rounded-full px-4 py-2 text-[#89d1fe] text-sm shadow-sm">
-                <img src={lock2} alt="Services" className="h-6 w-6" />
+                <img src={lock2} alt="Location" className="h-6 w-6" />
                 <span>{t("rental.location.label")}</span>
               </div>
             </div>
@@ -839,8 +839,21 @@ const ParticularProperty = () => {
               </svg>
             </button>
 
-            {/* RBooking Component */}
-            <RBooking onClose={() => setIsBookingModalOpen(false)} />
+            {/* RBooking Component - Pass current property to skip property selection */}
+            <RBooking
+              onClose={() => setIsBookingModalOpen(false)}
+              preSelectedProperty={property ? {
+                _id: property._id,
+                name: property.name,
+                description: property.description,
+                price: property.price,
+                guests: property.guests,
+                bedrooms: property.bedrooms,
+                parking: property.parking,
+                image: property.image,
+                imageUrl: property.imageUrl
+              } : undefined}
+            />
           </div>
         </div>
       )}

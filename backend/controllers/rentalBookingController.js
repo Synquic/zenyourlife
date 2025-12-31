@@ -24,24 +24,35 @@ exports.createRentalBooking = async (req, res) => {
       });
     }
 
-    // Parse the date from booking info
+    // Parse the dates from booking info
     let checkInDate = new Date();
+    let checkOutDate = new Date();
+    let numberOfNights = 1;
+
     if (booking) {
-      if (booking.fullDate) {
-        // Use the full ISO date string if provided
+      // New format with checkInDate and checkOutDate
+      if (booking.checkInDate) {
+        checkInDate = new Date(booking.checkInDate);
+      }
+      if (booking.checkOutDate) {
+        checkOutDate = new Date(booking.checkOutDate);
+      }
+      if (booking.nights) {
+        numberOfNights = booking.nights;
+      } else if (booking.checkInDate && booking.checkOutDate) {
+        // Calculate nights from dates
+        const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
+        numberOfNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      }
+      // Legacy support for old format
+      if (!booking.checkInDate && booking.fullDate) {
         checkInDate = new Date(booking.fullDate);
-      } else if (booking.year !== undefined && booking.month !== undefined && booking.date) {
-        // Create date from year, month, date
-        checkInDate = new Date(booking.year, booking.month, booking.date);
-      } else if (booking.date) {
-        // Fallback: Create date from the booking date number (legacy support)
-        const now = new Date();
-        checkInDate = new Date(now.getFullYear(), now.getMonth(), booking.date);
+        checkOutDate = new Date(checkInDate);
+        checkOutDate.setDate(checkOutDate.getDate() + 1);
       }
     }
 
     // Calculate total price
-    const numberOfNights = 1; // Default to 1 night
     const pricePerNight = property?.price || 0;
     const totalPrice = pricePerNight * numberOfNights;
     const deposit = totalPrice * 0.3; // 30% deposit
@@ -63,8 +74,9 @@ exports.createRentalBooking = async (req, res) => {
       } : null,
       booking: {
         checkInDate: checkInDate,
-        checkInTime: booking?.checkInTime || '10:30',
-        checkOutTime: booking?.checkOutTime || '10:00',
+        checkOutDate: checkOutDate,
+        checkInTime: booking?.checkInTime || '10:30 AM',
+        checkOutTime: booking?.checkOutTime || '10:00 AM',
         numberOfNights: numberOfNights,
         totalPrice: totalPrice
       },
@@ -88,6 +100,9 @@ exports.createRentalBooking = async (req, res) => {
     console.log('Email:', email);
     console.log('Property:', property?.name || 'N/A');
     console.log('Check-in Date:', checkInDate.toDateString());
+    console.log('Check-out Date:', checkOutDate.toDateString());
+    console.log('Number of Nights:', numberOfNights);
+    console.log('Total Price:', `€${totalPrice}`);
     console.log('Status:', rentalBooking.status);
 
     // Send confirmation emails
@@ -422,6 +437,14 @@ function generateCustomerEmailTemplate(booking) {
             <span class="value">${booking.booking.checkInDate.toDateString()}</span>
           </div>
           <div class="info-row">
+            <span class="label">Check-out Date:</span>
+            <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toDateString() : 'N/A'}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Number of Nights:</span>
+            <span class="value">${booking.booking.numberOfNights} night${booking.booking.numberOfNights > 1 ? 's' : ''}</span>
+          </div>
+          <div class="info-row">
             <span class="label">Check-in Time:</span>
             <span class="value">${booking.booking.checkInTime}</span>
           </div>
@@ -543,6 +566,14 @@ function generateAdminEmailTemplate(booking) {
             <div class="info-row">
               <span class="label">Check-in Date:</span>
               <span class="value">${booking.booking.checkInDate.toDateString()}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Check-out Date:</span>
+              <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toDateString() : 'N/A'}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Number of Nights:</span>
+              <span class="value">${booking.booking.numberOfNights} night${booking.booking.numberOfNights > 1 ? 's' : ''}</span>
             </div>
             <div class="info-row">
               <span class="label">Check-in Time:</span>

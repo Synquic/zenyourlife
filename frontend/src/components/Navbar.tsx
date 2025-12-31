@@ -59,6 +59,7 @@ const Navbar = () => {
     { code: "NL", lang: "nl", name: "Nederlands", flag: "🇳🇱" },
     { code: "FR", lang: "fr", name: "Français", flag: "🇫🇷" },
     { code: "DE", lang: "de", name: "Deutsch", flag: "🇩🇪" },
+    { code: "ES", lang: "es", name: "Español", flag: "🇪🇸" },
   ];
 
   // Change language handler
@@ -316,7 +317,7 @@ const Navbar = () => {
               href="/contact"
               className="text-gray-700 font-medium hover:text-gray-900"
             >
-              {t("nav.contact")}
+              {t("nav.contact_us")}
             </a>
 
             {/* Premium Language Dropdown */}
@@ -381,7 +382,7 @@ const Navbar = () => {
             onClick={() => navigate("/contact")}
             className="hidden md:block bg-[#d4af37]  text-white px-6 py-2 rounded-full hover:bg-yellow-500 transition"
           >
-            {t("nav.contact")}
+            {t("nav.contact_us")}
           </button>
 
           <button
@@ -512,7 +513,7 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
               className="block text-gray-700 font-medium hover:text-gray-900 py-2"
             >
-              {t("nav.contact")}
+              {t("nav.contact_us")}
             </Link>
 
             {/* Language Selector for Mobile */}
@@ -547,7 +548,7 @@ const Navbar = () => {
               }}
               className="w-full bg-[#d4af37] text-white px-6 py-3 rounded-full hover:bg-yellow-500 transition mt-4"
             >
-              {t("nav.contact")}
+              {t("nav.contact_us")}
             </button>
           </div>
         </div>

@@ -78,6 +78,9 @@ const Testimonial = ({ propertyId, propertyName }: TestimonialProps = {}) => {
   const [testimonials, setTestimonials] = useState<TestimonialData[]>(defaultTestimonials);
   const [activeTab, setActiveTab] = useState<TabType>('villa');
 
+  // Check if we're on a specific property page (propertyName is passed)
+  const isPropertyPage = !!propertyName;
+
   // Get current language for API calls (extract base language code, e.g., "de-DE" -> "de")
   const currentLang = i18n.language?.split('-')[0] || 'en';
 
@@ -88,8 +91,11 @@ const Testimonial = ({ propertyId, propertyName }: TestimonialProps = {}) => {
         const params = new URLSearchParams();
         params.append('lang', currentLang);
 
-        // Tab-based filtering - only Villa or Casa
-        if (activeTab === 'villa') {
+        // If on a specific property page, use that property's name
+        // Otherwise use tab-based filtering
+        if (isPropertyPage && propertyName) {
+          params.append('propertyName', propertyName);
+        } else if (activeTab === 'villa') {
           params.append('propertyName', 'Villa Zen Your Life');
         } else if (activeTab === 'casa') {
           params.append('propertyName', 'Casa Artevista');
@@ -107,7 +113,7 @@ const Testimonial = ({ propertyId, propertyName }: TestimonialProps = {}) => {
     };
 
     fetchTestimonials();
-  }, [currentLang, propertyId, propertyName, activeTab]);
+  }, [currentLang, propertyId, propertyName, activeTab, isPropertyPage]);
 
   const getPhotoSrc = (testimonial: TestimonialData) => {
     if (testimonial.photoUrl) return testimonial.photoUrl;
@@ -140,29 +146,31 @@ const Testimonial = ({ propertyId, propertyName }: TestimonialProps = {}) => {
           </h2>
         </div>
 
-        {/* Property Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 mb-6">
-          <button
-            onClick={() => setActiveTab('villa')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'villa'
-                ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Villa Zen Your Life
-          </button>
-          <button
-            onClick={() => setActiveTab('casa')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              activeTab === 'casa'
-                ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
-          >
-            Casa Artevista
-          </button>
-        </div>
+        {/* Property Filter Tabs - Only show when NOT on a specific property page */}
+        {!isPropertyPage && (
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <button
+              onClick={() => setActiveTab('villa')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'villa'
+                  ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Villa Zen Your Life
+            </button>
+            <button
+              onClick={() => setActiveTab('casa')}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === 'casa'
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Casa Artevista
+            </button>
+          </div>
+        )}
 
         {/* Testimonial Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">

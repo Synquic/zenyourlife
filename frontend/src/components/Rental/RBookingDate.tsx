@@ -20,32 +20,18 @@ interface RBookingDateProps {
 
 const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) => {
   const today = new Date();
-  const [selectedFullDate, setSelectedFullDate] = useState<Date>(today);
+  const [checkInDate, setCheckInDate] = useState<Date | null>(null);
+  const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
+  const [selectingFor, setSelectingFor] = useState<'checkIn' | 'checkOut'>('checkIn');
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date(today.getFullYear(), today.getMonth(), 1));
   const checkInTime = '10:30 AM';
-  const checkOutTime = '10:00 PM';
+  const checkOutTime = '10:00 AM';
 
-  // Generate week days for quick selection (current week)
-  const generateWeekDays = () => {
-    const days = [];
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay()); // Start from Sunday
-
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
-      days.push({
-        day: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][i],
-        date: date.getDate(),
-        fullDate: new Date(date)
-      });
-    }
-    return days;
-  };
-
-  const weekDays = generateWeekDays();
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Calendar functions
   const getDaysInMonth = (date: Date) => {
@@ -73,26 +59,24 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
   };
 
   const calendarDays = generateCalendarDays();
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                      'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  const handleQuickDateSelect = (fullDate: Date) => {
-    // Prevent selecting past dates
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const selectedStart = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate());
-
-    if (selectedStart < todayStart) {
-      return; // Don't allow past date selection
-    }
-
-    setSelectedFullDate(fullDate);
-  };
 
   const handleCalendarDateSelect = (day: number) => {
     const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    setSelectedFullDate(newDate);
-    setShowCalendar(false);
+
+    if (selectingFor === 'checkIn') {
+      setCheckInDate(newDate);
+      // If checkout date is before new checkin, reset it
+      if (checkOutDate && newDate >= checkOutDate) {
+        setCheckOutDate(null);
+      }
+      setSelectingFor('checkOut');
+    } else {
+      // Check-out must be after check-in
+      if (checkInDate && newDate > checkInDate) {
+        setCheckOutDate(newDate);
+        setShowCalendar(false);
+      }
+    }
   };
 
   const handlePrevMonth = () => {
@@ -103,10 +87,24 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
   };
 
-  const isDateSelected = (day: number) => {
-    return selectedFullDate.getDate() === day &&
-           selectedFullDate.getMonth() === currentMonth.getMonth() &&
-           selectedFullDate.getFullYear() === currentMonth.getFullYear();
+  const isCheckInDate = (day: number) => {
+    if (!checkInDate) return false;
+    return checkInDate.getDate() === day &&
+           checkInDate.getMonth() === currentMonth.getMonth() &&
+           checkInDate.getFullYear() === currentMonth.getFullYear();
+  };
+
+  const isCheckOutDate = (day: number) => {
+    if (!checkOutDate) return false;
+    return checkOutDate.getDate() === day &&
+           checkOutDate.getMonth() === currentMonth.getMonth() &&
+           checkOutDate.getFullYear() === currentMonth.getFullYear();
+  };
+
+  const isInRange = (day: number) => {
+    if (!checkInDate || !checkOutDate) return false;
+    const currentDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    return currentDate > checkInDate && currentDate < checkOutDate;
   };
 
   const isToday = (day: number) => {
@@ -121,28 +119,40 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     return checkDate < todayStart;
   };
 
-  const isQuickDateSelected = (fullDate: Date) => {
-    return selectedFullDate.getDate() === fullDate.getDate() &&
-           selectedFullDate.getMonth() === fullDate.getMonth() &&
-           selectedFullDate.getFullYear() === fullDate.getFullYear();
+  const isBeforeCheckIn = (day: number) => {
+    if (!checkInDate || selectingFor !== 'checkOut') return false;
+    const checkDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+    return checkDate <= checkInDate;
   };
 
-  const isQuickDatePast = (fullDate: Date) => {
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const checkStart = new Date(fullDate.getFullYear(), fullDate.getMonth(), fullDate.getDate());
-    return checkStart < todayStart;
+  const formatDate = (date: Date | null) => {
+    if (!date) return 'Select Date';
+    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+    return `${dayName}, ${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   };
 
-  const getSelectedDayName = () => {
-    return ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][selectedFullDate.getDay()];
+  const calculateNights = () => {
+    if (!checkInDate || !checkOutDate) return 0;
+    const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const handleNext = () => {
-    console.log('Selected date:', selectedFullDate);
-    console.log('Day name:', getSelectedDayName());
-    console.log('Check-in time:', checkInTime);
-    console.log('Check-out time:', checkOutTime);
+    if (!checkInDate || !checkOutDate) {
+      return;
+    }
     setShowForm(true);
+  };
+
+  const openCalendarFor = (type: 'checkIn' | 'checkOut') => {
+    setSelectingFor(type);
+    if (type === 'checkIn' && checkInDate) {
+      setCurrentMonth(new Date(checkInDate.getFullYear(), checkInDate.getMonth(), 1));
+    } else if (type === 'checkOut' && checkOutDate) {
+      setCurrentMonth(new Date(checkOutDate.getFullYear(), checkOutDate.getMonth(), 1));
+    }
+    setShowCalendar(true);
   };
 
   // If form is shown, render RBookingForm instead
@@ -152,11 +162,11 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
         onClose={onClose}
         propertyData={propertyData}
         dateInfo={{
-          fullDate: selectedFullDate.toISOString(),
-          date: selectedFullDate.getDate(),
-          month: selectedFullDate.getMonth(),
-          year: selectedFullDate.getFullYear(),
-          day: getSelectedDayName(),
+          checkInDate: checkInDate!.toISOString(),
+          checkOutDate: checkOutDate!.toISOString(),
+          checkInDateFormatted: formatDate(checkInDate),
+          checkOutDateFormatted: formatDate(checkOutDate),
+          nights: calculateNights(),
           checkInTime,
           checkOutTime
         }}
@@ -168,7 +178,7 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     <div className="bg-white w-full relative">
       {/* Header */}
       <div className="px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Check Availability</h2>
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Select Your Dates</h2>
         {onClose && (
           <button
             onClick={onClose}
@@ -181,80 +191,93 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
 
       {/* Date Selection */}
       <div className="px-3 sm:px-6 py-4 sm:py-6">
-        {/* Week Days with Calendar Icon */}
-        <div className="flex gap-1.5 sm:gap-3 mb-4 sm:mb-6 items-center">
-          {weekDays.map((item) => {
-            const isPast = isQuickDatePast(item.fullDate);
-            const isSelected = isQuickDateSelected(item.fullDate);
+        {/* Section Heading */}
+        <div className="mb-4 sm:mb-5">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">When would you like to stay?</h3>
+          <p className="text-xs sm:text-sm text-gray-500">Select your check-in and check-out dates to continue</p>
+        </div>
 
-            return (
-              <button
-                key={item.fullDate.toISOString()}
-                onClick={() => handleQuickDateSelect(item.fullDate)}
-                disabled={isPast}
-                className={`
-                  flex-1 flex flex-col items-center justify-center py-2 sm:py-3 px-1 sm:px-2 rounded-lg sm:rounded-xl border-2 transition-all
-                  ${isSelected
-                    ? 'bg-blue-500 border-blue-500 text-white'
-                    : isPast
-                      ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                  }
-                `}
-              >
-                <span className={`text-[8px] sm:text-xs font-medium mb-0.5 sm:mb-1 ${isSelected ? 'text-white' : isPast ? 'text-gray-300' : 'text-gray-400'}`}>
-                  {item.day}
-                </span>
-                <span className="text-sm sm:text-xl font-semibold">
-                  {item.date}
-                </span>
-              </button>
-            );
-          })}
-
-          {/* Calendar Icon Button */}
-          <button
-            onClick={() => setShowCalendar(true)}
-            className="flex-shrink-0 flex flex-col items-center justify-center py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl border-2 border-gray-200 bg-white text-gray-600 hover:border-blue-500 hover:text-blue-500 transition-all"
+        {/* Check-in and Check-out Date Selection */}
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          {/* Check-in Date */}
+          <div
+            onClick={() => openCalendarFor('checkIn')}
+            className={`cursor-pointer rounded-xl border-2 p-3 sm:p-4 transition-all ${
+              selectingFor === 'checkIn' && showCalendar
+                ? 'border-blue-500 bg-blue-50'
+                : checkInDate
+                  ? 'border-green-500 bg-green-50'
+                  : 'border-gray-200 hover:border-blue-300'
+            }`}
           >
-            <Calendar className="w-4 h-4 sm:w-6 sm:h-6" />
-          </button>
-        </div>
-
-        {/* Selected Date Display */}
-        <div className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
-          <p className="text-xs sm:text-sm text-gray-600 mb-0.5 sm:mb-1">Selected Date</p>
-          <p className="text-sm sm:text-lg font-semibold text-blue-600">
-            {getSelectedDayName()}, {monthNames[selectedFullDate.getMonth()]} {selectedFullDate.getDate()}, {selectedFullDate.getFullYear()}
-          </p>
-        </div>
-
-        {/* Check In & Check Out Times */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-6 mb-4 sm:mb-6">
-          {/* Check In Time */}
-          <div>
-            <label className="block text-xs sm:text-base font-medium text-gray-700 mb-1.5 sm:mb-3">
-              Check In Time
-            </label>
-            <input
-              type="text"
-              value={checkInTime}
-              readOnly
-              className="w-full px-3 sm:px-5 py-3 sm:py-5 border border-gray-300 rounded-lg bg-gray-50 text-base sm:text-xl font-semibold cursor-default"
-            />
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4 text-blue-600" />
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">Check-in Date</p>
+            </div>
+            <p className={`text-sm sm:text-base font-semibold ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
+              {checkInDate ? formatDate(checkInDate) : 'Select Date'}
+            </p>
           </div>
 
-          {/* Check Out Time */}
-          <div>
-            <label className="block text-xs sm:text-base font-medium text-gray-700 mb-1.5 sm:mb-3">
-              Check Out Time
-            </label>
-            <input
-              type="text"
-              value={checkOutTime}
-              readOnly
-              className="w-full px-3 sm:px-5 py-3 sm:py-5 border border-gray-300 rounded-lg bg-gray-50 text-base sm:text-xl font-semibold cursor-default"
-            />
+          {/* Check-out Date */}
+          <div
+            onClick={() => checkInDate && openCalendarFor('checkOut')}
+            className={`cursor-pointer rounded-xl border-2 p-3 sm:p-4 transition-all ${
+              !checkInDate
+                ? 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-60'
+                : selectingFor === 'checkOut' && showCalendar
+                  ? 'border-blue-500 bg-blue-50'
+                  : checkOutDate
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-200 hover:border-blue-300'
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4 text-blue-600" />
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">Check-out Date</p>
+            </div>
+            <p className={`text-sm sm:text-base font-semibold ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
+              {checkOutDate ? formatDate(checkOutDate) : checkInDate ? 'Select Date' : 'Select check-in first'}
+            </p>
+          </div>
+        </div>
+
+        {/* Nights Summary */}
+        {checkInDate && checkOutDate && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs sm:text-sm text-green-700 font-medium">Your Stay</p>
+                <p className="text-lg sm:text-xl font-bold text-green-800">{calculateNights()} Night{calculateNights() > 1 ? 's' : ''}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs sm:text-sm text-green-700">Total Price</p>
+                <p className="text-lg sm:text-xl font-bold text-green-800">€{(propertyData?.price || 0) * calculateNights()}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Check In & Check Out Times Info */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+          <div className="flex items-center gap-2 mb-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs sm:text-sm font-medium text-blue-800">Property Check-in & Check-out Times</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
+            {/* Check In Time */}
+            <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">Check In Time</p>
+              <p className="text-base sm:text-xl font-semibold text-gray-900">{checkInTime}</p>
+            </div>
+
+            {/* Check Out Time */}
+            <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">Check Out Time</p>
+              <p className="text-base sm:text-xl font-semibold text-gray-900">{checkOutTime}</p>
+            </div>
           </div>
         </div>
 
@@ -262,7 +285,12 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
         <div className="flex justify-center mt-6 sm:mt-8">
           <button
             onClick={handleNext}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2"
+            disabled={!checkInDate || !checkOutDate}
+            className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all flex items-center gap-2 ${
+              checkInDate && checkOutDate
+                ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
           >
             Next
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -282,9 +310,14 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </button>
-              <h3 className="text-sm sm:text-lg font-semibold text-gray-900">
-                {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-              </h3>
+              <div className="text-center">
+                <p className="text-xs text-blue-600 font-medium mb-1">
+                  {selectingFor === 'checkIn' ? 'Select Check-in Date' : 'Select Check-out Date'}
+                </p>
+                <h3 className="text-sm sm:text-lg font-semibold text-gray-900">
+                  {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+                </h3>
+              </div>
               <div className="flex items-center gap-0.5 sm:gap-1">
                 <button
                   onClick={handleNextMonth}
@@ -312,31 +345,55 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
 
             {/* Calendar Days */}
             <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
-              {calendarDays.map((day, index) => (
-                <div key={index} className="aspect-square">
-                  {day !== null ? (
-                    <button
-                      onClick={() => !isPastDate(day) && handleCalendarDateSelect(day)}
-                      disabled={isPastDate(day)}
-                      className={`
-                        w-full h-full flex items-center justify-center rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all
-                        ${isDateSelected(day)
-                          ? 'bg-blue-500 text-white'
-                          : isToday(day)
-                            ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
-                            : isPastDate(day)
-                              ? 'text-gray-300 cursor-not-allowed'
-                              : 'text-gray-700 hover:bg-gray-100'
-                        }
-                      `}
-                    >
-                      {day}
-                    </button>
-                  ) : (
-                    <div className="w-full h-full"></div>
-                  )}
-                </div>
-              ))}
+              {calendarDays.map((day, index) => {
+                const isDisabled = day === null || isPastDate(day) || isBeforeCheckIn(day);
+                const isStart = day !== null && isCheckInDate(day);
+                const isEnd = day !== null && isCheckOutDate(day);
+                const inRange = day !== null && isInRange(day);
+                const isTodayDate = day !== null && isToday(day);
+
+                return (
+                  <div key={index} className="aspect-square">
+                    {day !== null ? (
+                      <button
+                        onClick={() => !isDisabled && handleCalendarDateSelect(day)}
+                        disabled={isDisabled}
+                        className={`
+                          w-full h-full flex items-center justify-center rounded-md sm:rounded-lg text-xs sm:text-sm font-medium transition-all
+                          ${isStart
+                            ? 'bg-blue-500 text-white'
+                            : isEnd
+                              ? 'bg-green-500 text-white'
+                              : inRange
+                                ? 'bg-blue-100 text-blue-700'
+                                : isTodayDate
+                                  ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                  : isDisabled
+                                    ? 'text-gray-300 cursor-not-allowed'
+                                    : 'text-gray-700 hover:bg-gray-100'
+                          }
+                        `}
+                      >
+                        {day}
+                      </button>
+                    ) : (
+                      <div className="w-full h-full"></div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Legend */}
+            <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-center gap-4 text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded bg-blue-500"></div>
+                <span className="text-gray-600">Check-in</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded bg-green-500"></div>
+                <span className="text-gray-600">Check-out</span>
+              </div>
             </div>
           </div>
         </div>

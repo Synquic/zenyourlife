@@ -206,7 +206,8 @@
     "reminder": "Erinnerungspräferenz",
     "fill_required": "Bitte füllen Sie alle Pflichtfelder aus",
     "submit_form": "Formular Absenden",
-    "submitting": "Wird gesendet..."
+    "submitting": "Wird gesendet...",
+    "some_dates_blocked": "Einige Termine sind für die Buchung nicht verfügbar"
   },
   "footer": {
     "description": "Erleben Sie die Kunst der Entspannung und Verjüngung bei Zen Your Life.",
@@ -404,7 +405,7 @@
       "checkin": "Selbst-Check-in"
     },
     "location": {
-      "label": "Dienstleistungen",
+      "label": "Lage",
       "title": "Lage",
       "description": "An der ruhigen Ostküste Lanzarotes gelegen, bietet die Villa direkten Zugang zu Stränden, Vulkanwegen und lokalen Orten ohne Touristenmassen.",
       "place1": "Vibrant Shopping Street",

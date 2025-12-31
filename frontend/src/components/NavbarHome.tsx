@@ -22,7 +22,8 @@ const NavbarHome = () => {
      { code: 'EN', lang: 'en', name: 'English', flag: '🇬🇧' },
      { code: 'NL', lang: 'nl', name: 'Nederlands', flag: '🇳🇱' },
      { code: 'FR', lang: 'fr', name: 'Français', flag: '🇫🇷' },
-     { code: 'DE', lang: 'de', name: 'Deutsch', flag: '🇩🇪' }
+     { code: 'DE', lang: 'de', name: 'Deutsch', flag: '🇩🇪' },
+     { code: 'ES', lang: 'es', name: 'Español', flag: '🇪🇸' }
    ];
 
    // Change language handler

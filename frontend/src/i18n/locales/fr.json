@@ -206,7 +206,8 @@
     "reminder": "Préférence de Rappel",
     "fill_required": "Veuillez remplir tous les champs obligatoires",
     "submit_form": "Soumettre le Formulaire",
-    "submitting": "Envoi en cours..."
+    "submitting": "Envoi en cours...",
+    "some_dates_blocked": "Certaines dates ne sont pas disponibles pour la réservation"
   },
   "footer": {
     "description": "Découvrez l'art de la relaxation et du rajeunissement chez Zen Your Life.",
@@ -404,7 +405,7 @@
       "checkin": "Arrivée autonome"
     },
     "location": {
-      "label": "Services",
+      "label": "Emplacement",
       "title": "Emplacement",
       "description": "Située sur la côte est paisible de Lanzarote, la villa vous donne un accès immédiat aux plages, sentiers volcaniques et lieux locaux sans affluence touristique.",
       "place1": "Vibrant Shopping Street",

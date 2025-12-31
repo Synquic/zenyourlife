@@ -8,6 +8,7 @@ const {
   deleteService,
   assignUniqueImages,
   updateServiceImage,
+  addAllServicesGalleryImages,
   addMassageGalleryImages,
   addFacialGalleryImages,
   updateServiceTranslations,
@@ -26,6 +27,7 @@ router.delete('/:id', deleteService);
 // Image management routes
 router.post('/assign-images', assignUniqueImages);
 router.patch('/:id/image', updateServiceImage);
+router.post('/add-all-gallery-images', addAllServicesGalleryImages);
 router.post('/add-massage-gallery-images', addMassageGalleryImages);
 router.post('/add-facial-gallery-images', addFacialGalleryImages);
 
