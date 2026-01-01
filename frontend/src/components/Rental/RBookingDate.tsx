@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, Calendar, X } from 'lucide-react';
 import RBookingForm from './RBookingForm';
+import { getBelgiumNow } from '../../utils/timezone';
 
 interface PropertyData {
   _id: string;
@@ -19,7 +20,8 @@ interface RBookingDateProps {
 }
 
 const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) => {
-  const today = new Date();
+  // Use Belgium timezone for today's date since business is in Belgium
+  const today = getBelgiumNow();
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
   const [checkOutDate, setCheckOutDate] = useState<Date | null>(null);
   const [selectingFor, setSelectingFor] = useState<'checkIn' | 'checkOut'>('checkIn');

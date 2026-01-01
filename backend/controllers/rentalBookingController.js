@@ -1,5 +1,6 @@
 const RentalBooking = require('../models/RentalBooking');
 const nodemailer = require('nodemailer');
+const { getStartOfDayBelgium, getEndOfDayBelgium, formatBelgiumDate, BELGIUM_TIMEZONE } = require('../utils/timezone');
 
 // Create a new rental booking
 exports.createRentalBooking = async (req, res) => {
@@ -188,8 +189,9 @@ exports.getAllRentalBookings = async (req, res) => {
     if (email) query.email = email.toLowerCase();
     if (startDate || endDate) {
       query['booking.checkInDate'] = {};
-      if (startDate) query['booking.checkInDate'].$gte = new Date(startDate);
-      if (endDate) query['booking.checkInDate'].$lte = new Date(endDate);
+      // Use Belgium timezone for date filtering
+      if (startDate) query['booking.checkInDate'].$gte = getStartOfDayBelgium(startDate);
+      if (endDate) query['booking.checkInDate'].$lte = getEndOfDayBelgium(endDate);
     }
 
     const bookings = await RentalBooking.find(query)
@@ -609,13 +611,14 @@ function generateAdminEmailTemplate(booking) {
 
           <div class="info-row" style="margin-top: 20px; background: #E3F2FD; text-align: center;">
             <span class="value">Booking submitted on: ${new Date().toLocaleString('en-US', {
+              timeZone: BELGIUM_TIMEZONE,
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit'
-            })}</span>
+            })} (Brussels time)</span>
           </div>
         </div>
         <div class="footer">

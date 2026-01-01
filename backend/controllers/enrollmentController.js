@@ -2,6 +2,7 @@ const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
 const nodemailer = require('nodemailer');
+const { BELGIUM_TIMEZONE } = require('../utils/timezone');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -16,6 +17,7 @@ const transporter = nodemailer.createTransport({
 const generateCustomerEmailTemplate = (enrollment) => {
   const appointmentDate = new Date(enrollment.appointmentDate);
   const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    timeZone: BELGIUM_TIMEZONE,
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -101,6 +103,7 @@ const generateCustomerEmailTemplate = (enrollment) => {
 const generateAdminEmailTemplate = (enrollment) => {
   const appointmentDate = new Date(enrollment.appointmentDate);
   const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    timeZone: BELGIUM_TIMEZONE,
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -211,13 +214,14 @@ const generateAdminEmailTemplate = (enrollment) => {
 
           <div class="info-row" style="margin-top: 20px; background: #E8F5E9; text-align: center;">
             <span class="value">Booking created on: ${new Date().toLocaleString('en-US', {
+              timeZone: BELGIUM_TIMEZONE,
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit'
-            })}</span>
+            })} (Brussels time)</span>
           </div>
         </div>
         <div class="footer">
@@ -541,6 +545,17 @@ exports.updateEnrollmentStatus = async (req, res) => {
       });
     }
 
+    // Also update the corresponding appointment status
+    // This ensures cancelled/completed enrollments free up the time slot
+    await Appointment.findOneAndUpdate(
+      {
+        email: enrollment.email,
+        appointmentDate: enrollment.appointmentDate,
+        appointmentTime: enrollment.appointmentTime
+      },
+      { status }
+    );
+
     res.status(200).json({
       success: true,
       message: 'Enrollment status updated successfully',
@@ -558,7 +573,8 @@ exports.updateEnrollmentStatus = async (req, res) => {
 // Delete enrollment
 exports.deleteEnrollment = async (req, res) => {
   try {
-    const enrollment = await Enrollment.findByIdAndDelete(req.params.id);
+    // First find the enrollment to get its details before deleting
+    const enrollment = await Enrollment.findById(req.params.id);
 
     if (!enrollment) {
       return res.status(404).json({
@@ -567,9 +583,22 @@ exports.deleteEnrollment = async (req, res) => {
       });
     }
 
+    // Delete the corresponding appointment from Appointment collection
+    // This ensures the time slot becomes available again
+    await Appointment.findOneAndDelete({
+      email: enrollment.email,
+      appointmentDate: enrollment.appointmentDate,
+      appointmentTime: enrollment.appointmentTime
+    });
+
+    // Now delete the enrollment
+    await Enrollment.findByIdAndDelete(req.params.id);
+
+    console.log(`✅ Deleted enrollment and corresponding appointment for ${enrollment.email} on ${enrollment.appointmentDate} at ${enrollment.appointmentTime}`);
+
     res.status(200).json({
       success: true,
-      message: 'Enrollment deleted successfully'
+      message: 'Enrollment and appointment deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

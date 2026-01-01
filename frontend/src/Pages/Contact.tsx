@@ -111,7 +111,7 @@ const Contact = () => {
               </h1>
 
               {/* Social Icons */}
-              <div className="flex items-center gap-3 sm:gap-4">
+              {/* <div className="flex items-center gap-3 sm:gap-4">
                 <a
                   href="#"
                   className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition"
@@ -130,7 +130,7 @@ const Contact = () => {
                 >
                   <Twitter size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </a>
-              </div>
+              </div> */}
             </div>
 
             {/* Right Side - Form */}

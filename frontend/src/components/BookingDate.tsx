@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { X, AlertCircle, Calendar, Clock } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { API_BASE_URL } from "../config/api";
+import { getBelgiumNow, generateBelgiumDates } from "../utils/timezone";
 
 interface Service {
   _id: string;
@@ -63,20 +64,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   const [blockedTimeSlotsForDate, setBlockedTimeSlotsForDate] = useState<string[]>([]);
 
   // Generate dates from today onwards for 30 days with corresponding day names
-  const days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const dates = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i + 1); // Start from tomorrow
-    return {
-      day: days[date.getDay()],
-      date: date.getDate(),
-      fullDate: date,
-      dayOffset: i + 1
-    };
-  });
+  // Using Belgium timezone since business is located in Belgium
+  const dates = generateBelgiumDates(30);
 
   const dayNames: DayName[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -130,12 +119,14 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   };
 
   // Check if a date is completely too soon (all time slots would be blocked)
+  // Uses Belgium timezone for accurate time comparison
   const isDateTooSoon = (dateToCheck: Date): boolean => {
     if (!bookingSettings || !bookingSettings.minAdvanceBooking) return false;
 
-    const now = new Date();
+    // Use Belgium timezone for current time
+    const belgiumNow = getBelgiumNow();
     const minAdvanceMs = bookingSettings.minAdvanceBooking * 60 * 60 * 1000;
-    const minAllowedDateTime = new Date(now.getTime() + minAdvanceMs);
+    const minAllowedDateTime = new Date(belgiumNow.getTime() + minAdvanceMs);
 
     // Get the latest possible time slot for this day
     const daySlots = getTimeSlotsForDay(dateToCheck);
@@ -153,12 +144,14 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   };
 
   // Check if a specific time slot is too soon based on advance booking
+  // Uses Belgium timezone for accurate time comparison
   const isTimeSlotTooSoon = (dateToCheck: Date, timeSlot: string): boolean => {
     if (!bookingSettings || !bookingSettings.minAdvanceBooking) return false;
 
-    const now = new Date();
+    // Use Belgium timezone for current time
+    const belgiumNow = getBelgiumNow();
     const minAdvanceMs = bookingSettings.minAdvanceBooking * 60 * 60 * 1000;
-    const minAllowedDateTime = new Date(now.getTime() + minAdvanceMs);
+    const minAllowedDateTime = new Date(belgiumNow.getTime() + minAdvanceMs);
 
     const [hours, minutes] = timeSlot.split(':').map(Number);
     const slotDateTime = new Date(dateToCheck);

@@ -1,5 +1,6 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
+const { getStartOfDayBelgium, getEndOfDayBelgium } = require('../utils/timezone');
 
 // Create new appointment
 exports.createAppointment = async (req, res) => {
@@ -223,6 +224,27 @@ exports.deleteAppointment = async (req, res) => {
   }
 };
 
+// Clear all appointments (admin utility)
+exports.clearAllAppointments = async (req, res) => {
+  try {
+    const result = await Appointment.deleteMany({});
+
+    console.log(`🗑️ Cleared ${result.deletedCount} appointments from database`);
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully deleted ${result.deletedCount} appointments`,
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error clearing appointments',
+      error: error.message
+    });
+  }
+};
+
 // Get booked time slots for a specific date
 exports.getBookedSlots = async (req, res) => {
   try {
@@ -235,12 +257,9 @@ exports.getBookedSlots = async (req, res) => {
       });
     }
 
-    // Create date range for the entire day
-    const startDate = new Date(date);
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date(date);
-    endDate.setHours(23, 59, 59, 999);
+    // Create date range for the entire day using Belgium timezone
+    const startDate = getStartOfDayBelgium(date);
+    const endDate = getEndOfDayBelgium(date);
 
     // Find all confirmed appointments for this date
     const appointments = await Appointment.find({

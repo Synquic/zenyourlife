@@ -633,6 +633,17 @@ const Inquiries = () => {
                             {actionLoading === 'archived' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
                             Archive
                           </button>
+                          <button
+                            onClick={() => {
+                              setDeleteId(selectedInquiry._id)
+                              setShowDeleteConfirm(true)
+                            }}
+                            disabled={actionLoading !== null}
+                            className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 disabled:opacity-50"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>

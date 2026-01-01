@@ -140,7 +140,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                 </h1>
 
                 {/* Social Icons */}
-                <div className="flex items-center justify-center md:justify-start gap-3 sm:gap-4 mb-6 md:mb-0">
+                {/* <div className="flex items-center justify-center md:justify-start gap-3 sm:gap-4 mb-6 md:mb-0">
                   <a
                     href="#"
                     className="w-9 h-9 sm:w-10 sm:h-10 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-gray-700 transition"
@@ -159,7 +159,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   >
                     <Twitter size={16} className="sm:w-[18px] sm:h-[18px]" />
                   </a>
-                </div>
+                </div> */}
               </div>
 
               {/* Right Side - Form */}
