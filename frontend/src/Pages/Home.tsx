@@ -1,9 +1,10 @@
 import  { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_BASE_URL } from "../config/api";
 
-import frame2 from "../assets/frame2.png";
+import zenurlifemassage from "../assets/zenurlifemassage.jpeg";
+import massage2zen from "../assets/massage2zen.jpeg";
 import frame3 from "../assets/frame3.png";
-import frame01 from "../assets/frame01.png";
 import frame5 from "../assets/frame5.png";
 import frame6 from "../assets/Frame 6.png";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
@@ -28,13 +29,44 @@ import Footer from "../components/Footer";
 import FloatingBookButton from "../components/FloatingBookButton";
 
 
+interface FAQData {
+  _id: string;
+  question: string;
+  answer: string;
+}
+
 const Home = () => {
-  const [openFaq, setOpenFaq] = useState<number | null>(2);
+  const [openFaq, setOpenFaq] = useState<number | null>(1);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const { t } = useTranslation();
+  const [faqs, setFaqs] = useState<FAQData[]>([]);
+  const [loadingFaqs, setLoadingFaqs] = useState(true);
+  const { t, i18n } = useTranslation();
+
+  // Get current language for API calls
+  const currentLang = i18n.language?.split('-')[0] || 'en';
 
   const navigate=useNavigate();
+
+  // Fetch FAQs from database
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoadingFaqs(true);
+        const response = await fetch(`${API_BASE_URL}/faqs?category=massage&lang=${currentLang}`);
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+          setFaqs(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching FAQs:', error);
+      } finally {
+        setLoadingFaqs(false);
+      }
+    };
+
+    fetchFAQs();
+  }, [currentLang]);
 
   // Disable background scroll when modal is open
   useEffect(() => {
@@ -61,7 +93,7 @@ const Home = () => {
         <div className="relative max-w-7xl mx-auto h-[520px] sm:h-[600px] md:h-[700px] rounded-2xl sm:rounded-3xl overflow-hidden">
           {/* Background Image */}
           <img
-            src={frame2}
+            src={zenurlifemassage}
             alt="Wellness"
             className="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center"
           />
@@ -245,14 +277,14 @@ const Home = () => {
               </div>
 
               {/* Healing reflexology */}
-              <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm">
+              {/* <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm">
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">
                   {t('home.healing_reflexology')}
                 </h3>
                 <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
                   {t('home.reflexology_desc')}
                 </p>
-              </div>
+              </div> */}
 
               {/* Signature hot stone */}
               <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm">
@@ -322,7 +354,7 @@ const Home = () => {
             {/* Right - Image */}
             <div className="md:w-1/2 h-48 sm:h-64 md:h-auto order-1 md:order-2">
               <img
-                src={frame01}
+                src={massage2zen}
                 alt="Deep Tissue Massage"
                 className="w-full h-full object-cover"
               />
@@ -573,273 +605,84 @@ const Home = () => {
 
             {/* Right Side - FAQ Accordion */}
             <div className="space-y-3 sm:space-y-4">
-              {/* Question 1 */}
-              <div
-                className={`border-2 rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
-                  openFaq === 1
-                    ? "border-[#B8860B] bg-[#FFFBEA]"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex gap-2 sm:gap-4">
-                    <span
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 1 ? "text-[#B8860B]" : "text-gray-400"
-                      }`}
-                    >
-                      01
-                    </span>
-                    <h4
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 1 ? "text-[#B8860B]" : "text-gray-900"
-                      }`}
-                    >
-                      {t('home.faq_q1')}
-                    </h4>
-                  </div>
-                  <button
-                    onClick={() => toggleFaq(1)}
-                    className={`flex-shrink-0 ${
-                      openFaq === 1
-                        ? "text-[#B8860B] hover:text-[#9A7209]"
-                        : "text-gray-400 hover:text-gray-600"
+              {loadingFaqs ? (
+                <div className="text-center py-8">
+                  <div className="inline-block w-8 h-8 border-4 border-[#B8860B]/20 border-t-[#B8860B] rounded-full animate-spin"></div>
+                </div>
+              ) : faqs.length > 0 ? (
+                faqs.map((faq, index) => (
+                  <div
+                    key={faq._id}
+                    className={`border-2 rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
+                      openFaq === index + 1
+                        ? "border-[#B8860B] bg-[#FFFBEA]"
+                        : "border-gray-200"
                     }`}
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 sm:h-5 sm:w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      {openFaq === 1 ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      )}
-                    </svg>
-                  </button>
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex gap-2 sm:gap-4">
+                        <span
+                          className={`font-medium text-sm sm:text-base ${
+                            openFaq === index + 1 ? "text-[#B8860B]" : "text-gray-400"
+                          }`}
+                        >
+                          {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <h4
+                          className={`font-medium text-sm sm:text-base ${
+                            openFaq === index + 1 ? "text-[#B8860B]" : "text-gray-900"
+                          }`}
+                        >
+                          {faq.question}
+                        </h4>
+                      </div>
+                      <button
+                        onClick={() => toggleFaq(index + 1)}
+                        className={`flex-shrink-0 ${
+                          openFaq === index + 1
+                            ? "text-[#B8860B] hover:text-[#9A7209]"
+                            : "text-gray-400 hover:text-gray-600"
+                        }`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 sm:h-5 sm:w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          {openFaq === index + 1 ? (
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          ) : (
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 4v16m8-8H4"
+                            />
+                          )}
+                        </svg>
+                      </button>
+                    </div>
+                    {openFaq === index + 1 && (
+                      <div className="pl-6 sm:pl-9 mt-3 sm:mt-4">
+                        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+                          {faq.answer}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500 text-sm">
+                  {t('home.no_faqs', 'No FAQs available at the moment.')}
                 </div>
-                {openFaq === 1 && (
-                  <div className="pl-6 sm:pl-9 mt-3 sm:mt-4">
-                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                      {t('home.faq_a1')}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Question 2 - Expanded */}
-              <div
-                className={`border-2 rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
-                  openFaq === 2
-                    ? "border-[#B8860B] bg-[#FFFBEA]"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex gap-2 sm:gap-4">
-                    <span
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 2 ? "text-[#B8860B]" : "text-gray-400"
-                      }`}
-                    >
-                      02
-                    </span>
-                    <h4
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 2 ? "text-[#B8860B]" : "text-gray-900"
-                      }`}
-                    >
-                      {t('home.faq_q2')}
-                    </h4>
-                  </div>
-                  <button
-                    onClick={() => toggleFaq(2)}
-                    className={`flex-shrink-0 ${
-                      openFaq === 2
-                        ? "text-[#B8860B] hover:text-[#9A7209]"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 sm:h-5 sm:w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      {openFaq === 2 ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-                {openFaq === 2 && (
-                  <div className="pl-6 sm:pl-9 mt-3 sm:mt-4">
-                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                      {t('home.faq_a2')}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Question 3 */}
-              <div
-                className={`border-2 rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
-                  openFaq === 3
-                    ? "border-[#B8860B] bg-[#FFFBEA]"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex gap-2 sm:gap-4">
-                    <span
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 3 ? "text-[#B8860B]" : "text-gray-400"
-                      }`}
-                    >
-                      03
-                    </span>
-                    <h4
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 3 ? "text-[#B8860B]" : "text-gray-900"
-                      }`}
-                    >
-                      {t('home.faq_q3')}
-                    </h4>
-                  </div>
-                  <button
-                    onClick={() => toggleFaq(3)}
-                    className={`flex-shrink-0 ${
-                      openFaq === 3
-                        ? "text-[#B8860B] hover:text-[#9A7209]"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 sm:h-5 sm:w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      {openFaq === 3 ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-                {openFaq === 3 && (
-                  <div className="pl-6 sm:pl-9 mt-3 sm:mt-4">
-                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                      {t('home.faq_a3')}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Question 4 */}
-              <div
-                className={`border-2 rounded-lg sm:rounded-xl p-4 sm:p-6 transition-all ${
-                  openFaq === 4
-                    ? "border-[#B8860B] bg-[#FFFBEA]"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex gap-2 sm:gap-4">
-                    <span
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 4 ? "text-[#B8860B]" : "text-gray-400"
-                      }`}
-                    >
-                      04
-                    </span>
-                    <h4
-                      className={`font-medium text-sm sm:text-base ${
-                        openFaq === 4 ? "text-[#B8860B]" : "text-gray-900"
-                      }`}
-                    >
-                      {t('home.faq_q4')}
-                    </h4>
-                  </div>
-                  <button
-                    onClick={() => toggleFaq(4)}
-                    className={`flex-shrink-0 ${
-                      openFaq === 4
-                        ? "text-[#B8860B] hover:text-[#9A7209]"
-                        : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 sm:h-5 sm:w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      {openFaq === 4 ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      )}
-                    </svg>
-                  </button>
-                </div>
-                {openFaq === 4 && (
-                  <div className="pl-6 sm:pl-9 mt-3 sm:mt-4">
-                    <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
-                      {t('home.faq_a4')}
-                    </p>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </div>

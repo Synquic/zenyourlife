@@ -33,7 +33,7 @@
   },
   "home": {
     "hero_title": "Because health is more than the absence of disease",
-    "hero_description": "Experience a peaceful retreat with luxurious treatments, crafted to refresh your senses and restore harmony.",
+    "hero_description": "Experience luxurious treatments, crafted to refresh your senses and restore harmony. Leave for a peaceful retreat.",
     "trusted_by": "Trusted by",
     "partners": "1000+ Clients",
     "treatments_offered": "Treatments Offered",
@@ -52,7 +52,7 @@
     "hot_stone": "Signature hot stone",
     "hot_stone_desc": "Experience deep relaxation with hot stones applied to pressure points, relieving tension & improving circulation for total wellness",
     "facial_care_desc": "Keeping your skin beautiful and youthful longer requires extra effort. A healthy lifestyle, diet, exercise, and using natural, healthy products.",
-    "book_consultation": "Book your consultation call now!",
+    "book_consultation": "Book your appointment",
     "customized_treatments": "Customized Treatments",
     "customized_desc": "Every massage is tailored to your unique needs. Your body's tension points are assessed to customize pressure, techniques, and focus areas for optimal relief.",
     "expert_therapists": "Expert Therapist",
@@ -174,7 +174,7 @@
     "email_label": "Email",
     "number_label": "Number",
     "assistance_hours": "Assistance hours:",
-    "hours_detail": "Monday - Friday 6 am to 8 pm EST"
+    "hours_detail": "Monday - Friday 8 am to 8 pm EST"
   },
   "booking": {
     "title": "Book Appointment",
@@ -441,7 +441,7 @@
       "number_label": "Number",
       "address_label": "Address",
       "assistance_hours": "Assistance hours:",
-      "hours_detail": "Monday - Friday 6 am to 8 pm EST"
+      "hours_detail": "Monday - Friday 8 am to 8 pm EST"
     }
   }
 }

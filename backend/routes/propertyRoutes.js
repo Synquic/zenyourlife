@@ -3,7 +3,7 @@ const router = express.Router();
 const { Property, SectionSettings } = require('../models/Property');
 const { autoTranslateProperty, autoTranslateSectionSettings } = require('../services/autoTranslateService');
 
-const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl'];
+const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl', 'es'];
 
 // Helper function to get translated property from stored translations
 const getTranslatedProperty = (property, lang) => {

@@ -33,7 +33,7 @@
   },
   "home": {
     "hero_title": "Parce que la santé est plus que l'absence de maladie",
-    "hero_description": "Vivez une retraite paisible avec des soins luxueux, conçus pour rafraîchir vos sens et restaurer l'harmonie.",
+    "hero_description": "Vivez des soins luxueux, conçus pour rafraîchir vos sens et restaurer l'harmonie. Partez pour une retraite paisible.",
     "trusted_by": "Approuvé par",
     "partners": "1000+ Clients",
     "treatments_offered": "Soins Proposés",
@@ -52,7 +52,7 @@
     "hot_stone": "Pierre chaude signature",
     "hot_stone_desc": "Vivez une relaxation profonde avec des pierres chaudes appliquées sur les points de pression, soulageant les tensions et améliorant la circulation",
     "facial_care_desc": "Garder votre peau belle et jeune plus longtemps nécessite un effort supplémentaire. Un mode de vie sain, une alimentation, de l'exercice et des produits naturels.",
-    "book_consultation": "Réservez votre consultation maintenant!",
+    "book_consultation": "Réservez votre rendez-vous",
     "customized_treatments": "Soins Personnalisés",
     "customized_desc": "Chaque massage est adapté à vos besoins uniques. Vos points de tension sont évalués et la pression, les techniques et les zones de focus sont personnalisées pour un soulagement optimal.",
     "expert_therapists": "Thérapeute Expert",
@@ -174,7 +174,7 @@
     "email_label": "E-mail",
     "number_label": "Numéro",
     "assistance_hours": "Heures d'assistance:",
-    "hours_detail": "Lundi - Vendredi 6h à 20h EST"
+    "hours_detail": "Lundi - Vendredi 8h à 20h EST"
   },
   "booking": {
     "title": "Prendre Rendez-vous",
@@ -441,7 +441,7 @@
       "number_label": "Numéro",
       "address_label": "Adresse",
       "assistance_hours": "Heures d'assistance:",
-      "hours_detail": "Lundi - Vendredi 6h à 20h EST"
+      "hours_detail": "Lundi - Vendredi 8h à 20h EST"
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import lock from "../assets/lock.png";
-import nadia02 from "../assets/naida02.png"
+import nadia05 from "../assets/nadia05.png"
 
 const Expert = () => {
   const { t } = useTranslation();
@@ -17,14 +17,14 @@ const Expert = () => {
         </div>
 
         {/* Content Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden ">
           <div className="flex flex-col md:flex-row">
             {/* Image Section */}
             <div className="md:w-2/5 relative">
               <img
-                src={nadia02}
+                src={nadia05}
                 alt="Nadia Delens"
-                className="w-full h-56 sm:h-64 md:h-80 object-cover object-[center_20%]"
+                className="w-full h-56 sm:h-64 md:h-80 object-cover object-[center_25%]"
               />
             </div>
 

@@ -33,7 +33,7 @@
   },
   "home": {
     "hero_title": "Weil Gesundheit mehr ist als die Abwesenheit von Krankheit",
-    "hero_description": "Erleben Sie einen friedlichen Rückzugsort mit luxuriösen Behandlungen, die Ihre Sinne erfrischen und Harmonie wiederherstellen.",
+    "hero_description": "Erleben Sie luxuriöse Behandlungen, die Ihre Sinne erfrischen und Harmonie wiederherstellen. Begeben Sie sich auf einen friedlichen Rückzugsort.",
     "trusted_by": "Vertraut von",
     "partners": "1000+ Kunden",
     "treatments_offered": "Angebotene Behandlungen",
@@ -52,7 +52,7 @@
     "hot_stone": "Signature Hot Stone",
     "hot_stone_desc": "Erleben Sie tiefe Entspannung mit heißen Steinen auf Druckpunkten, lösen Sie Verspannungen und verbessern Sie die Durchblutung",
     "facial_care_desc": "Um Ihre Haut länger schön und jugendlich zu halten, braucht es zusätzliche Pflege. Ein gesunder Lebensstil, Ernährung, Bewegung und natürliche Produkte.",
-    "book_consultation": "Buchen Sie jetzt Ihr Beratungsgespräch!",
+    "book_consultation": "Buchen Sie Ihren Termin",
     "customized_treatments": "Maßgeschneiderte Behandlungen",
     "customized_desc": "Jede Massage wird auf Ihre individuellen Bedürfnisse abgestimmt. Ihre Verspannungspunkte werden analysiert und Druck, Techniken und Fokusbereich für optimale Linderung angepasst.",
     "expert_therapists": "Experten-Therapeut",
@@ -174,7 +174,7 @@
     "email_label": "E-Mail",
     "number_label": "Nummer",
     "assistance_hours": "Erreichbarkeit:",
-    "hours_detail": "Montag - Freitag 6 bis 20 Uhr EST"
+    "hours_detail": "Montag - Freitag 8 bis 20 Uhr EST"
   },
   "booking": {
     "title": "Termin Buchen",
@@ -441,7 +441,7 @@
       "number_label": "Nummer",
       "address_label": "Adresse",
       "assistance_hours": "Erreichbarkeit:",
-      "hours_detail": "Montag - Freitag 6 bis 20 Uhr EST"
+      "hours_detail": "Montag - Freitag 8 bis 20 Uhr EST"
     }
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Users, BedDouble, ParkingCircle } from 'lucide-react';
+import { X, Users, BedDouble, ParkingCircle, ChevronRight } from 'lucide-react';
 import Apat1 from '../../assets/Apat1.png';
 import Apat2 from '../../assets/Apat2.png';
 import RBookingDate from './RBookingDate';
@@ -67,11 +67,10 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
     fetchProperties();
   }, []);
 
-  const handleNext = () => {
-    if (selectedProperty !== null) {
-      console.log('Selected property:', selectedProperty);
-      setShowDateSelection(true);
-    }
+  const handlePropertyClick = (property: Property) => {
+    setSelectedProperty(property._id);
+    console.log('Selected property:', property._id);
+    setShowDateSelection(true);
   };
 
   // Get selected property details - use preSelectedProperty if available
@@ -117,14 +116,8 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
           {!loading && !error && properties.map((property) => (
             <div
               key={property._id}
-              onClick={() => setSelectedProperty(property._id)}
-              className={`
-                flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all
-                ${selectedProperty === property._id
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300 bg-white'
-                }
-              `}
+              onClick={() => handlePropertyClick(property)}
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 cursor-pointer transition-all border-gray-200 hover:border-blue-400 hover:bg-blue-50 bg-white group"
             >
               {/* Top Row on Mobile: Image + Price */}
               <div className="flex gap-3 sm:hidden">
@@ -147,6 +140,10 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
                     </div>
                     <div className="text-xs text-gray-500">per night</div>
                   </div>
+                </div>
+                {/* Arrow on Mobile */}
+                <div className="flex items-center">
+                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
                 </div>
               </div>
 
@@ -209,34 +206,20 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
                 </div>
               </div>
 
-              {/* Price - Desktop */}
-              <div className="hidden sm:block flex-shrink-0 text-right">
-                <div className="text-2xl font-bold text-blue-600">
-                  €{property.price}
+              {/* Price + Arrow - Desktop */}
+              <div className="hidden sm:flex flex-shrink-0 items-center gap-4">
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-blue-600">
+                    €{property.price}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    per night
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  per night
-                </div>
+                <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" />
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Footer */}
-        <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200 flex justify-end">
-          <button
-            onClick={handleNext}
-            disabled={selectedProperty === null}
-            className={`
-              px-6 sm:px-8 py-2 sm:py-2.5 rounded-lg font-medium text-sm sm:text-base transition-all
-              ${selectedProperty !== null
-                ? 'bg-blue-500 hover:bg-blue-600 text-white cursor-pointer'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }
-            `}
-          >
-            Next
-          </button>
         </div>
     </div>
   );

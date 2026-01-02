@@ -10,13 +10,14 @@
 
 const axios = require('axios');
 
-const TARGET_LANGUAGES = ['fr', 'de', 'nl'];
+const TARGET_LANGUAGES = ['fr', 'de', 'nl', 'es'];
 
 // DeepL language codes (some differ from standard ISO codes)
 const DEEPL_LANGUAGE_MAP = {
   'fr': 'FR',
   'de': 'DE',
-  'nl': 'NL'
+  'nl': 'NL',
+  'es': 'ES'
 };
 
 // DeepL API configuration

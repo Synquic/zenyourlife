@@ -178,6 +178,7 @@ const ParticularProperty = () => {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useState(false);
 
   // Image error states for fallback handling
   const [mainImageError, setMainImageError] = useState(false);
@@ -223,7 +224,7 @@ const ParticularProperty = () => {
 
   // Disable background scroll when modal is open
   useEffect(() => {
-    if (isBookingModalOpen || isContactModalOpen) {
+    if (isBookingModalOpen || isContactModalOpen || isPhotoGalleryOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -231,7 +232,7 @@ const ParticularProperty = () => {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [isBookingModalOpen, isContactModalOpen]);
+  }, [isBookingModalOpen, isContactModalOpen, isPhotoGalleryOpen]);
 
   // Reset image error states when property ID changes
   useEffect(() => {
@@ -329,6 +330,9 @@ const ParticularProperty = () => {
       })
     : [apat1, apat2];
 
+  // All photos for the gallery modal (main image + gallery images)
+  const allPhotos = [mainImage, ...galleryImages];
+
   return (
     <>
       <RNavbar onContactClick={() => setIsContactModalOpen(true)} />
@@ -357,13 +361,25 @@ const ParticularProperty = () => {
                 className="w-full h-full object-cover rounded-xl sm:rounded-2xl shadow-md"
               />
             </div>
-            <div className="w-1/2 lg:w-full h-[140px] sm:h-[165px] lg:h-[200px]">
+            <div className="w-1/2 lg:w-full h-[140px] sm:h-[165px] lg:h-[200px] relative">
               <img
                 src={galleryImages[1] || apat2}
                 alt={`${property.name} view 2`}
                 onError={() => handleGalleryImageError(1)}
                 className="w-full h-full object-cover rounded-xl sm:rounded-2xl shadow-md"
               />
+              {/* View More Photos Button - overlaid on second gallery image */}
+              {allPhotos.length > 2 && (
+                <button
+                  onClick={() => setIsPhotoGalleryOpen(true)}
+                  className="absolute bottom-3 right-3 flex items-center gap-2 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 px-3 py-2 rounded-lg shadow-lg transition-all text-xs sm:text-sm font-medium"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {t("rental.property.view_photos", "View all")} ({allPhotos.length})
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -887,6 +903,55 @@ const ParticularProperty = () => {
 
             {/* RContact Component */}
             <RContact isModal={true} onClose={() => setIsContactModalOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Photo Gallery Modal */}
+      {isPhotoGalleryOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-5xl max-h-[95vh] overflow-hidden shadow-2xl relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsPhotoGalleryOpen(false)}
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white hover:bg-gray-100 rounded-full p-1.5 sm:p-2 transition z-50 shadow-md"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Modal Header */}
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+                {property.name} - {t("rental.property.photos", "Photos")}
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                {allPhotos.length} {t("rental.property.photos_count", "photos")}
+              </p>
+            </div>
+
+            {/* Photos Grid */}
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(95vh-100px)]" style={{ scrollbarWidth: 'thin' }}>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {allPhotos.map((photo, index) => (
+                  <div
+                    key={index}
+                    className="relative aspect-square rounded-xl overflow-hidden group"
+                  >
+                    <img
+                      src={photo}
+                      alt={`${property.name} - Photo ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+                    <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-gray-700">
+                      {index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -33,7 +33,7 @@
   },
   "home": {
     "hero_title": "Porque la salud es más que la ausencia de enfermedad",
-    "hero_description": "Experimenta un retiro tranquilo con tratamientos lujosos, diseñados para refrescar tus sentidos y restaurar la armonía.",
+    "hero_description": "Experimenta tratamientos lujosos, diseñados para refrescar tus sentidos y restaurar la armonía. Parte hacia un retiro tranquilo.",
     "trusted_by": "Confían en Nosotros",
     "partners": "Más de 1000 Clientes",
     "treatments_offered": "Tratamientos Ofrecidos",
@@ -52,7 +52,7 @@
     "hot_stone": "Piedras calientes exclusivas",
     "hot_stone_desc": "Experimenta una relajación profunda con piedras calientes aplicadas en puntos de presión, aliviando la tensión y mejorando la circulación para un bienestar total",
     "facial_care_desc": "Mantener tu piel hermosa y joven por más tiempo requiere un esfuerzo extra. Un estilo de vida saludable, dieta, ejercicio y el uso de productos naturales y saludables.",
-    "book_consultation": "¡Reserva tu llamada de consulta ahora!",
+    "book_consultation": "Reserva tu cita",
     "customized_treatments": "Tratamientos Personalizados",
     "customized_desc": "Cada masaje está adaptado a tus necesidades únicas. Se evalúan los puntos de tensión de tu cuerpo para personalizar la presión, las técnicas y las áreas de enfoque para un alivio óptimo.",
     "expert_therapists": "Terapeuta Experto",
@@ -174,7 +174,7 @@
     "email_label": "Correo",
     "number_label": "Número",
     "assistance_hours": "Horario de asistencia:",
-    "hours_detail": "Lunes - Viernes 6 am a 8 pm EST"
+    "hours_detail": "Lunes - Viernes 8 am a 8 pm EST"
   },
   "booking": {
     "title": "Reservar Cita",
@@ -441,7 +441,7 @@
       "number_label": "Número",
       "address_label": "Dirección",
       "assistance_hours": "Horario de asistencia:",
-      "hours_detail": "Lunes - Viernes 6 am a 8 pm EST"
+      "hours_detail": "Lunes - Viernes 8 am a 8 pm EST"
     }
   }
 }

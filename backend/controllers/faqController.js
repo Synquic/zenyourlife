@@ -1,7 +1,7 @@
 const FAQ = require('../models/FAQ');
 const { autoTranslateFAQ } = require('../services/autoTranslateService');
 
-const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl'];
+const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl', 'es'];
 
 // Helper function to get translated FAQ from stored translations
 const getTranslatedFAQ = (faq, lang) => {

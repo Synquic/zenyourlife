@@ -1,7 +1,7 @@
 const Testimonial = require('../models/Testimonial');
 const { autoTranslateTestimonial } = require('../services/autoTranslateService');
 
-const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl'];
+const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl', 'es'];
 
 // Helper function to get translated testimonial from stored translations
 const getTranslatedTestimonial = (testimonial, lang) => {

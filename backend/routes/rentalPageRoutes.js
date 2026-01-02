@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { RentalOverviewSettings } = require('../models/RentalPageSettings');
 
-const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl'];
+const SUPPORTED_LANGUAGES = ['en', 'fr', 'de', 'nl', 'es'];
 
 // Helper function to get translated overview settings
 const getTranslatedOverview = (settings, lang) => {

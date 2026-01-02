@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 
-import { API_BASE_URL } from "../config/api";
+import { API_BASE_URL, getImageUrl } from "../config/api";
 
 // Import massage images
 import m1 from "../assets/m1.png";
@@ -288,6 +288,10 @@ const Services = () => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrlInput, setImageUrlInput] = useState("");
+
+  // Main service image upload state
+  const [uploadingMainImage, setUploadingMainImage] = useState(false);
+  const mainImageInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch services and content
   useEffect(() => {
@@ -659,6 +663,41 @@ const Services = () => {
       ],
     });
     setImageUrlInput("");
+  };
+
+  // Upload main service image
+  const handleMainImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingMainImage(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append("image", file);
+
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setFormData((prev) => ({
+          ...prev,
+          imageUrl: data.data.url,
+        }));
+      } else {
+        alert("Failed to upload image: " + (data.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error uploading main image:", error);
+      alert("Error uploading image. Please try again.");
+    } finally {
+      setUploadingMainImage(false);
+      if (mainImageInputRef.current) {
+        mainImageInputRef.current.value = "";
+      }
+    }
   };
 
   // Open modal for adding new service
@@ -1104,7 +1143,7 @@ const Services = () => {
                       {/* Image */}
                       <div className="h-36 relative overflow-hidden">
                         <img
-                          src={service.imageUrl || getImageSrc(service.image)}
+                          src={service.imageUrl ? (getImageUrl(service.imageUrl) || service.imageUrl) : getImageSrc(service.image)}
                           alt={service.title}
                           className="w-full h-full object-cover"
                         />
@@ -1231,8 +1270,7 @@ const Services = () => {
                                 <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
                                   <img
                                     src={
-                                      service.imageUrl ||
-                                      getImageSrc(service.image)
+                                      service.imageUrl ? (getImageUrl(service.imageUrl) || service.imageUrl) : getImageSrc(service.image)
                                     }
                                     alt={service.title}
                                     className="w-full h-full object-cover"
@@ -1311,7 +1349,7 @@ const Services = () => {
                           <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0">
                             <img
                               src={
-                                service.imageUrl || getImageSrc(service.image)
+                                service.imageUrl ? (getImageUrl(service.imageUrl) || service.imageUrl) : getImageSrc(service.image)
                               }
                               alt={service.title}
                               className="w-full h-full object-cover"
@@ -1565,23 +1603,67 @@ const Services = () => {
                 </div>
               </div>
 
-              {/* Custom Image URL */}
+              {/* Custom Image URL or Upload */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
-                  Custom Image URL{" "}
-                  <span className="font-normal text-slate-400">(Optional)</span>
+                  Custom Image{" "}
+                  <span className="font-normal text-slate-400">(Optional - URL or Upload)</span>
                 </label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) =>
-                    setFormData({ ...formData, imageUrl: e.target.value })
-                  }
-                  placeholder="https://example.com/image.jpg"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
-                />
+
+                {/* Show uploaded image preview if exists */}
+                {formData.imageUrl && (
+                  <div className="mb-3 relative inline-block">
+                    <img
+                      src={getImageUrl(formData.imageUrl) || formData.imageUrl}
+                      alt="Uploaded preview"
+                      className="w-20 h-20 object-cover rounded-xl border-2 border-[#DFB13B]"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, imageUrl: "" })}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={formData.imageUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imageUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/image.jpg"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
+                  />
+                  <input
+                    ref={mainImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleMainImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => mainImageInputRef.current?.click()}
+                    disabled={uploadingMainImage}
+                    className="px-3 sm:px-4 py-2.5 sm:py-3 bg-[#DFB13B] text-white rounded-xl hover:bg-[#C9A032] transition flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {uploadingMainImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    <span className="hidden sm:inline text-sm">Upload</span>
+                  </button>
+                </div>
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-1.5 sm:mt-2">
-                  If provided, this URL will override the selected image
+                  If provided, this will override the selected image above
                 </p>
               </div>
 

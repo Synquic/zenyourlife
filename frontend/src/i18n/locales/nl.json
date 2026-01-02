@@ -33,7 +33,7 @@
   },
   "home": {
     "hero_title": "Omdat gezondheid meer is dan de afwezigheid van ziekte",
-    "hero_description": "Ervaar een vredige retraite met luxueuze behandelingen, ontworpen om uw zintuigen te verfrissen en harmonie te herstellen.",
+    "hero_description": "Ervaar luxueuze behandelingen, ontworpen om uw zintuigen te verfrissen en harmonie te herstellen. Vertrek voor een vredige retraite.",
     "trusted_by": "Vertrouwd door",
     "partners": "1000+ Klanten",
     "treatments_offered": "Behandelingen Aangeboden",
@@ -52,7 +52,7 @@
     "hot_stone": "Kenmerkende hot stone",
     "hot_stone_desc": "Ervaar diepe ontspanning met hete stenen op drukpunten, verlicht spanning en verbetert de bloedsomloop voor totale wellness",
     "facial_care_desc": "Uw huid mooi en jeugdig houden vereist extra inspanning. Een gezonde levensstijl, voeding, beweging en het gebruik van natuurlijke, gezonde producten.",
-    "book_consultation": "Boek nu uw consultatiegesprek!",
+    "book_consultation": "Boek uw afspraak",
     "customized_treatments": "Aangepaste Behandelingen",
     "customized_desc": "Elke massage wordt afgestemd op uw unieke behoeften. Uw spanningspunten worden beoordeeld om druk, technieken en focusgebieden aan te passen voor optimale verlichting.",
     "expert_therapists": "Expert Therapeut",
@@ -174,7 +174,7 @@
     "email_label": "E-mail",
     "number_label": "Nummer",
     "assistance_hours": "Bereikbaar:",
-    "hours_detail": "Maandag - Vrijdag 6 tot 20 uur EST"
+    "hours_detail": "Maandag - Vrijdag 8 tot 20 uur EST"
   },
   "booking": {
     "title": "Afspraak Maken",
@@ -441,7 +441,7 @@
       "number_label": "Nummer",
       "address_label": "Adres",
       "assistance_hours": "Bereikbaar:",
-      "hours_detail": "Maandag - Vrijdag 6 tot 20 uur EST"
+      "hours_detail": "Maandag - Vrijdag 8 tot 20 uur EST"
     }
   }
 }
