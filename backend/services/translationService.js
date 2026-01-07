@@ -1,4 +1,4 @@
-const translate = require('translate-google-api');
+const translate = require('@vitalets/google-translate-api');
 const Translation = require('../models/Translation');
 
 // Supported languages (matching frontend i18n config)
@@ -40,11 +40,10 @@ async function translateText(text, targetLang, contentType = 'general', referenc
     // Translate using Google Translate API
     console.log(`[Translation] Translating "${text.substring(0, 30)}..." to ${targetLang}`);
     const result = await translate(text, {
-      tld: 'com',
       to: targetLang,
     });
 
-    const translatedText = Array.isArray(result) ? result[0] : result;
+    const translatedText = result.text;
 
     // Cache the translation
     await Translation.saveTranslation({

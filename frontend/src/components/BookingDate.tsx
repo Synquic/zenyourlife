@@ -326,7 +326,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       }`}
-                      title={isBlocked ? t('booking.date_unavailable') || 'Date unavailable' : ''}
+                      title={isBlocked ? t('booking.date_unavailable') : ''}
                     >
                       {isBlocked && (
                         <div className="absolute inset-0 flex items-center justify-center">
@@ -350,9 +350,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
               </p>
             )}
             {blockedDatesInfo.length > 0 && (
-              <p className="mt-2 text-xs text-gray-400 flex items-center gap-1">
-                <span className="w-3 h-3 inline-flex items-center justify-center text-gray-400">/</span>
-                {t('booking.some_dates_blocked') || 'Some dates are unavailable for booking'}
+              <p className="mt-2 text-xs text-gray-400">
+                {t('booking.some_dates_blocked')}
               </p>
             )}
           </div>
@@ -427,7 +426,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                                 ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
-                            title={isTooSoon ? 'Too soon - advance booking required' : isBlockedByAdmin ? (t('booking.time_blocked') || 'Time slot blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
+                            title={isTooSoon ? 'Too soon - advance booking required' : isBlockedByAdmin ? t('booking.time_blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
                           >
                             {time}
                           </button>
@@ -456,7 +455,6 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           )}
                           {blockedTimeSlotsForDate.length > 0 && (
                             <p className="text-xs text-gray-400">
-                              <span className="inline mr-1">/</span>
                               {blockedTimeSlotsForDate.length} time slot{blockedTimeSlotsForDate.length > 1 ? 's' : ''} unavailable
                             </p>
                           )}
@@ -467,13 +465,13 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 ) : (
                   <div className="text-center py-6 bg-gray-50 rounded-lg">
                     <Calendar className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">{t('booking.no_slots_available') || 'No time slots available for this day'}</p>
-                    <p className="text-xs text-gray-400 mt-1">{t('booking.select_another_date') || 'Please select another date'}</p>
+                    <p className="text-sm text-gray-500">{t('booking.no_slots_available')}</p>
+                    <p className="text-xs text-gray-400 mt-1">{t('booking.select_another_date')}</p>
                   </div>
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-500">{t('booking.select_date_first') || 'Please select a date first'}</p>
+              <p className="text-sm text-gray-500">{t('booking.select_date_first')}</p>
             )}
           </div>
 
@@ -532,9 +530,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">{t('booking.select_date')}</h2>
                 {blockedDatesInfo.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                    <span className="text-gray-400">/</span>
-                    {t('booking.blocked_dates_legend') || 'Crossed dates are unavailable'}
+                  <p className="text-xs text-gray-400 mt-1">
+                    {t('booking.blocked_dates_legend')}
                   </p>
                 )}
               </div>
@@ -568,7 +565,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800 shadow-lg"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md"
                       }`}
-                      title={isBlocked ? t('booking.date_unavailable') || 'Date unavailable' : ''}
+                      title={isBlocked ? t('booking.date_unavailable') : ''}
                     >
                       {isBlocked && (
                         <div className="absolute inset-0 flex items-center justify-center">

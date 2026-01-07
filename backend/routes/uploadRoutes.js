@@ -3,6 +3,8 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const authMiddleware = require('../middleware/auth');
+const { uploadLimiter } = require('../middleware/rateLimiter');
 
 // Create uploads directory if it doesn't exist
 const uploadDir = path.join(__dirname, '../uploads');
@@ -81,8 +83,8 @@ router.get('/', (req, res) => {
   }
 });
 
-// Upload single image
-router.post('/image', (req, res) => {
+// Upload single image (authentication + rate limiting required)
+router.post('/image', authMiddleware, uploadLimiter, (req, res) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
       console.error('[Upload Error]', err);
@@ -136,8 +138,8 @@ router.post('/image', (req, res) => {
   });
 });
 
-// Upload multiple images (max 4)
-router.post('/images', upload.array('images', 4), (req, res) => {
+// Upload multiple images (max 4) - authentication + rate limiting required
+router.post('/images', authMiddleware, uploadLimiter, upload.array('images', 4), (req, res) => {
   try {
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
@@ -166,8 +168,8 @@ router.post('/images', upload.array('images', 4), (req, res) => {
   }
 });
 
-// Delete image
-router.delete('/image/:filename', (req, res) => {
+// Delete image (authentication required)
+router.delete('/image/:filename', authMiddleware, (req, res) => {
   try {
     const filePath = path.join(uploadDir, req.params.filename);
 

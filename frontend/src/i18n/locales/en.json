@@ -207,7 +207,13 @@
     "fill_required": "Please fill in all required fields",
     "submit_form": "Submit Your Form",
     "submitting": "Submitting...",
-    "some_dates_blocked": "Some dates are unavailable for booking"
+    "some_dates_blocked": "Some dates are unavailable for booking",
+    "select_date_first": "Please select a date first to see available time slots",
+    "date_unavailable": "Date unavailable",
+    "no_slots_available": "No time slots available for this day",
+    "select_another_date": "Please select another date",
+    "time_blocked": "Time slot blocked",
+    "blocked_dates_legend": "Crossed dates are unavailable"
   },
   "footer": {
     "description": "Experience the art of relaxation and rejuvenation at Zen Your Life.",

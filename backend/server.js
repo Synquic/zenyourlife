@@ -7,10 +7,31 @@ require('dotenv').config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Security Middleware
+const { sanitizeInput, preventParameterPollution, xssSanitize } = require('./middleware/security');
+const { apiLimiter } = require('./middleware/rateLimiter');
+
+// Configure CORS properly
+const corsOptions = {
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true,
+  maxAge: 86400 // 24 hours
+};
+app.use(cors(corsOptions));
+
+// Body parsing middleware
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security middleware - sanitize inputs
+app.use(sanitizeInput); // Prevent NoSQL injection
+app.use(preventParameterPollution); // Prevent parameter pollution
+app.use(xssSanitize); // Prevent XSS attacks
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -18,10 +39,18 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Serve static files for frontend and admin (in production)
 if (process.env.SERVER_ENV === 'production') {
   // Serve admin panel at /admin
-  app.use('/admin', express.static(path.join(__dirname, '../admin/dist')));
+  app.use('/admin', express.static(path.join(__dirname, '../admin/dist'), {
+    setHeaders: (res) => {
+      res.setHeader('Content-Security-Policy', "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src *;");
+    }
+  }));
 
   // Serve frontend at root
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.use(express.static(path.join(__dirname, '../frontend/dist'), {
+    setHeaders: (res) => {
+      res.setHeader('Content-Security-Policy', "default-src *; script-src * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; img-src * data: blob:; font-src * data:; connect-src *;");
+    }
+  }));
 }
 
 // Import Reminder Scheduler
@@ -76,6 +105,7 @@ const assignUniqueImagesToServices = async () => {
 };
 
 // Import Routes
+const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
@@ -97,6 +127,7 @@ const rentalPageRoutes = require('./routes/rentalPageRoutes');
 const faqRoutes = require('./routes/faqRoutes');
 
 // Use Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/enrollments', enrollmentRoutes);

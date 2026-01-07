@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const authMiddleware = require('../middleware/auth');
+const { strictLimiter } = require('../middleware/rateLimiter');
 const {
   getAllServices,
   getServiceById,
@@ -15,24 +17,24 @@ const {
   bulkUpdateTranslations
 } = require('../controllers/serviceController');
 
-// Public routes
+// Public routes (no authentication required)
 router.get('/', getAllServices);
 router.get('/:id', getServiceById);
 
-// Admin routes (you can add authentication middleware later)
-router.post('/', createService);
-router.put('/:id', updateService);
-router.delete('/:id', deleteService);
+// Admin routes (authentication required)
+router.post('/', authMiddleware, strictLimiter, createService);
+router.put('/:id', authMiddleware, strictLimiter, updateService);
+router.delete('/:id', authMiddleware, strictLimiter, deleteService);
 
-// Image management routes
-router.post('/assign-images', assignUniqueImages);
-router.patch('/:id/image', updateServiceImage);
-router.post('/add-all-gallery-images', addAllServicesGalleryImages);
-router.post('/add-massage-gallery-images', addMassageGalleryImages);
-router.post('/add-facial-gallery-images', addFacialGalleryImages);
+// Image management routes (authentication required)
+router.post('/assign-images', authMiddleware, strictLimiter, assignUniqueImages);
+router.patch('/:id/image', authMiddleware, strictLimiter, updateServiceImage);
+router.post('/add-all-gallery-images', authMiddleware, strictLimiter, addAllServicesGalleryImages);
+router.post('/add-massage-gallery-images', authMiddleware, strictLimiter, addMassageGalleryImages);
+router.post('/add-facial-gallery-images', authMiddleware, strictLimiter, addFacialGalleryImages);
 
-// Translation management routes (for cost-efficient multi-language support)
-router.patch('/:id/translations', updateServiceTranslations);
-router.post('/bulk-translations', bulkUpdateTranslations);
+// Translation management routes (authentication required)
+router.patch('/:id/translations', authMiddleware, strictLimiter, updateServiceTranslations);
+router.post('/bulk-translations', authMiddleware, strictLimiter, bulkUpdateTranslations);
 
 module.exports = router;

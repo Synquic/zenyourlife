@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import znlogo from '../assets/znlogo.png'
 import { createAdminSession } from '../utils/cookies'
 
-const ADMIN_EMAIL = 'admin@zenyourlife.be'
-const ADMIN_PASSWORD = 'admin12345'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001'
 
 const Login = () => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -24,16 +24,44 @@ const Login = () => {
     setError('')
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+    setError('')
 
-    if (formData.email === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
-      // Create session cookie
-      createAdminSession(formData.email)
-      // Navigate to dashboard (basename is /admin, so this goes to /admin/dashboard)
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed')
+      }
+
+      // Store authentication data
+      localStorage.setItem('admin_token', data.data.token)
+      localStorage.setItem('admin_api_key', data.data.apiKey)
+      localStorage.setItem('admin_email', data.data.admin.email)
+      localStorage.setItem('admin_name', data.data.admin.name)
+
+      // Create session cookie (for backward compatibility)
+      createAdminSession(data.data.admin.email)
+
+      // Navigate to dashboard
       navigate('/dashboard')
-    } else {
-      setError('Invalid email or password')
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -109,9 +137,10 @@ const Login = () => {
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white py-3 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-[#DFB13B]/30 transition"
+            disabled={loading}
+            className="w-full bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white py-3 rounded-lg text-sm font-medium hover:shadow-lg hover:shadow-[#DFB13B]/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Log In
+            {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
 
