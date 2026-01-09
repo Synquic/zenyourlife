@@ -206,12 +206,11 @@ const Servicepage = () => {
       {/* Statistics Section */}
       <section className="px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
+          <div className="grid grid-cols-3 bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
             {[
-              { value: '100+', label: t('home.treatments_offered'), isHighlighted: false },
-              { value: '5+', label: t('home.years_experience'), isHighlighted: true },
-              { value: '2k+', label: t('home.satisfied_clients'), isHighlighted: false },
-              { value: '300+', label: t('home.unique_wellness'), isHighlighted: false }
+              { value: '10+', label: t('home.treatments_offered'), isHighlighted: false },
+              { value: '15+', label: t('home.years_experience'), isHighlighted: true },
+              { value: '2k+', label: t('home.satisfied_clients'), isHighlighted: false }
             ].map((stat, index) => (
               <div
                 key={index}
@@ -219,7 +218,7 @@ const Servicepage = () => {
                   stat.isHighlighted
                     ? 'bg-gradient-to-r from-[#8C3C06] to-[#EBB11D]'
                     : ''
-                } ${index < 3 ? 'border-r' : ''} ${index < 2 ? 'border-b md:border-b-0' : ''} border-gray-200`}
+                } ${index < 2 ? 'border-r border-gray-200' : ''}`}
               >
                 <h3 className={`text-2xl sm:text-4xl font-bold mb-1 sm:mb-2 ${stat.isHighlighted ? 'text-white' : 'text-gray-800'}`}>
                   {stat.value}

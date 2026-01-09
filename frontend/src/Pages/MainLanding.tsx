@@ -45,7 +45,10 @@ const MainLanding = () => {
             {/* Right Side - Contact Button and Language Dropdown */}
             <div className="flex items-center gap-2 sm:gap-3">
               {/* Contact Button */}
-              <button className="bg-[#d4af37] text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-base font-medium hover:bg-[#b8921f] transition shadow-md">
+              <button
+                onClick={() => navigate('/contact')}
+                className="bg-[#d4af37] text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-base font-medium hover:bg-[#b8921f] transition shadow-md"
+              >
                 {t('nav.contact_us')}
               </button>
 

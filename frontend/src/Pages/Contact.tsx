@@ -311,7 +311,7 @@ const Contact = () => {
                 <p className="text-[10px] sm:text-xs text-gray-600 leading-relaxed">
                   Schapenbaan 45
                   <br />
-                  1731 Relegem
+                  1731 Relegem, Belgium
                 </p>
               </div>
             </div>

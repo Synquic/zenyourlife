@@ -28,6 +28,18 @@ import Sidebar from "../components/Sidebar";
 
 import { API_BASE_URL, getImageUrl } from "../config/api";
 
+// Helper function to get authentication headers
+const getAuthHeaders = (): Record<string, string> => {
+  const apiKey = localStorage.getItem('admin_api_key');
+  const token = localStorage.getItem('admin_token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (apiKey) headers['x-api-key'] = apiKey;
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+};
+
 // Import massage images
 import m1 from "../assets/m1.png";
 import m2 from "../assets/m2.png";
@@ -169,6 +181,7 @@ interface Service {
   price: number;
   image: string;
   imageUrl?: string;
+  bannerImageUrl?: string;
   isActive: boolean;
   displayOrder: number;
   contentSections?: ContentSection[];
@@ -185,6 +198,7 @@ interface ServiceFormData {
   price: number;
   image: string;
   imageUrl: string;
+  bannerImageUrl: string;
   isActive: boolean;
   contentSections: ContentSection[];
   benefits: ServiceBenefit[];
@@ -218,6 +232,7 @@ const initialFormData: ServiceFormData = {
   price: 0,
   image: "m1.png",
   imageUrl: "",
+  bannerImageUrl: "",
   isActive: true,
   contentSections: [],
   benefits: [],
@@ -293,6 +308,10 @@ const Services = () => {
   const [uploadingMainImage, setUploadingMainImage] = useState(false);
   const mainImageInputRef = useRef<HTMLInputElement>(null);
 
+  // Banner image upload state
+  const [uploadingBannerImage, setUploadingBannerImage] = useState(false);
+  const bannerImageInputRef = useRef<HTMLInputElement>(null);
+
   // Fetch services and content
   useEffect(() => {
     fetchServices();
@@ -302,7 +321,10 @@ const Services = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}/services`);
+      // Use admin endpoint to get ALL services (including inactive)
+      const response = await fetch(`${API_BASE_URL}/services/admin/all`, {
+        headers: getAuthHeaders()
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -583,6 +605,13 @@ const Services = () => {
       const filesToUpload = Array.from(files).slice(0, remainingSlots);
       setUploadingImage(true);
 
+      // Get auth headers (without Content-Type for FormData)
+      const apiKey = localStorage.getItem('admin_api_key');
+      const token = localStorage.getItem('admin_token');
+      const headers: Record<string, string> = {};
+      if (apiKey) headers['x-api-key'] = apiKey;
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       try {
         const uploadPromises = filesToUpload.map(async (file) => {
           const formDataUpload = new FormData();
@@ -590,6 +619,7 @@ const Services = () => {
 
           const response = await fetch(`${API_BASE_URL}/upload/image`, {
             method: "POST",
+            headers,
             body: formDataUpload,
           });
 
@@ -675,8 +705,16 @@ const Services = () => {
       const formDataUpload = new FormData();
       formDataUpload.append("image", file);
 
+      // Get auth headers (without Content-Type for FormData)
+      const apiKey = localStorage.getItem('admin_api_key');
+      const token = localStorage.getItem('admin_token');
+      const headers: Record<string, string> = {};
+      if (apiKey) headers['x-api-key'] = apiKey;
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
       const response = await fetch(`${API_BASE_URL}/upload/image`, {
         method: "POST",
+        headers,
         body: formDataUpload,
       });
 
@@ -696,6 +734,49 @@ const Services = () => {
       setUploadingMainImage(false);
       if (mainImageInputRef.current) {
         mainImageInputRef.current.value = "";
+      }
+    }
+  };
+
+  // Upload banner image
+  const handleBannerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingBannerImage(true);
+    try {
+      const formDataUpload = new FormData();
+      formDataUpload.append("image", file);
+
+      // Get auth headers (without Content-Type for FormData)
+      const apiKey = localStorage.getItem('admin_api_key');
+      const token = localStorage.getItem('admin_token');
+      const headers: Record<string, string> = {};
+      if (apiKey) headers['x-api-key'] = apiKey;
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const response = await fetch(`${API_BASE_URL}/upload/image`, {
+        method: "POST",
+        headers,
+        body: formDataUpload,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setFormData((prev) => ({
+          ...prev,
+          bannerImageUrl: data.data.url,
+        }));
+      } else {
+        alert("Failed to upload banner image: " + (data.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error uploading banner image:", error);
+      alert("Error uploading banner image. Please try again.");
+    } finally {
+      setUploadingBannerImage(false);
+      if (bannerImageInputRef.current) {
+        bannerImageInputRef.current.value = "";
       }
     }
   };
@@ -726,6 +807,7 @@ const Services = () => {
       price: service.price,
       image: service.image,
       imageUrl: service.imageUrl || "",
+      bannerImageUrl: service.bannerImageUrl || "",
       isActive: service.isActive,
       contentSections: service.contentSections || [],
       benefits: service.benefits || [],
@@ -767,9 +849,7 @@ const Services = () => {
 
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(formData),
       });
 
@@ -800,6 +880,7 @@ const Services = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/services/${id}`, {
         method: "DELETE",
+        headers: getAuthHeaders(),
       });
 
       const data = await response.json();
@@ -815,23 +896,42 @@ const Services = () => {
     }
   };
 
-  // Toggle active status
+  // Toggle active status - optimistic update for smooth UX
   const handleToggleStatus = async (service: Service) => {
+    const newIsActive = !service.isActive;
+
+    // Optimistic update - update UI immediately
+    setServices(prevServices =>
+      prevServices.map(s =>
+        s._id === service._id ? { ...s, isActive: newIsActive } : s
+      )
+    );
+
     try {
       const response = await fetch(`${API_BASE_URL}/services/${service._id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...service, isActive: !service.isActive }),
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ ...service, isActive: newIsActive }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        fetchServices();
+      if (!data.success) {
+        // Revert on failure
+        setServices(prevServices =>
+          prevServices.map(s =>
+            s._id === service._id ? { ...s, isActive: !newIsActive } : s
+          )
+        );
+        alert("Failed to update visibility");
       }
     } catch (err) {
+      // Revert on error
+      setServices(prevServices =>
+        prevServices.map(s =>
+          s._id === service._id ? { ...s, isActive: !newIsActive } : s
+        )
+      );
       console.error("Error toggling status:", err);
     }
   };
@@ -1137,19 +1237,28 @@ const Services = () => {
                   return (
                     <div
                       key={service._id}
-                      className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200 transition-all duration-300"
+                      className={`group relative rounded-2xl border overflow-hidden transition-all duration-300 ${
+                        !service.isActive
+                          ? 'bg-slate-100 border-slate-200 grayscale'
+                          : 'bg-white border-slate-100 hover:shadow-xl hover:shadow-slate-200/50 hover:border-slate-200'
+                      }`}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
+                      {/* Grey overlay for inactive */}
+                      {!service.isActive && (
+                        <div className="absolute inset-0 bg-slate-500/20 z-10 pointer-events-none"></div>
+                      )}
+
                       {/* Image */}
                       <div className="h-36 relative overflow-hidden">
                         <img
                           src={service.imageUrl ? (getImageUrl(service.imageUrl) || service.imageUrl) : getImageSrc(service.image)}
                           alt={service.title}
-                          className="w-full h-full object-cover"
+                          className={`w-full h-full object-cover ${!service.isActive ? 'opacity-50' : ''}`}
                         />
 
                         {/* Category Badge */}
-                        <div className="absolute top-3 left-3">
+                        <div className="absolute top-3 left-3 z-20">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold ${catConfig.bgLight} ${catConfig.textColor}`}
                           >
@@ -1158,21 +1267,18 @@ const Services = () => {
                         </div>
 
                         {/* Status Badge */}
-                        <button
-                          onClick={() => handleToggleStatus(service)}
-                          className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold transition ${
-                            service.isActive
-                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                              : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                          }`}
-                        >
-                          {service.isActive ? "Active" : "Inactive"}
-                        </button>
+                        <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-lg text-xs font-medium backdrop-blur-md z-20 ${
+                          service.isActive
+                            ? 'bg-emerald-500/90 text-white'
+                            : 'bg-slate-700/90 text-white'
+                        }`}>
+                          {service.isActive ? 'Active' : 'Hidden'}
+                        </div>
 
-                        {/* Inactive Overlay */}
+                        {/* Inactive Overlay on Image */}
                         {!service.isActive && (
-                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-                            <EyeOff className="w-8 h-8 text-white/70" />
+                          <div className="absolute inset-0 bg-slate-600/50 flex items-center justify-center z-10">
+                            <EyeOff className="w-10 h-10 text-white/80" />
                           </div>
                         )}
                       </div>
@@ -1202,7 +1308,18 @@ const Services = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex items-center gap-2 pt-4 border-t border-slate-100">
+                        <div className="flex items-center gap-2 pt-4 border-t border-slate-100 relative z-20">
+                          <button
+                            onClick={() => handleToggleStatus(service)}
+                            className={`p-2.5 rounded-xl transition-all ${
+                              service.isActive
+                                ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                            }`}
+                            title={service.isActive ? 'Hide service' : 'Show service'}
+                          >
+                            {service.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
                           <button
                             onClick={() => handleEdit(service)}
                             className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded-xl transition text-sm font-medium"
@@ -1210,13 +1327,12 @@ const Services = () => {
                             <Edit2 className="w-4 h-4" />
                             Edit
                           </button>
-                          <div className="w-px h-6 bg-slate-200"></div>
                           <button
                             onClick={() => handleDelete(service._id)}
-                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition text-sm font-medium"
+                            className="p-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
+                            title="Delete service"
                           >
                             <Trash2 className="w-4 h-4" />
-                            Delete
                           </button>
                         </div>
                       </div>
@@ -1304,13 +1420,14 @@ const Services = () => {
                             <td className="py-4 px-6">
                               <button
                                 onClick={() => handleToggleStatus(service)}
-                                className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                                className={`p-2 rounded-lg transition-all ${
                                   service.isActive
-                                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                                    : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                                    ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'
+                                    : 'bg-slate-100 text-slate-400 hover:bg-slate-200'
                                 }`}
+                                title={service.isActive ? 'Hide service' : 'Show service'}
                               >
-                                {service.isActive ? "Active" : "Inactive"}
+                                {service.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                               </button>
                             </td>
                             <td className="py-4 px-6">
@@ -1367,13 +1484,14 @@ const Services = () => {
                               </div>
                               <button
                                 onClick={() => handleToggleStatus(service)}
-                                className={`px-2 py-0.5 rounded-full text-[10px] font-semibold transition flex-shrink-0 ${
+                                className={`p-1.5 rounded-lg transition-all flex-shrink-0 ${
                                   service.isActive
-                                    ? "bg-emerald-100 text-emerald-700"
-                                    : "bg-slate-100 text-slate-500"
+                                    ? 'bg-emerald-50 text-emerald-600'
+                                    : 'bg-slate-100 text-slate-400'
                                 }`}
+                                title={service.isActive ? 'Hide service' : 'Show service'}
                               >
-                                {service.isActive ? "Active" : "Inactive"}
+                                {service.isActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                               </button>
                             </div>
                             <div className="flex items-center gap-3 mt-2">
@@ -1664,6 +1782,70 @@ const Services = () => {
                 </div>
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-1.5 sm:mt-2">
                   If provided, this will override the selected image above
+                </p>
+              </div>
+
+              {/* Banner Image URL or Upload */}
+              <div className="border-t border-slate-200 pt-4">
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
+                  Banner Image{" "}
+                  <span className="font-normal text-slate-400">(For service detail page hero)</span>
+                </label>
+
+                {/* Show uploaded banner image preview if exists */}
+                {formData.bannerImageUrl && (
+                  <div className="mb-3 relative inline-block">
+                    <img
+                      src={getImageUrl(formData.bannerImageUrl) || formData.bannerImageUrl}
+                      alt="Banner preview"
+                      className="w-40 h-20 object-cover rounded-xl border-2 border-violet-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, bannerImageUrl: "" })}
+                      className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    value={formData.bannerImageUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, bannerImageUrl: e.target.value })
+                    }
+                    placeholder="https://example.com/banner-image.jpg"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 focus:bg-white transition-all outline-none text-sm sm:text-base"
+                  />
+                  <input
+                    ref={bannerImageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleBannerImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => bannerImageInputRef.current?.click()}
+                    disabled={uploadingBannerImage}
+                    className="px-3 sm:px-4 py-2.5 sm:py-3 bg-violet-500 text-white rounded-xl hover:bg-violet-600 transition flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {uploadingBannerImage ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    <span className="hidden sm:inline text-sm">Upload</span>
+                  </button>
+                </div>
+                <p className="text-[10px] sm:text-xs text-slate-400 mt-1.5 sm:mt-2">
+                  This image appears as the hero banner on the service detail page
                 </p>
               </div>
 
@@ -2155,7 +2337,7 @@ const Services = () => {
                         className="relative group rounded-md overflow-hidden bg-slate-100 w-14 h-14"
                       >
                         <img
-                          src={img.url}
+                          src={getImageUrl(img.url) || img.url}
                           alt={`Service image ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {

@@ -194,9 +194,9 @@ const Home = () => {
       {/* Statistics Section */}
       <section className="px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
+          <div className="grid grid-cols-3 bg-white rounded-xl sm:rounded-2xl shadow-lg overflow-hidden">
             {/* Treatments Offered */}
-            <div className="text-center p-4 sm:p-8 border-r border-b md:border-b-0 border-gray-200">
+            <div className="text-center p-4 sm:p-8 border-r border-gray-200">
               <h3 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">10+</h3>
               <p className="text-xs sm:text-sm text-gray-600">
                 {t('home.treatments_offered')}
@@ -204,26 +204,18 @@ const Home = () => {
             </div>
 
             {/* Years of Experience */}
-            <div className="text-center bg-[#B8860B] p-4 sm:p-8 border-b md:border-b-0 md:border-r border-gray-200">
-              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">5+</h3>
+            <div className="text-center bg-[#B8860B] p-4 sm:p-8 border-r border-gray-200">
+              <h3 className="text-2xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">15+</h3>
               <p className="text-xs sm:text-sm text-white">
                 {t('home.years_experience')}
               </p>
             </div>
 
             {/* Satisfied Clients */}
-            <div className="text-center p-4 sm:p-8 border-r border-gray-200">
+            <div className="text-center p-4 sm:p-8">
               <h3 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">2k+</h3>
               <p className="text-xs sm:text-sm text-gray-600">
                 {t('home.satisfied_clients')}
-              </p>
-            </div>
-
-            {/* Unique Wellness */}
-            <div className="text-center p-4 sm:p-8">
-              <h3 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">300+</h3>
-              <p className="text-xs sm:text-sm text-gray-600">
-                {t('home.unique_wellness')}
               </p>
             </div>
           </div>
@@ -326,7 +318,8 @@ const Home = () => {
                     <img
                       src={MasterPrimaryButton}
                       alt="Book Now"
-                      className="h-8 sm:h-10 w-auto cursor-pointer"
+                      onClick={() => setIsBookingModalOpen(true)}
+                      className="h-8 sm:h-10 w-auto cursor-pointer hover:scale-105 transition-transform"
                     />
                   </div>
                 </div>

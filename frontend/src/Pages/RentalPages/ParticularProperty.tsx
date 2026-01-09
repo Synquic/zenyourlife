@@ -774,12 +774,10 @@ const ParticularProperty = () => {
                       {t("rental.location.view_on_map")}
                     </h3>
                   </div>
-                  <div className="rounded-xl overflow-hidden">
+                  <div className="rounded-xl overflow-hidden relative w-full" style={{ paddingBottom: '56.25%', minHeight: '250px' }}>
                     <iframe
                       src={property.location.mapEmbedUrl}
-                      width="100%"
-                      height="400"
-                      style={{ border: 0 }}
+                      style={{ border: 0, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
                       allowFullScreen
                       loading="lazy"
                       referrerPolicy="no-referrer-when-downgrade"

@@ -4,6 +4,7 @@ const authMiddleware = require('../middleware/auth');
 const { strictLimiter } = require('../middleware/rateLimiter');
 const {
   getAllServices,
+  getAllServicesAdmin,
   getServiceById,
   createService,
   updateService,
@@ -19,9 +20,14 @@ const {
 
 // Public routes (no authentication required)
 router.get('/', getAllServices);
+
+// Admin routes (authentication required) - MUST be before /:id routes
+router.get('/admin/all', authMiddleware, getAllServicesAdmin);
+
+// Public route for single service
 router.get('/:id', getServiceById);
 
-// Admin routes (authentication required)
+// Admin write routes
 router.post('/', authMiddleware, strictLimiter, createService);
 router.put('/:id', authMiddleware, strictLimiter, updateService);
 router.delete('/:id', authMiddleware, strictLimiter, deleteService);

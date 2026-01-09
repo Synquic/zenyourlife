@@ -55,7 +55,11 @@ const serviceSchema = new mongoose.Schema({
   },
   imageUrl: {
     type: String,
-    default: '' // URL to uploaded image (for admin uploads)
+    default: '' // URL to uploaded service card thumbnail image
+  },
+  bannerImageUrl: {
+    type: String,
+    default: '' // URL to uploaded banner image for ParticularService page
   },
   // Content sections for detailed descriptions (e.g., "Energy points: We work with basalt stones...")
   contentSections: [{

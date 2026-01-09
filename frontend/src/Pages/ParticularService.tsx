@@ -3,13 +3,79 @@ import { useLocation, useParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { ArrowRight, Sparkles, Heart, Users, CheckCircle2, X } from 'lucide-react'
 import serviceF1 from '../assets/serviceF1.png'
+import zenurlifemassage from '../assets/zenurlifemassage.jpeg'
+import massage2zen from '../assets/massage2zen.jpeg'
+import scrubzen from '../assets/scrubzen.jpeg'
+import facialzen from '../assets/facialzen.jpeg'
+import pmubrows from '../assets/pmubrows.jpeg'
+import pmueyes from '../assets/pmueyes.jpeg'
+import sportsMassagelegs from '../assets/sportsMassagelegs.jpeg'
 import Footer from '../components/Footer'
 import FloatingBookButton from '../components/FloatingBookButton'
 import { useTranslation } from 'react-i18next'
 import BookingDate from '../components/BookingDate'
 import TickImage from '../assets/tick.png'
 import MasterPrimaryButton from '../assets/Master Primary Button (4).png'
-import { API_BASE_URL } from "../config/api";
+import { API_BASE_URL, getImageUrl } from "../config/api";
+
+// Auto-select banner image based on service name/category keywords
+const getBannerImageByServiceName = (title: string, category: string): string => {
+  const lowerTitle = title.toLowerCase();
+  const lowerCategory = category.toLowerCase();
+
+  // Sports massage
+  if (lowerTitle.includes('sport') || lowerTitle.includes('athletic') || lowerTitle.includes('legs') || lowerTitle.includes('full body')) {
+    return sportsMassagelegs;
+  }
+
+  // Hot stone massage
+  if (lowerTitle.includes('hot stone') || lowerTitle.includes('stone')) {
+    return massage2zen;
+  }
+
+  // Scrub/exfoliation treatments
+  if (lowerTitle.includes('scrub') || lowerTitle.includes('exfoliat') || lowerTitle.includes('peeling')) {
+    return scrubzen;
+  }
+
+  // Facial treatments
+  if (lowerTitle.includes('facial') || lowerTitle.includes('face') || lowerCategory.includes('facial')) {
+    return facialzen;
+  }
+
+  // PMU - Eyebrows
+  if (lowerTitle.includes('brow') || lowerTitle.includes('eyebrow') || (lowerCategory.includes('pmu') && lowerTitle.includes('brow'))) {
+    return pmubrows;
+  }
+
+  // PMU - Eyes/Eyeliner
+  if (lowerTitle.includes('eye') || lowerTitle.includes('liner') || lowerTitle.includes('lash')) {
+    return pmueyes;
+  }
+
+  // PMU category default
+  if (lowerCategory.includes('pmu')) {
+    return pmubrows;
+  }
+
+  // Relaxation/Swedish/Classic massage
+  if (lowerTitle.includes('relax') || lowerTitle.includes('swedish') || lowerTitle.includes('classic') || lowerTitle.includes('wellness')) {
+    return zenurlifemassage;
+  }
+
+  // Deep tissue/Therapeutic
+  if (lowerTitle.includes('deep tissue') || lowerTitle.includes('therapeutic') || lowerTitle.includes('pressure')) {
+    return massage2zen;
+  }
+
+  // Default fallback based on category
+  if (lowerCategory.includes('massage')) {
+    return zenurlifemassage;
+  }
+
+  // Ultimate fallback
+  return serviceF1;
+};
 
 interface ContentSection {
   title: string;
@@ -42,6 +108,7 @@ interface Service {
   price: number;
   image: string;
   imageUrl?: string;
+  bannerImageUrl?: string;
   isActive: boolean;
   contentSections?: ContentSection[];
   benefits?: BenefitItem[];
@@ -203,9 +270,9 @@ const ParticularService = () => {
       {/* Hero Banner Section */}
       <section className="px-4 sm:px-6 lg:px-8 py-8 mt-10">
         <div className="relative max-w-7xl mx-auto min-h-[300px] rounded-3xl overflow-hidden">
-          {/* Background Image */}
+          {/* Background Image - Use bannerImageUrl if available, otherwise auto-select */}
           <img
-            src={serviceF1}
+            src={service.bannerImageUrl ? (getImageUrl(service.bannerImageUrl) || getBannerImageByServiceName(service.title, service.category)) : getBannerImageByServiceName(service.title, service.category)}
             alt={service.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -326,7 +393,7 @@ const ParticularService = () => {
                   }`}
                 >
                   <img
-                    src={img.url}
+                    src={getImageUrl(img.url) || img.url}
                     alt={img.caption || `${service.title} image ${index + 1}`}
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />

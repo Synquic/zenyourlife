@@ -51,9 +51,10 @@ const Overview = () => {
   const description1 = overviewData?.description1 || t('rental.overview.description_1');
   const description2 = overviewData?.description2 || t('rental.overview.description_2');
 
-  // Use API cards if available, otherwise use translation defaults (2 cards)
+  // Use API cards if available, otherwise use translation defaults (3 cards)
   const cards = overviewData?.cards || [
     { title: t('rental.overview.villas_title'), description: t('rental.overview.villas_desc'), imageUrl: '' },
+    { title: t('rental.overview.casa_title'), description: t('rental.overview.casa_desc'), imageUrl: '' },
     { title: t('rental.overview.countryside_title'), description: t('rental.overview.countryside_desc'), imageUrl: '' }
   ];
 

@@ -20,6 +20,7 @@ const apiLimiter = rateLimit({
 });
 
 // Strict rate limiter for sensitive operations - 10 requests per 15 minutes
+// Skips rate limiting for authenticated admin requests
 const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // Limit each IP to 10 requests per windowMs
@@ -28,10 +29,21 @@ const strictLimiter = rateLimit({
     message: 'Too many requests for this operation. Please try again later.'
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  // Skip rate limiting for authenticated admin requests
+  skip: (req) => {
+    const apiKey = req.headers['x-api-key'] || req.headers['authorization'];
+    const validApiKey = process.env.ADMIN_API_KEY;
+    if (apiKey && validApiKey) {
+      const key = apiKey.replace('Bearer ', '');
+      return key === validApiKey;
+    }
+    return false;
+  }
 });
 
 // Upload rate limiter - 20 uploads per 15 minutes
+// Skips rate limiting for authenticated admin requests
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 20, // Limit each IP to 20 uploads per windowMs
@@ -40,7 +52,17 @@ const uploadLimiter = rateLimit({
     message: 'Too many upload requests. Please try again later.'
   },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  // Skip rate limiting for authenticated admin requests
+  skip: (req) => {
+    const apiKey = req.headers['x-api-key'] || req.headers['authorization'];
+    const validApiKey = process.env.ADMIN_API_KEY;
+    if (apiKey && validApiKey) {
+      const key = apiKey.replace('Bearer ', '');
+      return key === validApiKey;
+    }
+    return false;
+  }
 });
 
 // Contact form limiter - 5 submissions per hour

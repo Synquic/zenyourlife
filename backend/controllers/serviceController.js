@@ -76,6 +76,27 @@ exports.getAllServices = async (req, res) => {
   }
 };
 
+// Get all services for admin (including inactive)
+exports.getAllServicesAdmin = async (req, res) => {
+  try {
+    console.log(`📖 [DB READ] Admin fetching all services (including inactive)`);
+    const services = await Service.find({}).sort({ displayOrder: 1, createdAt: 1 });
+
+    console.log(`📖 [DB READ] Returning ${services.length} services for admin`);
+    res.status(200).json({
+      success: true,
+      count: services.length,
+      data: services
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching services',
+      error: error.message
+    });
+  }
+};
+
 // Get single service by ID (with optional translation from DB)
 exports.getServiceById = async (req, res) => {
   try {
