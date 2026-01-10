@@ -84,7 +84,7 @@ const generateCustomerEmailTemplate = (enrollment) => {
           </div>
 
           <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 25px; text-align: center;">
-            <p style="margin: 0; color: #1976D2; font-weight: 500;">Please arrive 10 minutes before your appointment time.</p>
+            <p style="margin: 0; color: #1976D2; font-weight: 500;">Please arrive 5 minutes before your appointment time.</p>
           </div>
 
           <div class="footer">
@@ -270,10 +270,13 @@ exports.createEnrollment = async (req, res) => {
       });
     }
 
-    // Get day of the week from the date
+    // Get day of the week from the date in Belgium timezone
     const date = new Date(selectedDate);
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const appointmentDay = days[date.getDay()];
+    // Use Intl.DateTimeFormat to get the correct day in Belgium timezone
+    const appointmentDay = new Intl.DateTimeFormat('en-US', {
+      timeZone: BELGIUM_TIMEZONE,
+      weekday: 'long'
+    }).format(date);
 
     // Create enrollment (enrollmentId will be auto-generated)
     const enrollment = new Enrollment({

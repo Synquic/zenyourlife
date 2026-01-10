@@ -102,7 +102,7 @@ exports.enrollmentConfirmationEmail = (enrollment) => {
 
           <p><strong>What to Bring:</strong></p>
           <ul>
-            <li>Please arrive 10 minutes early</li>
+            <li>Please arrive 5 minutes early</li>
             <li>Wear comfortable clothing</li>
             <li>Bring any medical information if applicable</li>
           </ul>

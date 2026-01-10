@@ -75,7 +75,7 @@ Date: ${formattedDate}
 Time: ${enrollment.appointmentTime}
 Location: Schapenbaan 45, 1731 Relegem
 
-Please arrive 10 minutes early. To reschedule or cancel, kindly contact us in advance.
+Please arrive 5 minutes early. To reschedule or cancel, kindly contact us in advance.
 
 We look forward to seeing you!
 - Zen Your Life Team`;

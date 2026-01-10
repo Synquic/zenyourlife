@@ -72,7 +72,7 @@ const generateCustomerReminderTemplate = (enrollment) => {
           </div>
 
           <div style="background: #E8F5E9; padding: 15px; border-radius: 8px; margin-top: 25px; text-align: center;">
-            <p style="margin: 0; color: #2E7D32; font-weight: 500;">Please arrive 10 minutes before your appointment time.</p>
+            <p style="margin: 0; color: #2E7D32; font-weight: 500;">Please arrive 5 minutes before your appointment time.</p>
           </div>
 
           <div class="footer">
