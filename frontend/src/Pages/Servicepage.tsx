@@ -19,7 +19,7 @@ import Testimonial from '../components/Testimonial'
 import Footer from '../components/Footer'
 import FloatingBookButton from '../components/FloatingBookButton'
 import { API_BASE_URL, getImageUrl } from "../config/api";
-
+import zenurlifemassage from "../assets/zenurlifemassage.jpeg";
 // Image array for cycling through service images (m1 to m9)
 const serviceImages = [m1, m2, m3, m4, m5, m6, m7, m8, m9]
 
@@ -167,7 +167,7 @@ const Servicepage = () => {
         <div className="relative max-w-7xl mx-auto h-[400px] sm:h-[500px] md:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden">
           {/* Background Image */}
           <img
-            src={getHeroImage()}
+            src={zenurlifemassage}
             alt="Massage therapy"
             className="absolute inset-0 w-full h-full object-cover"
           />
