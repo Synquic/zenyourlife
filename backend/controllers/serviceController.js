@@ -195,11 +195,26 @@ exports.updateService = async (req, res) => {
     console.log('Updating service with data:', JSON.stringify(req.body, null, 2));
     console.log('serviceImages received:', req.body.serviceImages);
 
+    // Get the existing service first
+    const existingService = await Service.findById(req.params.id);
+    if (!existingService) {
+      return res.status(404).json({
+        success: false,
+        message: 'Service not found'
+      });
+    }
+
     // Check if translatable fields are being updated
     const translatableFields = ['title', 'description', 'benefits', 'targetAudience', 'contentSections'];
     const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
 
     let updateData = { ...req.body };
+
+    // Preserve existing image if not explicitly being updated
+    // (prevent accidental overwrites when editing other fields)
+    if (!req.body.image || req.body.image === existingService.image) {
+      updateData.image = existingService.image;
+    }
 
     // Auto-translate if translatable content is being updated
     if (hasTranslatableChanges) {
@@ -213,13 +228,6 @@ exports.updateService = async (req, res) => {
       updateData,
       { new: true, runValidators: true }
     );
-
-    if (!service) {
-      return res.status(404).json({
-        success: false,
-        message: 'Service not found'
-      });
-    }
 
     res.status(200).json({
       success: true,

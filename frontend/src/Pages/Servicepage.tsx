@@ -269,7 +269,7 @@ const Servicepage = () => {
             )}
 
             {/* Dynamic Service Cards - Show only first 8 */}
-            {!loading && !error && filteredServices.slice(0, 8).map((service, index) => (
+            {!loading && !error && filteredServices.map((service, index) => (
               <div
                 key={service._id}
                 className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"

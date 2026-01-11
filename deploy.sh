@@ -37,15 +37,12 @@ fi
 echo -e "${GREEN}✓ Dependencies OK${NC}"
 echo ""
 
-# Step 2: Sync uploads folder (preserve user-uploaded files)
-echo -e "${YELLOW}[2/7] Syncing uploads folder to server...${NC}"
-if [ -d "backend/uploads" ]; then
-    sshpass -p "${SSH_PASS}" rsync -avz --progress -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
-        backend/uploads/ ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/backend/uploads/
-    echo -e "${GREEN}✓ Uploads synced${NC}"
-else
-    echo -e "${YELLOW}⚠ No uploads folder found (skipping)${NC}"
-fi
+# Step 2: Backup server uploads (pull from server to local backup)
+echo -e "${YELLOW}[2/7] Backing up server uploads to local...${NC}"
+mkdir -p backend/uploads-backup
+sshpass -p "${SSH_PASS}" rsync -avz -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
+    ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/backend/uploads/ backend/uploads-backup/ 2>/dev/null || echo "No server uploads to backup"
+echo -e "${GREEN}✓ Server uploads backed up locally${NC}"
 echo ""
 
 # Step 3: Build Docker image
