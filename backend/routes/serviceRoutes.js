@@ -9,7 +9,6 @@ const {
   createService,
   updateService,
   deleteService,
-  assignUniqueImages,
   updateServiceImage,
   addAllServicesGalleryImages,
   addMassageGalleryImages,
@@ -33,7 +32,6 @@ router.put('/:id', authMiddleware, strictLimiter, updateService);
 router.delete('/:id', authMiddleware, strictLimiter, deleteService);
 
 // Image management routes (authentication required)
-router.post('/assign-images', authMiddleware, strictLimiter, assignUniqueImages);
 router.patch('/:id/image', authMiddleware, strictLimiter, updateServiceImage);
 router.post('/add-all-gallery-images', authMiddleware, strictLimiter, addAllServicesGalleryImages);
 router.post('/add-massage-gallery-images', authMiddleware, strictLimiter, addMassageGalleryImages);

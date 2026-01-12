@@ -24,7 +24,7 @@ const Expert = () => {
               <img
                 src={nadia07}
                 alt="Nadia Delens"
-                className="w-full h-56 sm:h-64 md:h-full object-cover object-[center_20%]"
+                className="w-full h-96 sm:h-72 md:h-full object-cover object-[center_30%] md:object-[center_20%]"
               />
             </div>
 

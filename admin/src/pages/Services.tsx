@@ -911,7 +911,8 @@ const Services = () => {
       const response = await fetch(`${API_BASE_URL}/services/${service._id}`, {
         method: "PUT",
         headers: getAuthHeaders(),
-        body: JSON.stringify({ ...service, isActive: newIsActive }),
+        // FIXED: Only send the field being updated to prevent overwriting other fields
+        body: JSON.stringify({ isActive: newIsActive }),
       });
 
       const data = await response.json();

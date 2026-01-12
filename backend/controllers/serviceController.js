@@ -216,6 +216,17 @@ exports.updateService = async (req, res) => {
       updateData.image = existingService.image;
     }
 
+    // CRITICAL: Preserve imageUrl if not provided in request
+    // This prevents accidental deletion when toggling visibility or updating other fields
+    if (req.body.imageUrl === undefined) {
+      updateData.imageUrl = existingService.imageUrl;
+    }
+
+    // Preserve bannerImageUrl if not provided in request
+    if (req.body.bannerImageUrl === undefined) {
+      updateData.bannerImageUrl = existingService.bannerImageUrl;
+    }
+
     // Auto-translate if translatable content is being updated
     if (hasTranslatableChanges) {
       console.log('[Service Update] Auto-translating content...');
@@ -268,41 +279,9 @@ exports.deleteService = async (req, res) => {
   }
 };
 
-// Assign unique images to all services (m1.png to m9.png)
-exports.assignUniqueImages = async (req, res) => {
-  try {
-    const services = await Service.find({}).sort({ createdAt: 1 });
-    const imageNames = ['m1.png', 'm2.png', 'm3.png', 'm4.png', 'm5.png', 'm6.png', 'm7.png', 'm8.png', 'm9.png'];
-
-    const updatePromises = services.map((service, index) => {
-      const imageIndex = index % imageNames.length;
-      return Service.findByIdAndUpdate(
-        service._id,
-        {
-          image: imageNames[imageIndex],
-          displayOrder: index
-        },
-        { new: true }
-      );
-    });
-
-    await Promise.all(updatePromises);
-
-    const updatedServices = await Service.find({}).sort({ displayOrder: 1 });
-
-    res.status(200).json({
-      success: true,
-      message: `Assigned unique images to ${services.length} services`,
-      data: updatedServices
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error assigning images',
-      error: error.message
-    });
-  }
-};
+// REMOVED: assignUniqueImages function
+// This function was removed to prevent accidental overwrites of uploaded images
+// If you need to assign default images, do it manually in seed.js only
 
 // Add gallery images to ALL services (massage, facial, and other categories)
 exports.addAllServicesGalleryImages = async (req, res) => {
