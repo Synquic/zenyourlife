@@ -60,49 +60,10 @@ const { startReminderScheduler } = require('./services/reminderScheduler');
 mongoose.connect(process.env.MONGODB_URI)
 .then(async () => {
   console.log('✅ MongoDB Connected Successfully');
-  // Auto-assign unique images to services on startup
-  await assignUniqueImagesToServices();
   // Start reminder scheduler after DB connection
   startReminderScheduler();
 })
 .catch((err) => console.error('❌ MongoDB Connection Error:', err));
-
-// Function to assign unique images (m1.png to m9.png) to all services
-const assignUniqueImagesToServices = async () => {
-  try {
-    const Service = require('./models/Service');
-    const services = await Service.find({}).sort({ createdAt: 1 });
-    const imageNames = ['m1.png', 'm2.png', 'm3.png', 'm4.png', 'm5.png', 'm6.png', 'm7.png', 'm8.png', 'm9.png'];
-
-    if (services.length === 0) {
-      console.log('📷 No services found to assign images');
-      return;
-    }
-
-    let updated = 0;
-    for (let i = 0; i < services.length; i++) {
-      const imageIndex = i % imageNames.length;
-      const expectedImage = imageNames[imageIndex];
-
-      // Only update if image is different or not set properly
-      if (services[i].image !== expectedImage) {
-        await Service.findByIdAndUpdate(services[i]._id, {
-          image: expectedImage,
-          displayOrder: i
-        });
-        updated++;
-      }
-    }
-
-    if (updated > 0) {
-      console.log(`📷 Assigned unique images to ${updated} services`);
-    } else {
-      console.log('📷 All services already have unique images assigned');
-    }
-  } catch (error) {
-    console.error('Error assigning images to services:', error.message);
-  }
-};
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
