@@ -4,6 +4,7 @@ import Apat1 from '../../assets/Apat1.png';
 import Apat2 from '../../assets/Apat2.png';
 import RBookingDate from './RBookingDate';
 import { API_BASE_URL, getImageUrl } from "../../config/api";
+import { useTranslation } from 'react-i18next';
 
 // Image mapping for property images
 const imageMap: { [key: string]: string } = {
@@ -29,6 +30,7 @@ interface RBookingProps {
 }
 
 const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => {
+  const { t } = useTranslation();
   const [selectedProperty, setSelectedProperty] = useState<string | null>(preSelectedProperty?._id || null);
   const [showDateSelection, setShowDateSelection] = useState<boolean>(!!preSelectedProperty); // Skip to date if property pre-selected
   const [properties, setProperties] = useState<Property[]>([]);
@@ -85,7 +87,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
     <div className="bg-white w-full">
         {/* Header */}
         <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200">
-          <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Check Availability</h2>
+          <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">{t('rental.booking.check_availability')}</h2>
           {onClose && (
             <button
               onClick={onClose}
@@ -101,7 +103,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
           {/* Loading State */}
           {loading && (
             <div className="flex items-center justify-center py-12">
-              <div className="text-gray-500">Loading properties...</div>
+              <div className="text-gray-500">{t('rental.booking.loading')}</div>
             </div>
           )}
 
@@ -138,7 +140,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
                     <div className="text-xl font-bold text-blue-600">
                       €{property.price}
                     </div>
-                    <div className="text-xs text-gray-500">per night</div>
+                    <div className="text-xs text-gray-500">{t('rental.booking.per_night')}</div>
                   </div>
                 </div>
                 {/* Arrow on Mobile */}
@@ -156,15 +158,15 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
               <div className="flex flex-wrap gap-3 sm:hidden text-xs text-gray-700">
                 <div className="flex items-center gap-1">
                   <Users className="w-3.5 h-3.5 text-blue-500" />
-                  <span>{property.guests} guests</span>
+                  <span>{property.guests} {t('rental.booking.guests')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <BedDouble className="w-3.5 h-3.5 text-blue-500" />
-                  <span>{property.bedrooms} beds</span>
+                  <span>{property.bedrooms} {t('rental.booking.beds')}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <ParkingCircle className="w-3.5 h-3.5 text-blue-500" />
-                  <span>Parking</span>
+                  <span>{t('rental.booking.parking')}</span>
                 </div>
               </div>
 
@@ -193,11 +195,11 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <Users className="w-4 h-4 text-blue-500" />
-                    <span>{property.guests} guests</span>
+                    <span>{property.guests} {t('rental.booking.guests')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <BedDouble className="w-4 h-4 text-blue-500" />
-                    <span>{property.bedrooms} bedrooms</span>
+                    <span>{property.bedrooms} {t('rental.booking.bedrooms')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-700">
                     <ParkingCircle className="w-4 h-4 text-blue-500" />
@@ -213,7 +215,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
                     €{property.price}
                   </div>
                   <div className="text-sm text-gray-500">
-                    per night
+                    {t('rental.booking.per_night')}
                   </div>
                 </div>
                 <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-blue-500 transition-colors" />

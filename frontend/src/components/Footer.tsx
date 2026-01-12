@@ -140,9 +140,9 @@ const Footer = () => {
         <div className="mb-8 sm:mb-0 sm:hidden">
           <h3 className="text-xl font-semibold mb-3">zenyourlife.be</h3>
           <p className="text-gray-400 text-sm leading-relaxed mb-4">
-            Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
+            {t('footer.about_description')}
           </p>
-         
+
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
@@ -153,9 +153,9 @@ const Footer = () => {
               <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              Your sanctuary for relaxation and rejuvenation. We offer professional massage therapy, facial treatments, and permanent makeup services to help you achieve balance, wellness, and natural beauty.
+              {t('footer.about_description')}
             </p>
-            
+
           </div>
 
           {/* Services */}
@@ -236,7 +236,7 @@ const Footer = () => {
                 <li className="flex items-center">
                   <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
                   <Link to="/dpa" className="hover:text-white transition-colors">
-                    DPA
+                    {t('footer.dpa')}
                   </Link>
                 </li>
                 <li className="flex items-center">

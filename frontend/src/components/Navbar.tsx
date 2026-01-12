@@ -175,11 +175,11 @@ const Navbar = () => {
             </span>
           </Link>
 
-          <div className="hidden md:flex space-x-8 items-center">
+          <div className="hidden md:flex md:space-x-4 lg:space-x-8 items-center flex-wrap">
             {/* Home Link */}
             <Link
               to="/home"
-              className="text-gray-700 font-medium hover:text-gray-900"
+              className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
             >
               {t("nav.home")}
             </Link>
@@ -191,7 +191,7 @@ const Navbar = () => {
                   setIsMassageOpen(!isMassageOpen);
                   setIsFacialOpen(false);
                 }}
-                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
+                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition whitespace-nowrap"
               >
                 {t("nav.massage")}
                 <ChevronDown
@@ -234,7 +234,7 @@ const Navbar = () => {
                   setIsFacialOpen(!isFacialOpen);
                   setIsMassageOpen(false);
                 }}
-                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
+                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition whitespace-nowrap"
               >
                 {t("nav.facial_care")}
                 <ChevronDown
@@ -277,7 +277,7 @@ const Navbar = () => {
                   setIsMassageOpen(false);
                   setIsFacialOpen(false);
                 }}
-                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition"
+                className="flex items-center gap-1 text-gray-700 font-medium hover:text-gray-900 transition whitespace-nowrap"
               >
                 {t("nav.pmu")}
                 <ChevronDown
@@ -315,7 +315,7 @@ const Navbar = () => {
 
             <a
               href="/contact"
-              className="text-gray-700 font-medium hover:text-gray-900"
+              className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
             >
               {t("nav.contact_us")}
             </a>

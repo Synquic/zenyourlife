@@ -305,7 +305,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
               <button
                 onClick={() => setShowCalendarModal(true)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition"
-                title="View all dates"
+                title={t('booking.view_all_dates')}
               >
                 <Calendar className="w-5 h-5 text-gray-600" />
               </button>
@@ -344,9 +344,11 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
             {bookingSettings?.minAdvanceBooking && bookingSettings.minAdvanceBooking > 0 && (
               <p className="mt-3 text-xs text-amber-600 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
-                Bookings require at least {bookingSettings.minAdvanceBooking >= 24
-                  ? `${Math.floor(bookingSettings.minAdvanceBooking / 24)} day${Math.floor(bookingSettings.minAdvanceBooking / 24) !== 1 ? 's' : ''}${bookingSettings.minAdvanceBooking % 24 > 0 ? ` ${bookingSettings.minAdvanceBooking % 24} hours` : ''}`
-                  : `${bookingSettings.minAdvanceBooking} hours`} advance notice
+                {t('booking.advance_booking_required', {
+                  duration: bookingSettings.minAdvanceBooking >= 24
+                    ? `${Math.floor(bookingSettings.minAdvanceBooking / 24)} ${t('booking.day' + (Math.floor(bookingSettings.minAdvanceBooking / 24) !== 1 ? 's' : ''))}${bookingSettings.minAdvanceBooking % 24 > 0 ? ` ${bookingSettings.minAdvanceBooking % 24} ${t('booking.hours')}` : ''}`
+                    : `${bookingSettings.minAdvanceBooking} ${t('booking.hours')}`
+                })}
               </p>
             )}
             {blockedDatesInfo.length > 0 && (
@@ -426,7 +428,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                                 ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800"
                                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
-                            title={isTooSoon ? 'Too soon - advance booking required' : isBlockedByAdmin ? t('booking.time_blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
+                            title={isTooSoon ? t('booking.too_soon') : isBlockedByAdmin ? t('booking.time_blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
                           >
                             {time}
                           </button>
@@ -444,18 +446,18 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           {tooSoonCount > 0 && (
                             <p className="text-xs text-amber-600">
                               <Clock className="w-3 h-3 inline mr-1" />
-                              {tooSoonCount} time slot{tooSoonCount > 1 ? 's' : ''} too soon (advance booking required)
+                              {t('booking.slots_too_soon', { count: tooSoonCount })}
                             </p>
                           )}
                           {bookedSlots.length > 0 && (
                             <p className="text-xs text-gray-500">
                               <AlertCircle className="w-3 h-3 inline mr-1" />
-                              {bookedSlots.length} time slot{bookedSlots.length > 1 ? 's' : ''} already booked for this date
+                              {t('booking.slots_booked', { count: bookedSlots.length })}
                             </p>
                           )}
                           {blockedTimeSlotsForDate.length > 0 && (
                             <p className="text-xs text-gray-400">
-                              {blockedTimeSlotsForDate.length} time slot{blockedTimeSlotsForDate.length > 1 ? 's' : ''} unavailable
+                              {t('booking.slots_unavailable', { count: blockedTimeSlotsForDate.length })}
                             </p>
                           )}
                         </div>

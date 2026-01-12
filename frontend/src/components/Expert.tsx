@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import lock from "../assets/lock.png";
-import nadia07 from "../assets/nadia07.jpeg"
+import nadia07 from "../assets/client.jpeg"
 
 const Expert = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ const Expert = () => {
         <div className="flex justify-center mb-5 sm:mb-6">
           <span className="inline-flex items-center gap-2 bg-[#FDF8E8] text-[#B8860B] px-4 py-1.5 rounded-full text-sm font-medium border border-[#E8D9A0]">
             <img src={lock} alt="" className="w-3 h-3" />
-            {t('experts.team_badge')}
+            {t('experts.badge')}
           </span>
         </div>
 
@@ -24,7 +24,7 @@ const Expert = () => {
               <img
                 src={nadia07}
                 alt="Nadia Delens"
-                className="w-full h-56 sm:h-64 md:h-80 object-cover object-[center_70%]"
+                className="w-full h-56 sm:h-64 md:h-full object-cover object-[center_20%]"
               />
             </div>
 

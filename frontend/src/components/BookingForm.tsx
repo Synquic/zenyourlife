@@ -277,7 +277,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                     <input
                       type="tel"
                       name="phoneNumber"
-                      placeholder="+32455689"
+                      placeholder={t('booking.phone_placeholder')}
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
                       className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
@@ -318,7 +318,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                         onChange={handleInputChange}
                         className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
                       />
-                      <span className="text-sm text-gray-700">Email</span>
+                      <span className="text-sm text-gray-700">{t('booking.reminder_email')}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -329,7 +329,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                         onChange={handleInputChange}
                         className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
                       />
-                      <span className="text-sm text-gray-700">SMS</span>
+                      <span className="text-sm text-gray-700">{t('booking.reminder_sms')}</span>
                     </label>
                   </div>
                 </div>

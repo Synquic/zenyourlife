@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ChevronRight, ChevronLeft, Calendar, X } from 'lucide-react';
 import RBookingForm from './RBookingForm';
 import { getBelgiumNow } from '../../utils/timezone';
+import { useTranslation } from 'react-i18next';
 
 interface PropertyData {
   _id: string;
@@ -20,6 +21,7 @@ interface RBookingDateProps {
 }
 
 const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) => {
+  const { t } = useTranslation();
   // Use Belgium timezone for today's date since business is in Belgium
   const today = getBelgiumNow();
   const [checkInDate, setCheckInDate] = useState<Date | null>(null);
@@ -31,9 +33,9 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
   const checkInTime = '10:30 AM';
   const checkOutTime = '10:00 AM';
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                      'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const monthNames = [t('rental.date.january'), t('rental.date.february'), t('rental.date.march'), t('rental.date.april'), t('rental.date.may'), t('rental.date.june'),
+                      t('rental.date.july'), t('rental.date.august'), t('rental.date.september'), t('rental.date.october'), t('rental.date.november'), t('rental.date.december')];
+  const dayNames = [t('rental.date.sun'), t('rental.date.mon'), t('rental.date.tue'), t('rental.date.wed'), t('rental.date.thu'), t('rental.date.fri'), t('rental.date.sat')];
 
   // Calendar functions
   const getDaysInMonth = (date: Date) => {
@@ -128,8 +130,8 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
   };
 
   const formatDate = (date: Date | null) => {
-    if (!date) return 'Select Date';
-    const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
+    if (!date) return t('rental.date.select_date');
+    const dayName = dayNames[date.getDay()];
     return `${dayName}, ${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   };
 
@@ -180,7 +182,7 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
     <div className="bg-white w-full relative">
       {/* Header */}
       <div className="px-3 sm:px-6 py-3 sm:py-5 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">Select Your Dates</h2>
+        <h2 className="text-lg sm:text-2xl font-semibold text-gray-900">{t('rental.date.select_dates')}</h2>
         {onClose && (
           <button
             onClick={onClose}
@@ -195,8 +197,8 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
       <div className="px-3 sm:px-6 py-4 sm:py-6">
         {/* Section Heading */}
         <div className="mb-4 sm:mb-5">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">When would you like to stay?</h3>
-          <p className="text-xs sm:text-sm text-gray-500">Select your check-in and check-out dates to continue</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">{t('rental.date.when_to_stay')}</h3>
+          <p className="text-xs sm:text-sm text-gray-500">{t('rental.date.select_dates_subtitle')}</p>
         </div>
 
         {/* Check-in and Check-out Date Selection */}
@@ -214,10 +216,10 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
           >
             <div className="flex items-center gap-2 mb-1">
               <Calendar className="w-4 h-4 text-blue-600" />
-              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">Check-in Date</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">{t('rental.date.checkin_date')}</p>
             </div>
             <p className={`text-sm sm:text-base font-semibold ${checkInDate ? 'text-gray-900' : 'text-gray-400'}`}>
-              {checkInDate ? formatDate(checkInDate) : 'Select Date'}
+              {checkInDate ? formatDate(checkInDate) : t('rental.date.select_date')}
             </p>
           </div>
 
@@ -236,10 +238,10 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
           >
             <div className="flex items-center gap-2 mb-1">
               <Calendar className="w-4 h-4 text-blue-600" />
-              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">Check-out Date</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide font-medium">{t('rental.date.checkout_date')}</p>
             </div>
             <p className={`text-sm sm:text-base font-semibold ${checkOutDate ? 'text-gray-900' : 'text-gray-400'}`}>
-              {checkOutDate ? formatDate(checkOutDate) : checkInDate ? 'Select Date' : 'Select check-in first'}
+              {checkOutDate ? formatDate(checkOutDate) : checkInDate ? t('rental.date.select_date') : t('rental.date.select_checkin_first')}
             </p>
           </div>
         </div>
@@ -249,11 +251,11 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
           <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm text-green-700 font-medium">Your Stay</p>
-                <p className="text-lg sm:text-xl font-bold text-green-800">{calculateNights()} Night{calculateNights() > 1 ? 's' : ''}</p>
+                <p className="text-xs sm:text-sm text-green-700 font-medium">{t('rental.date.your_stay')}</p>
+                <p className="text-lg sm:text-xl font-bold text-green-800">{calculateNights()} {calculateNights() > 1 ? t('rental.date.nights') : t('rental.date.night')}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs sm:text-sm text-green-700">Total Price</p>
+                <p className="text-xs sm:text-sm text-green-700">{t('rental.date.total_price')}</p>
                 <p className="text-lg sm:text-xl font-bold text-green-800">€{(propertyData?.price || 0) * calculateNights()}</p>
               </div>
             </div>
@@ -266,18 +268,18 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span className="text-xs sm:text-sm font-medium text-blue-800">Property Check-in & Check-out Times</span>
+            <span className="text-xs sm:text-sm font-medium text-blue-800">{t('rental.date.checkin_checkout_times')}</span>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
             {/* Check In Time */}
             <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
-              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">Check In Time</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">{t('rental.date.checkin_time')}</p>
               <p className="text-base sm:text-xl font-semibold text-gray-900">{checkInTime}</p>
             </div>
 
             {/* Check Out Time */}
             <div className="bg-white rounded-lg p-3 sm:p-4 border border-blue-100">
-              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">Check Out Time</p>
+              <p className="text-[10px] sm:text-xs text-gray-500 uppercase tracking-wide mb-1">{t('rental.date.checkout_time')}</p>
               <p className="text-base sm:text-xl font-semibold text-gray-900">{checkOutTime}</p>
             </div>
           </div>
@@ -294,7 +296,7 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
           >
-            Next
+            {t('rental.date.next')}
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
@@ -314,7 +316,7 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
               </button>
               <div className="text-center">
                 <p className="text-xs text-blue-600 font-medium mb-1">
-                  {selectingFor === 'checkIn' ? 'Select Check-in Date' : 'Select Check-out Date'}
+                  {selectingFor === 'checkIn' ? t('rental.date.select_checkin') : t('rental.date.select_checkout')}
                 </p>
                 <h3 className="text-sm sm:text-lg font-semibold text-gray-900">
                   {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
@@ -390,11 +392,11 @@ const RBookingDate: React.FC<RBookingDateProps> = ({ onClose, propertyData }) =>
             <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-center gap-4 text-xs">
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded bg-blue-500"></div>
-                <span className="text-gray-600">Check-in</span>
+                <span className="text-gray-600">{t('rental.date.checkin')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="w-3 h-3 rounded bg-green-500"></div>
-                <span className="text-gray-600">Check-out</span>
+                <span className="text-gray-600">{t('rental.date.checkout')}</span>
               </div>
             </div>
           </div>

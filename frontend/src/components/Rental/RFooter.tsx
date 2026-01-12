@@ -307,7 +307,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
                   onClick={openTermsModal}
                   className="hover:text-white transition-colors text-left"
                 >
-                  Terms & Conditions
+                  {t('rental.footer.terms')}
                 </button>
               </li>
               <li className="flex items-start">
@@ -316,7 +316,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
                   onClick={openDpaModal}
                   className="hover:text-white transition-colors text-left"
                 >
-                  DPA
+                  {t('rental.footer.dpa')}
                 </button>
               </li>
               <li className="flex items-start">
@@ -325,7 +325,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
                   onClick={openCookieModal}
                   className="hover:text-white transition-colors text-left"
                 >
-                  Cookie Policy
+                  {t('rental.footer.cookie_policy')}
                 </button>
               </li>
             </ul>

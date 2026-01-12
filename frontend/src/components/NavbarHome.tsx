@@ -60,35 +60,35 @@ const NavbarHome = () => {
 </Link>
 
 
-<div className="hidden md:flex space-x-8">
+<div className="hidden md:flex md:space-x-4 lg:space-x-8 items-center flex-wrap">
   <a
     href='#herosection'
      onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('herosection')?.scrollIntoView({ behavior: 'smooth' });
               }}
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.overview')}
   </a>
 
   <Link
     to="/Servicepage"
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.services')}
   </Link>
 
   <button
     onClick={() => setShowBookingModal(true)}
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.booking')}
   </button>
 
   <Link
     to="/about"
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.about')}
   </Link>
@@ -99,7 +99,7 @@ const NavbarHome = () => {
                 e.preventDefault();
                 document.getElementById('testimonial')?.scrollIntoView({ behavior: 'smooth' });
               }}
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.testimonial')}
   </a>
@@ -110,7 +110,7 @@ const NavbarHome = () => {
                 e.preventDefault();
                 document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' });
               }}
-    className="text-gray-700 font-medium hover:text-gray-900"
+    className="text-gray-700 font-medium hover:text-gray-900 whitespace-nowrap"
   >
     {t('nav.faqs')}
   </a>

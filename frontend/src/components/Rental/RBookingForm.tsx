@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import RApproved from './RApproved';
 import { API_BASE_URL } from "../../config/api";
+import { useTranslation } from 'react-i18next';
 
 interface PropertyData {
   _id: string;
@@ -31,6 +32,7 @@ interface RBookingFormProps {
 }
 
 const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, dateInfo }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -82,7 +84,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
     const hasErrors = Object.values(newErrors).some(error => error);
 
     if (hasErrors) {
-      setSubmitMessage('Please fill in all required fields correctly');
+      setSubmitMessage(t('rental.form.fill_required'));
       setSubmitStatus('error');
       setTimeout(() => {
         setSubmitStatus('idle');
@@ -146,7 +148,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
     } catch (error) {
       console.error('Error submitting booking:', error);
       setSubmitStatus('error');
-      setSubmitMessage('Failed to submit booking. Please try again.');
+      setSubmitMessage(t('rental.form.submit_error'));
       setTimeout(() => {
         setSubmitStatus('idle');
         setSubmitMessage('');
@@ -172,7 +174,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
     <div className="bg-white w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200">
-        <h2 className="text-lg sm:text-2xl font-normal text-gray-900">Check Availability</h2>
+        <h2 className="text-lg sm:text-2xl font-normal text-gray-900">{t('rental.booking.check_availability')}</h2>
         {onClose && (
           <button
             onClick={onClose}
@@ -195,7 +197,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleInputChange}
-                placeholder="Your First Name"
+                placeholder={t('rental.form.first_name')}
                 className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg text-xs sm:text-sm transition-all ${
                   errors.firstName
                     ? 'bg-red-50 border border-red-200 text-red-900 placeholder-red-400'
@@ -212,7 +214,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleInputChange}
-                placeholder="Your Last Name"
+                placeholder={t('rental.form.last_name')}
                 className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg text-xs sm:text-sm transition-all ${
                   errors.lastName
                     ? 'bg-red-50 border border-red-200 text-red-900 placeholder-red-400'
@@ -229,7 +231,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Your Email Address"
+                placeholder={t('rental.form.email')}
                 className={`w-full px-3 sm:px-4 py-3 sm:py-3.5 rounded-lg text-xs sm:text-sm transition-all ${
                   errors.email
                     ? 'bg-red-50 border border-red-200 text-red-900 placeholder-red-400'
@@ -242,7 +244,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
             {/* Phone Number */}
             <div>
               <label className="block text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2 font-medium">
-                Phone Number <span className="text-red-500">*</span>
+                {t('rental.form.phone')} <span className="text-red-500">*</span>
               </label>
               <div className="flex gap-2">
                 <select
@@ -292,7 +294,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
             {/* Gender */}
             <div>
               <label className="block text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2 font-medium">
-                Gender <span className="text-red-500">*</span>
+                {t('rental.form.gender')} <span className="text-red-500">*</span>
               </label>
               <select
                 name="accountType"
@@ -309,10 +311,10 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                   backgroundPosition: 'right 1rem center',
                 }}
               >
-                <option value="">Select</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="">{t('rental.form.select_gender')}</option>
+                <option value="male">{t('rental.form.male')}</option>
+                <option value="female">{t('rental.form.female')}</option>
+                <option value="other">{t('rental.form.other')}</option>
               </select>
             </div>
           </div>
@@ -325,7 +327,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
                 name="specialRequests"
                 value={formData.specialRequests}
                 onChange={handleInputChange}
-                placeholder="Special Requests"
+                placeholder={t('rental.form.special_requests')}
                 rows={4}
                 className="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-gray-50 rounded-lg text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-200 focus:outline-none border border-transparent resize-none transition-all sm:rows-[7]"
               />
@@ -333,12 +335,12 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
 
             {/* Message */}
             <div>
-              <label className="block text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2 font-medium">Message</label>
+              <label className="block text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2 font-medium">{t('rental.form.message')}</label>
               <textarea
                 name="message"
                 value={formData.message}
                 onChange={handleInputChange}
-                placeholder="Message"
+                placeholder={t('rental.form.message')}
                 rows={4}
                 className="w-full px-3 sm:px-4 py-3 sm:py-3.5 bg-gray-50 rounded-lg text-xs sm:text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-200 focus:outline-none border border-transparent resize-none transition-all sm:rows-[7]"
               />
@@ -366,7 +368,7 @@ const RBookingForm: React.FC<RBookingFormProps> = ({ onClose, propertyData, date
               submitStatus === 'loading' ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {submitStatus === 'loading' ? 'Submitting...' : 'Submit Your Form'}
+            {submitStatus === 'loading' ? t('rental.form.submitting') : t('rental.form.submit')}
             <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>

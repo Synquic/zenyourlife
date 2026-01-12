@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TickImage from "../assets/tick.png";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import NavbarHome from "./NavbarHome";
 
 const Approved = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <>
@@ -24,11 +26,10 @@ const Approved = () => {
 
           {/* Success Message */}
           <h1 className="text-2xl font-semibold text-gray-900 mb-4">
-            Appointment Confirmed!
+            {t('booking.success')}
           </h1>
           <p className="text-gray-600 mb-8 leading-relaxed">
-            Your appointment has been successfully booked. We've sent a
-            confirmation email with all the details.
+            {t('booking.success_message')}
           </p>
 
           {/* Transparent Glass Effect Button */}
@@ -36,7 +37,7 @@ const Approved = () => {
             onClick={() => navigate("/")}
             className="bg-white/20 backdrop-blur-md border-2 border-[#d4af37] hover:bg-white/30 text-gray-900 px-8 py-3.5 rounded-full font-medium transition-all shadow-lg flex items-center gap-3 mx-auto"
           >
-            <span className="font-semibold">Back to Home</span>
+            <span className="font-semibold">{t('booking.back_to_home')}</span>
             <img src={MasterPrimaryButton} alt="" className="h-5 w-auto" />
           </button>
         </div>
