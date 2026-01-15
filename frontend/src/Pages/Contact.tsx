@@ -278,11 +278,11 @@ const Contact = () => {
                   {t('contact.email_label')}
                 </h3>
                 <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
-                <a href="mailto:info@zenyourlife.be" className="text-xs sm:text-sm text-gray-900 font-medium mb-1.5 sm:mb-2 hover:text-[#d4af37] transition-colors">
-                  info@zenyourlife.be
+                <a href={`mailto:${t('company.email')}`} className="text-xs sm:text-sm text-gray-900 font-medium mb-1.5 sm:mb-2 hover:text-[#d4af37] transition-colors">
+                  {t('company.email')}
                 </a>
                 <p className="text-[10px] sm:text-xs text-gray-500 leading-relaxed mt-2">
-                  BTW: BE0899912649
+                  {t('company.vat_label')}: {t('company.vat')}
                 </p>
               </div>
 
@@ -292,8 +292,8 @@ const Contact = () => {
                   {t('contact.number_label')}
                 </h3>
                 <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
-                <a href="tel:+32476667115" className="text-xs sm:text-sm text-gray-900 font-medium mb-1.5 sm:mb-2 hover:text-[#d4af37] transition-colors">
-                  0476 66 71 15
+                <a href={`tel:${t('company.phone_international')}`} className="text-xs sm:text-sm text-gray-900 font-medium mb-1.5 sm:mb-2 hover:text-[#d4af37] transition-colors">
+                  {t('company.phone')}
                 </a>
                 <p className="text-[10px] sm:text-xs text-gray-500 leading-relaxed mt-2">
                   {t('contact.assistance_hours')}
@@ -309,9 +309,9 @@ const Contact = () => {
                 </h3>
                 <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                 <p className="text-[10px] sm:text-xs text-gray-600 leading-relaxed">
-                  Schapenbaan 45
+                  {t('company.address_street')}
                   <br />
-                  1731 Relegem, Belgium
+                  {t('company.address_city')}, {t('company.address_country')}
                 </p>
               </div>
             </div>

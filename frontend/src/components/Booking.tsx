@@ -1,3 +1,4 @@
+
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,7 +21,7 @@ interface Service {
 }
 
 const Booking = ({ onClose }: BookingProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedService, setSelectedService] = useState<number | null>(null);
   const [selectedServiceData, setSelectedServiceData] = useState<Service | null>(null);
   const [showBookingDate, setShowBookingDate] = useState(false);
@@ -32,7 +33,8 @@ const Booking = ({ onClose }: BookingProps) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/services`)
+        const currentLang = i18n.language || 'en';
+        const response = await fetch(`${API_BASE_URL}/services?lang=${currentLang}`)
 
         console.log("respon =" ,response);
         const data = await response.json();
@@ -116,7 +118,7 @@ const Booking = ({ onClose }: BookingProps) => {
     };
 
     fetchServices();
-  }, []);
+  }, [i18n.language]);
 
   return (
     <>

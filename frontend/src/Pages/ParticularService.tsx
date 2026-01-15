@@ -79,7 +79,8 @@ const getBannerImageByServiceName = (title: string, category: string): string =>
 
 interface ContentSection {
   title: string;
-  description: string;
+  description?: string;
+  content?: string;
 }
 
 interface BenefitItem {
@@ -344,7 +345,7 @@ const ParticularService = () => {
                     </h3>
                     {/* Section Content */}
                     <p className="text-gray-600 leading-relaxed text-base">
-                      {section.description}
+                      {section.content || section.description}
                     </p>
                   </div>
 

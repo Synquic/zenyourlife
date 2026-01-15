@@ -171,7 +171,7 @@ const Navbar = () => {
               className="h-7 w-7 object-contain"
             />
             <span className="text-xl font-medium text-gray-800">
-              ZENYOURLIFE.BE
+              {t('company.name')}
             </span>
           </Link>
 

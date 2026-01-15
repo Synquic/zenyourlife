@@ -3,6 +3,77 @@ const router = express.Router();
 const Enrollment = require('../models/Enrollment');
 const { sendCustomerReminder, sendAdminReminder, sendCustomerSmsReminder, sendAdminSmsReminder } = require('../services/reminderScheduler');
 const { sendTestSms, formatPhoneNumber } = require('../services/twilioSmsService');
+const transporter = require('../config/emailConfig');
+
+// Send a simple test email
+router.post('/send-test-email', async (req, res) => {
+  try {
+    const { email = 'parv@synquic.com', subject = 'Test Email from ZenYourLife', message = 'This is a test email to verify email functionality is working correctly.' } = req.body;
+
+    console.log('Sending test email to:', email);
+
+    const mailOptions = {
+      from: `"ZenYourLife" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: subject,
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
+            .button { display: inline-block; padding: 12px 24px; background: #B8860B; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Test Email</h1>
+              <p>ZenYourLife Email System</p>
+            </div>
+            <div class="content">
+              <h2>Email Functionality Test</h2>
+              <p>${message}</p>
+              <p><strong>Sent at:</strong> ${new Date().toLocaleString('en-BE', { timeZone: 'Europe/Brussels' })}</p>
+              <p><strong>Environment:</strong> ${process.env.SERVER_ENV || 'development'}</p>
+              <p><strong>Email Service:</strong> Gmail (Nodemailer)</p>
+              <a href="https://zenyourlife.be" class="button">Visit ZenYourLife</a>
+            </div>
+            <div class="footer">
+              <p>This is an automated test email from ZenYourLife</p>
+              <p>© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    res.json({
+      success: true,
+      message: 'Test email sent successfully!',
+      details: {
+        recipient: email,
+        subject: subject,
+        messageId: info.messageId,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error sending test email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send test email',
+      error: error.message
+    });
+  }
+});
 
 // Test customer reminder for a specific enrollment
 router.post('/test-customer-reminder/:enrollmentId', async (req, res) => {

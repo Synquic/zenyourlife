@@ -210,7 +210,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <img src={znlogo} alt="ZenYourLife Logo" className="h-7 w-7 object-contain" />
-              <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
+              <h3 className="text-xl font-semibold">{t('company.name')}</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4 w-62">
               {t('rental.footer.about_description')}
@@ -282,15 +282,15 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex items-start">
                 <Phone className="w-4 h-4 mr-2 mt-1" />
-                <a href="tel:+32476667115" className="hover:text-white">0476 66 71 15</a>
+                <a href={`tel:${t('company.phone_international')}`} className="hover:text-white">{t('company.phone')}</a>
               </li>
               <li className="flex items-start">
                 <Mail className="w-4 h-4 mr-2 mt-1" />
-                <a href="mailto:info@zenyourlife.be" className="hover:text-white">info@zenyourlife.be</a>
+                <a href={`mailto:${t('company.email')}`} className="hover:text-white">{t('company.email')}</a>
               </li>
               <li className="flex items-start">
                 <FileText className="w-4 h-4 mr-2 mt-1" />
-                <span>BTW: BE0899912649</span>
+                <span>{t('company.vat_label')}: {t('company.vat')}</span>
               </li>
               <li className="flex items-start">
                 <Shield className="w-4 h-4 mr-2 mt-1" />
@@ -482,7 +482,7 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
                   <li>The right to object to processing of your personal data</li>
                 </ul>
                 <p className="mt-4">
-                  To exercise any of these rights, please contact us at privacy@zenyourlife.be.
+                  To exercise any of these rights, please contact us at {t('company.email_privacy')}.
                 </p>
               </AccordionItem>
 
@@ -615,8 +615,8 @@ const Footer = ({ onContactClick: _onContactClick }: FooterProps) => {
             <div className="mt-8 text-center">
               <p className="text-sm text-gray-600">
                 If you have any questions about our Privacy Policy or Terms of Service, please contact us at{' '}
-                <a href="mailto:info@zenyourlife.be" className="text-[#0D9488] hover:underline">
-                  info@zenyourlife.be
+                <a href={`mailto:${t('company.email')}`} className="text-[#0D9488] hover:underline">
+                  {t('company.email')}
                 </a>
               </p>
             </div>

@@ -81,7 +81,7 @@ interface PageContent {
 const Servicepage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [services, setServices] = useState<Service[]>([]);
   const [pageContent, setPageContent] = useState<PageContent | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -110,10 +110,11 @@ const Servicepage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        const currentLang = i18n.language || 'en';
 
-        // Fetch services and page content in parallel (services always in English)
+        // Fetch services and page content in parallel
         const [servicesRes, pageContentRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/services`),
+          fetch(`${API_BASE_URL}/services?lang=${currentLang}`),
           fetch(`${API_BASE_URL}/page-content/services`)
         ]);
 
@@ -138,7 +139,7 @@ const Servicepage = () => {
     };
 
     fetchData();
-  }, []);
+  }, [i18n.language]);
 
   // Get image source - prefer imageUrl from server, fallback to local image
   const getServiceImage = (service: Service, index: number) => {

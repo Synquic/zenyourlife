@@ -22,12 +22,13 @@ const testimonialSchema = new mongoose.Schema({
     required: [true, 'Testimonial text is required'],
     trim: true
   },
-  // Translations for different languages (fr, de, nl)
+  // Translations for different languages (fr, de, nl, es)
   // English is the default stored in text/role fields
   translations: {
     fr: testimonialTranslationSchema,
     de: testimonialTranslationSchema,
-    nl: testimonialTranslationSchema
+    nl: testimonialTranslationSchema,
+    es: testimonialTranslationSchema
   },
   photo: {
     type: String,

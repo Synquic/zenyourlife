@@ -308,7 +308,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-sm text-gray-900 font-medium mb-1 sm:mb-2">
-                    <a href="mailto:info@zenyourlife.be" className="hover:text-blue-600">info@zenyourlife.be</a>
+                    <a href={`mailto:${t('company.email')}`} className="hover:text-blue-600">{t('company.email')}</a>
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
                     {t('rental.contact.assistance_hours')}
@@ -324,7 +324,7 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-sm text-gray-900 font-medium mb-1 sm:mb-2">
-                    <a href="tel:+32476667115" className="hover:text-blue-600">0476 66 71 15</a>
+                    <a href={`tel:${t('company.phone_international')}`} className="hover:text-blue-600">{t('company.phone')}</a>
                   </p>
                   <p className="text-xs text-gray-500 leading-relaxed">
                     {t('rental.contact.assistance_hours')}
@@ -340,9 +340,9 @@ const RContact = ({ isModal = false }: RContactProps) => {
                   </h3>
                   <div className="w-8 h-0.5 bg-gray-900 mb-3 sm:mb-4 mx-auto sm:mx-0"></div>
                   <p className="text-xs text-gray-600 leading-relaxed">
-                    Lanzarote,
+                    {t('company.address_street')}
                     <br />
-                    Canary Islands, Spain
+                    {t('company.address_city')}, {t('company.address_country')}
                   </p>
                 </div>
               </div>

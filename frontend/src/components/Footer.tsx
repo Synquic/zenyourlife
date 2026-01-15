@@ -138,7 +138,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
         {/* About Section - Full width on mobile */}
         <div className="mb-8 sm:mb-0 sm:hidden">
-          <h3 className="text-xl font-semibold mb-3">zenyourlife.be</h3>
+          <h3 className="text-xl font-semibold mb-3">{t('company.name_lowercase')}</h3>
           <p className="text-gray-400 text-sm leading-relaxed mb-4">
             {t('footer.about_description')}
           </p>
@@ -150,7 +150,7 @@ const Footer = () => {
           <div className="hidden sm:block">
                         <div className="flex items-center gap-2 mb-4">
               <img src={znlogo} alt="ZenYourLife Logo" className="h-7 w-7 object-contain" />
-              <h3 className="text-xl font-semibold">ZENYOURLIFE.BE</h3>
+              <h3 className="text-xl font-semibold">{t('company.name')}</h3>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed mb-4">
               {t('footer.about_description')}
@@ -203,7 +203,7 @@ const Footer = () => {
                   className="flex items-center hover:text-white transition-colors py-2 -my-2 cursor-pointer active:text-yellow-400"
                 >
                   <Phone className="w-4 h-4 mr-2 shrink-0" />
-                  <span className="underline">0476 66 71 15</span>
+                  <span className="underline">{t('company.phone')}</span>
                 </a>
                 <span className="absolute left-0 -top-8 bg-white text-gray-900 px-3 py-1 rounded-md text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-lg">
                   Call
@@ -211,16 +211,16 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:info@zenyourlife.be"
+                  href={`mailto:${t('company.email')}`}
                   className="flex items-center hover:text-white transition-colors py-2 -my-2 cursor-pointer"
                 >
                   <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span>info@zenyourlife.be</span>
+                  <span>{t('company.email')}</span>
                 </a>
               </li>
               <li className="flex items-center">
-                <span className="text-xs mr-2 flex-shrink-0 font-medium">BTW:</span>
-                <span>BE0899912649</span>
+                <span className="text-xs mr-2 flex-shrink-0 font-medium">{t('company.vat_label')}:</span>
+                <span>{t('company.vat')}</span>
               </li>
             </ul>
 
@@ -261,8 +261,8 @@ const Footer = () => {
             <div className="flex items-start text-gray-400 text-sm">
               <MapPin className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
               <div>
-                <p>Schapenbaan 45</p>
-                <p>1731 Relegem</p>
+                <p>{t('company.address_street')}</p>
+                <p>{t('company.address_city')}</p>
               </div>
             </div>
           </div>

@@ -1,5 +1,30 @@
 const mongoose = require('mongoose');
 
+// Translation schema for PageContent
+const pageContentTranslationSchema = new mongoose.Schema({
+  hero: {
+    title: String,
+    subtitle: String,
+    badgeText: String,
+    buttonText: String
+  },
+  statistics: [{
+    value: String,
+    label: String
+  }],
+  sectionHeaders: {
+    services: {
+      title: String,
+      subtitle: String
+    }
+  },
+  seo: {
+    metaTitle: String,
+    metaDescription: String,
+    keywords: [String]
+  }
+}, { _id: false });
+
 const pageContentSchema = new mongoose.Schema({
   // Page identifier (e.g., 'services', 'home', 'about')
   pageId: {
@@ -72,6 +97,14 @@ const pageContentSchema = new mongoose.Schema({
     metaTitle: String,
     metaDescription: String,
     keywords: [String]
+  },
+
+  // Translations for different languages
+  translations: {
+    fr: pageContentTranslationSchema,
+    de: pageContentTranslationSchema,
+    nl: pageContentTranslationSchema,
+    es: pageContentTranslationSchema
   },
 
   isActive: {

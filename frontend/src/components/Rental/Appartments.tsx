@@ -49,6 +49,7 @@ interface CardProps {
 
 const Card = ({ property, t, onBookNow }: CardProps) => {
   const [showAllAmenities, setShowAllAmenities] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const [imageError, setImageError] = useState(false);
 
   // Get fallback image based on property.image or default
@@ -93,9 +94,17 @@ const Card = ({ property, t, onBookNow }: CardProps) => {
       <div className="flex flex-col justify-between flex-1 min-w-0">
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-gray-900">{property.name}</h2>
-          <p className="text-gray-600 text-xs sm:text-sm mt-2 leading-relaxed line-clamp-3">
+          <p className={`text-gray-600 text-xs sm:text-sm mt-2 leading-relaxed ${showFullDescription ? '' : 'line-clamp-3'}`}>
             {property.description}
           </p>
+          {property.description && property.description.length > 150 && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-blue-600 hover:text-blue-800 text-xs font-medium mt-1 transition-colors"
+            >
+              {showFullDescription ? t('rental.apartments.read_less') : t('rental.apartments.read_more')}
+            </button>
+          )}
         </div>
 
         {/* Icons Row */}
@@ -275,7 +284,7 @@ const Apartment = () => {
     const fetchData = async () => {
       try {
         // Fetch properties with language parameter
-        const propertiesResponse = await fetch(`${API_BASE_URL}/properties?lang=${currentLang}`);
+        const propertiesResponse = await fetch(`${API_BASE_URL}/translate/properties?lang=${currentLang}`);
         const propertiesData = await propertiesResponse.json();
 
         if (propertiesData.success && propertiesData.data.length > 0) {

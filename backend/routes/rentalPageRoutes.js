@@ -24,6 +24,7 @@ const getTranslatedOverview = (settings, lang) => {
 
   return {
     ...settingsObj,
+    badge: translation.badge || settingsObj.badge,
     title1: translation.title1 || settingsObj.title1,
     title2: translation.title2 || settingsObj.title2,
     description1: translation.description1 || settingsObj.description1,

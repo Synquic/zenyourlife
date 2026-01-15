@@ -9,6 +9,7 @@ const overviewCardSchema = new mongoose.Schema({
 
 // Translation schema for overview section
 const overviewTranslationSchema = new mongoose.Schema({
+  badge: String,
   title1: String,
   title2: String,
   description1: String,
@@ -54,7 +55,8 @@ const rentalOverviewSettingsSchema = new mongoose.Schema({
   translations: {
     fr: overviewTranslationSchema,
     de: overviewTranslationSchema,
-    nl: overviewTranslationSchema
+    nl: overviewTranslationSchema,
+    es: overviewTranslationSchema
   },
   isActive: {
     type: Boolean,

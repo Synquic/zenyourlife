@@ -29,12 +29,13 @@ const serviceSchema = new mongoose.Schema({
     required: [true, 'Service description is required'],
     trim: true
   },
-  // Translations for different languages (fr, de, nl)
+  // Translations for different languages (fr, de, nl, es)
   // English is the default stored in title/description fields
   translations: {
     fr: translationSchema,
     de: translationSchema,
-    nl: translationSchema
+    nl: translationSchema,
+    es: translationSchema
   },
   category: {
     type: String,

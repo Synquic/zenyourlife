@@ -22,7 +22,7 @@ exports.getAllServices = async (req, res) => {
     }
 
     // For other languages, use stored translations from DB (cost-efficient approach)
-    const supportedLangs = ['fr', 'de', 'nl'];
+    const supportedLangs = ['fr', 'de', 'nl', 'es'];
     if (supportedLangs.includes(lang)) {
       let translatedCount = 0;
       let noTranslationCount = 0;
@@ -31,12 +31,12 @@ exports.getAllServices = async (req, res) => {
         const serviceObj = service.toObject();
         const translation = serviceObj.translations?.[lang];
 
-        if (translation && translation.title) {
+        if (translation && translation.description) {
           translatedCount++;
-          // Use stored translation from DB
+          // Use stored translation from DB (keep title in English, only translate descriptions)
           return {
             ...serviceObj,
-            title: translation.title || serviceObj.title,
+            title: serviceObj.title, // Keep title in English
             description: translation.description || serviceObj.description,
             benefits: translation.benefits?.length > 0 ? translation.benefits : serviceObj.benefits,
             targetAudience: translation.targetAudience?.length > 0 ? translation.targetAudience : serviceObj.targetAudience,
@@ -120,16 +120,16 @@ exports.getServiceById = async (req, res) => {
     }
 
     // For other languages, use stored translations from DB
-    const supportedLangs = ['fr', 'de', 'nl'];
+    const supportedLangs = ['fr', 'de', 'nl', 'es'];
     if (supportedLangs.includes(lang)) {
       const serviceObj = service.toObject();
       const translation = serviceObj.translations?.[lang];
 
       if (translation) {
-        // Use stored translation from DB
+        // Use stored translation from DB (keep title in English, only translate descriptions)
         const translatedService = {
           ...serviceObj,
-          title: translation.title || serviceObj.title,
+          title: serviceObj.title, // Keep title in English
           description: translation.description || serviceObj.description,
           benefits: translation.benefits?.length > 0 ? translation.benefits : serviceObj.benefits,
           targetAudience: translation.targetAudience?.length > 0 ? translation.targetAudience : serviceObj.targetAudience,

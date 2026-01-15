@@ -1,5 +1,5 @@
 const Service = require('../models/Service');
-const Property = require('../models/Property');
+const { Property } = require('../models/Property');
 const Testimonial = require('../models/Testimonial');
 const RentalTestimonial = require('../models/RentalTestimonial');
 const translationService = require('../services/translationService');

@@ -62,7 +62,7 @@ const DPAPage = () => {
   const [openSection, setOpenSection] = useState<string | null>('subject')
   const [pageData, setPageData] = useState<LegalPageData | null>(null)
   const [loading, setLoading] = useState(true)
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
 
   // Scroll to top on mount
   useEffect(() => {
@@ -223,8 +223,8 @@ const DPAPage = () => {
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-600">
               If you have any questions about this Data Processing Agreement, please contact us at{' '}
-              <a href="mailto:info@zenyourlife.be" className="text-[#d4af37] hover:underline">
-                info@zenyourlife.be
+              <a href={`mailto:${t('company.email')}`} className="text-[#d4af37] hover:underline">
+                {t('company.email')}
               </a>
             </p>
           </div>

@@ -38,7 +38,7 @@ const MainLanding = () => {
                 className="h-6 w-6 sm:h-8 sm:w-8 object-contain"
               />
               <span className="text-sm sm:text-xl font-semibold text-gray-800">
-                ZENYOURLIFE.BE
+                {t('company.name')}
               </span>
             </div>
 
@@ -160,7 +160,7 @@ const MainLanding = () => {
                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                     />
                   </svg>
-                  <span>Schapenbaan 45 ,1731 Relegem</span>
+                  <span>{t('company.address_street')} ,{t('company.address_city')}</span>
                 </div>
               </div>
             </div>

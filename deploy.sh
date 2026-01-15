@@ -29,7 +29,7 @@ echo -e "${GREEN}================================${NC}"
 echo ""
 
 # Step 1: Install dependencies (if needed)
-echo -e "${YELLOW}[1/7] Checking dependencies...${NC}"
+echo -e "${YELLOW}[1/8] Checking dependencies...${NC}"
 if ! command -v docker &> /dev/null; then
     echo -e "${RED}Docker not found. Please install Docker first.${NC}"
     exit 1
@@ -38,7 +38,7 @@ echo -e "${GREEN}✓ Dependencies OK${NC}"
 echo ""
 
 # Step 2: Backup server uploads (pull from server to local backup)
-echo -e "${YELLOW}[2/7] Backing up server uploads to local...${NC}"
+echo -e "${YELLOW}[2/8] Backing up server uploads to local...${NC}"
 mkdir -p backend/uploads-backup
 sshpass -p "${SSH_PASS}" rsync -avz -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
     ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/backend/uploads/ backend/uploads-backup/ 2>/dev/null || echo "No server uploads to backup"
@@ -46,37 +46,51 @@ echo -e "${GREEN}✓ Server uploads backed up locally${NC}"
 echo ""
 
 # Step 3: Build Docker image
-echo -e "${YELLOW}[3/7] Building Docker image for linux/amd64...${NC}"
+echo -e "${YELLOW}[3/8] Building Docker image for linux/amd64...${NC}"
 docker build --platform linux/amd64 -t ${IMAGE_NAME} .
 echo -e "${GREEN}✓ Image built successfully${NC}"
 echo ""
 
 # Step 4: Save and compress image
-echo -e "${YELLOW}[4/7] Saving and compressing Docker image...${NC}"
+echo -e "${YELLOW}[4/8] Saving and compressing Docker image...${NC}"
 docker save ${IMAGE_NAME} | gzip > ${ARCHIVE_NAME}
 IMAGE_SIZE=$(du -h ${ARCHIVE_NAME} | cut -f1)
 echo -e "${GREEN}✓ Image compressed (${IMAGE_SIZE})${NC}"
 echo ""
 
 # Step 5: Upload to server
-echo -e "${YELLOW}[5/7] Uploading image to server...${NC}"
+echo -e "${YELLOW}[5/8] Uploading image to server...${NC}"
 sshpass -p "${SSH_PASS}" rsync -avz --progress -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
     ${ARCHIVE_NAME} ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/
 echo -e "${GREEN}✓ Upload complete${NC}"
 echo ""
 
 # Step 6: Deploy on server
-echo -e "${YELLOW}[6/7] Deploying on server...${NC}"
+echo -e "${YELLOW}[6/8] Deploying on server...${NC}"
 sshpass -p "${SSH_PASS}" ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} << 'EOF'
 cd /app/zenyourlife
+
+echo "Creating backup of current uploads..."
+mkdir -p /tmp/zenyourlife-uploads-backup
+cp -r backend/uploads/* /tmp/zenyourlife-uploads-backup/ 2>/dev/null || echo "No uploads to backup"
+
 echo "Loading Docker image..."
 docker load < zenyourlife-image.tar.gz
+
 echo "Stopping containers..."
 docker-compose down
+
+echo "Restoring uploads from backup..."
+mkdir -p backend/uploads
+cp -r /tmp/zenyourlife-uploads-backup/* backend/uploads/ 2>/dev/null || echo "No uploads to restore"
+rm -rf /tmp/zenyourlife-uploads-backup
+
 echo "Starting containers..."
 docker-compose up -d
+
 echo "Waiting for application to start..."
 sleep 15
+
 echo "Application logs:"
 docker logs zenyourlife-app --tail 10
 EOF
@@ -84,13 +98,30 @@ echo -e "${GREEN}✓ Deployment complete${NC}"
 echo ""
 
 # Step 7: Verify deployment
-echo -e "${YELLOW}[7/7] Verifying deployment...${NC}"
+echo -e "${YELLOW}[7/8] Verifying deployment...${NC}"
 sleep 5
 if curl -s -o /dev/null -w "%{http_code}" https://zenyourlife.be/api/health | grep -q "200"; then
     echo -e "${GREEN}✓ Health check passed${NC}"
 else
     echo -e "${RED}⚠ Health check failed - check logs${NC}"
 fi
+echo ""
+
+# Step 8: Sync server uploads back to local
+echo -e "${YELLOW}[8/8] Syncing server uploads to local...${NC}"
+mkdir -p backend/uploads
+mkdir -p backend/uploads-backup
+
+echo "Syncing to backend/uploads..."
+sshpass -p "${SSH_PASS}" rsync -avz -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
+    ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/backend/uploads/ backend/uploads/ 2>/dev/null || echo "No uploads to sync"
+
+echo "Syncing to backend/uploads-backup..."
+sshpass -p "${SSH_PASS}" rsync -avz -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
+    ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/backend/uploads/ backend/uploads-backup/ 2>/dev/null || echo "No uploads to backup"
+
+LOCAL_COUNT=$(find backend/uploads -type f 2>/dev/null | wc -l | tr -d ' ')
+echo -e "${GREEN}✓ Synced ${LOCAL_COUNT} images from server to local${NC}"
 echo ""
 
 # Cleanup

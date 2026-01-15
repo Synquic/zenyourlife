@@ -22,12 +22,13 @@ const rentalTestimonialSchema = new mongoose.Schema({
     required: [true, 'Testimonial text is required'],
     trim: true
   },
-  // Translations for different languages (fr, de, nl)
+  // Translations for different languages (fr, de, nl, es)
   // English is the default stored in text/role fields
   translations: {
     fr: rentalTestimonialTranslationSchema,
     de: rentalTestimonialTranslationSchema,
-    nl: rentalTestimonialTranslationSchema
+    nl: rentalTestimonialTranslationSchema,
+    es: rentalTestimonialTranslationSchema
   },
   photo: {
     type: String,

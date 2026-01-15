@@ -227,16 +227,6 @@ const Home = () => {
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8 sm:mb-12">
-            <div className="relative inline-block mb-3 sm:mb-4">
-              {/* Glow effect layers */}
-              <div className="absolute inset-0 bg-[#F5D88E]/30 blur-2xl rounded-full scale-150"></div>
-              <div className="absolute inset-0 bg-[#F5D88E]/20 blur-3xl rounded-full scale-[2]"></div>
-
-              <span className="relative inline-flex items-center gap-2 bg-white text-[#B8860B] px-4 sm:px-6 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm shadow-lg">
-                <img src={lock} alt="Lock" className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                {t('nav.services')}
-              </span>
-            </div>
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-normal text-gray-900 mb-3 sm:mb-4 px-2">
               {t('home.exclusive_services')}
             </h2>
@@ -337,7 +327,7 @@ const Home = () => {
             <div
               className="md:w-1/2 p-5 sm:p-8 md:p-12 flex items-center order-2 md:order-1"
               style={{
-                background: 'linear-gradient(to right, #8C3C06, #DFB13B, #FEFFCF)'
+                background: 'linear-gradient(to right, #5A2604, #8C6A1F, #C4A962)'
               }}
             >
               <p className="text-white text-sm sm:text-lg md:text-xl leading-relaxed font-light drop-shadow-sm">

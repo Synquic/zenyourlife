@@ -14,6 +14,18 @@ const targetAudienceItemSchema = new mongoose.Schema({
   }
 });
 
+// Translation schema for ServicePageContent
+const servicePageTranslationSchema = new mongoose.Schema({
+  benefits: [{
+    description: String
+  }],
+  targetAudience: [{
+    description: String
+  }],
+  benefitsTitle: String,
+  targetAudienceTitle: String
+}, { _id: false });
+
 const servicePageContentSchema = new mongoose.Schema({
   benefits: [benefitItemSchema],
   targetAudience: [targetAudienceItemSchema],
@@ -24,6 +36,14 @@ const servicePageContentSchema = new mongoose.Schema({
   targetAudienceTitle: {
     type: String,
     default: "Who It's For"
+  },
+
+  // Translations for different languages
+  translations: {
+    fr: servicePageTranslationSchema,
+    de: servicePageTranslationSchema,
+    nl: servicePageTranslationSchema,
+    es: servicePageTranslationSchema
   }
 }, {
   timestamps: true

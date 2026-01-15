@@ -24,12 +24,13 @@ const propertySchema = new mongoose.Schema({
     required: [true, 'Description is required'],
     trim: true
   },
-  // Translations for different languages (fr, de, nl)
+  // Translations for different languages (fr, de, nl, es)
   // English is the default stored in main fields
   translations: {
     fr: propertyTranslationSchema,
     de: propertyTranslationSchema,
-    nl: propertyTranslationSchema
+    nl: propertyTranslationSchema,
+    es: propertyTranslationSchema
   },
   price: {
     type: Number,

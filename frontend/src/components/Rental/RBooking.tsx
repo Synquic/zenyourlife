@@ -30,7 +30,7 @@ interface RBookingProps {
 }
 
 const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedProperty, setSelectedProperty] = useState<string | null>(preSelectedProperty?._id || null);
   const [showDateSelection, setShowDateSelection] = useState<boolean>(!!preSelectedProperty); // Skip to date if property pre-selected
   const [properties, setProperties] = useState<Property[]>([]);
@@ -50,7 +50,8 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
     const fetchProperties = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}/properties`)
+        const currentLang = i18n.language || 'en';
+        const response = await fetch(`${API_BASE_URL}/translate/properties?lang=${currentLang}`)
         const data = await response.json();
 
         if (data.success) {
@@ -67,7 +68,7 @@ const RBooking: React.FC<RBookingProps> = ({ onClose, preSelectedProperty }) => 
     };
 
     fetchProperties();
-  }, []);
+  }, [i18n.language]);
 
   const handlePropertyClick = (property: Property) => {
     setSelectedProperty(property._id);

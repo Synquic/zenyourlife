@@ -23,11 +23,12 @@ const faqSchema = new mongoose.Schema({
     required: [true, 'FAQ category is required'],
     index: true
   },
-  // Translations for FR, DE, NL (EN is default in question/answer)
+  // Translations for FR, DE, NL, ES (EN is default in question/answer)
   translations: {
     fr: faqTranslationSchema,
     de: faqTranslationSchema,
-    nl: faqTranslationSchema
+    nl: faqTranslationSchema,
+    es: faqTranslationSchema
   },
   isActive: {
     type: Boolean,

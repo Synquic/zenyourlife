@@ -1,5 +1,5 @@
 import { useState } from 'react'
-
+import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import RFooter from '../../components/Rental/RFooter'
 import RNavbar from '../../components/Rental/RNavbar'
@@ -36,6 +36,7 @@ const AccordionItem = ({ title, children, isOpen, onToggle }: AccordionItemProps
 
 const RPrivacy = () => {
   const [openSection, setOpenSection] = useState<string | null>('privacy')
+  const { t } = useTranslation()
 
   const toggleSection = (section: string) => {
     setOpenSection(openSection === section ? null : section)
@@ -103,7 +104,7 @@ const RPrivacy = () => {
                 <li>The right to object to processing of your personal data</li>
               </ul>
               <p className="mt-4">
-                To exercise any of these rights, please contact us at privacy@zenyourlife.be.
+                To exercise any of these rights, please contact us at {t('company.email_privacy')}.
               </p>
             </AccordionItem>
 
@@ -191,8 +192,8 @@ const RPrivacy = () => {
           <div className="mt-12 text-center">
             <p className="text-sm text-gray-600">
               If you have any questions about our Privacy Policy or Terms of Service, please contact us at{' '}
-              <a href="mailto:info@zenyourlife.be" className="text-[#0D9488] hover:underline">
-                info@zenyourlife.be
+              <a href={`mailto:${t('company.email')}`} className="text-[#0D9488] hover:underline">
+                {t('company.email')}
               </a>
             </p>
           </div>

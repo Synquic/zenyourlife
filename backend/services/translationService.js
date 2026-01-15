@@ -188,12 +188,30 @@ async function translateProperty(property, targetLang) {
   }
 
   const propertyObj = property.toObject ? property.toObject() : { ...property };
+
+  // Check if property has stored translations in the database
+  const storedTranslation = propertyObj.translations?.[targetLang];
+
+  if (storedTranslation && storedTranslation.description) {
+    // Use stored translations from DB (cost-efficient approach)
+    return {
+      ...propertyObj,
+      name: storedTranslation.name || propertyObj.name,
+      description: storedTranslation.description || propertyObj.description,
+      priceUnit: storedTranslation.priceUnit || propertyObj.priceUnit,
+      parking: storedTranslation.parking || propertyObj.parking,
+      cleanliness: storedTranslation.cleanliness || propertyObj.cleanliness,
+      amenities: storedTranslation.amenities?.length > 0 ? storedTranslation.amenities : propertyObj.amenities
+    };
+  }
+
+  // Fallback: If no stored translation, use real-time translation
   const referenceId = propertyObj._id;
 
-  // Translate main fields
+  // Translate main fields (keep name in English, only translate description)
   const translated = await translateObject(
     propertyObj,
-    ['name', 'description'],
+    ['description'],
     targetLang,
     'property',
     referenceId
