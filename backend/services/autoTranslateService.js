@@ -24,13 +24,21 @@ const DEEPL_LANGUAGE_MAP = {
 const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate';
 const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
 
+// Rate limiting configuration
+const RATE_LIMIT_DELAY_MS = 500; // Delay between API calls to avoid rate limiting
+
+/**
+ * Sleep utility for rate limiting
+ */
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 /**
  * Translate a single text string to a specific language using DeepL API
  * @param {string} text - Text to translate (English)
  * @param {string} targetLang - Target language code (fr, de, nl)
  * @returns {Promise<string>} - Translated text
  */
-async function translateWithDeepL(text, targetLang) {
+async function translateWithDeepL(text, targetLang, retryCount = 0) {
   if (!text || text.trim() === '' || !DEEPL_API_KEY) {
     return text;
   }
@@ -47,12 +55,22 @@ async function translateWithDeepL(text, targetLang) {
       }
     });
 
+    // Add delay after successful call to avoid rate limiting
+    await sleep(RATE_LIMIT_DELAY_MS);
+
     if (response.data && response.data.translations && response.data.translations[0]) {
       console.log(`✅ [DeepL API SUCCESS] ${targetLang}: "${response.data.translations[0].text.substring(0, 50)}..."`);
       return response.data.translations[0].text;
     }
     return text;
   } catch (error) {
+    // Handle rate limiting with exponential backoff
+    if (error.response && error.response.status === 429 && retryCount < 3) {
+      const waitTime = (retryCount + 1) * 5000; // 5s, 10s, 15s
+      console.log(`⏳ [DeepL RATE LIMITED] Waiting ${waitTime/1000}s before retry...`);
+      await sleep(waitTime);
+      return translateWithDeepL(text, targetLang, retryCount + 1);
+    }
     console.error(`❌ [DeepL API ERROR] ${targetLang}:`, error.message);
     return text; // Fallback to original
   }
@@ -65,12 +83,12 @@ async function translateWithDeepL(text, targetLang) {
  */
 async function translateToAllLanguages(text) {
   if (!text || text.trim() === '') {
-    return { fr: '', de: '', nl: '' };
+    return { fr: '', de: '', nl: '', es: '' };
   }
 
   if (!DEEPL_API_KEY) {
     console.warn('[AutoTranslate] DEEPL_API_KEY not configured, skipping translation');
-    return { fr: text, de: text, nl: text };
+    return { fr: text, de: text, nl: text, es: text };
   }
 
   const translations = {};
@@ -94,16 +112,17 @@ async function translateToAllLanguages(text) {
  */
 async function translateArrayToAllLanguages(texts) {
   if (!texts || texts.length === 0) {
-    return { fr: [], de: [], nl: [] };
+    return { fr: [], de: [], nl: [], es: [] };
   }
 
-  const translations = { fr: [], de: [], nl: [] };
+  const translations = { fr: [], de: [], nl: [], es: [] };
 
   for (const text of texts) {
     const translated = await translateToAllLanguages(text);
     translations.fr.push(translated.fr);
     translations.de.push(translated.de);
     translations.nl.push(translated.nl);
+    translations.es.push(translated.es);
   }
 
   return translations;
@@ -117,7 +136,7 @@ async function translateArrayToAllLanguages(texts) {
 async function autoTranslateService(serviceData) {
   console.log('[AutoTranslate] Translating service:', serviceData.title);
 
-  const translations = { fr: {}, de: {}, nl: {} };
+  const translations = { fr: {}, de: {}, nl: {}, es: {} };
 
   try {
     // Translate title
@@ -209,7 +228,7 @@ async function autoTranslateService(serviceData) {
 async function autoTranslateTestimonial(testimonialData) {
   console.log('[AutoTranslate] Translating testimonial for:', testimonialData.name);
 
-  const translations = { fr: {}, de: {}, nl: {} };
+  const translations = { fr: {}, de: {}, nl: {}, es: {} };
 
   try {
     // Translate text
@@ -249,7 +268,7 @@ async function autoTranslateTestimonial(testimonialData) {
 async function autoTranslateProperty(propertyData) {
   console.log('[AutoTranslate] Translating property:', propertyData.name);
 
-  const translations = { fr: {}, de: {}, nl: {} };
+  const translations = { fr: {}, de: {}, nl: {}, es: {} };
 
   try {
     // Translate name (keep as-is if it's a proper noun/place name)
@@ -327,7 +346,7 @@ async function autoTranslateProperty(propertyData) {
 async function autoTranslateSectionSettings(settingsData) {
   console.log('[AutoTranslate] Translating section settings:', settingsData.sectionType);
 
-  const translations = { fr: {}, de: {}, nl: {} };
+  const translations = { fr: {}, de: {}, nl: {}, es: {} };
 
   try {
     // Translate title
@@ -362,7 +381,7 @@ async function autoTranslateSectionSettings(settingsData) {
 async function autoTranslateFAQ(faqData) {
   console.log('[AutoTranslate] Translating FAQ:', faqData.question?.substring(0, 50));
 
-  const translations = { fr: {}, de: {}, nl: {} };
+  const translations = { fr: {}, de: {}, nl: {}, es: {} };
 
   try {
     // Translate question
