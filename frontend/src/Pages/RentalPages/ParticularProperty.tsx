@@ -99,24 +99,11 @@ const amenityIcons: { [key: string]: React.ReactNode } = {
   ),
 };
 
-// Amenity labels mapping
-const amenityLabels: { [key: string]: string } = {
-  wifi: 'High-speed Wi-Fi',
-  washing: 'Washing machine',
-  tv: 'Smart TV',
-  linens: 'Fresh linens & towels',
-  safe: 'Safe neighborhood',
-  coffee: 'Coffee maker',
-  outdoor: 'Outdoor seating',
-  checkin: 'Self check-in',
-  ac: 'Air conditioning',
-  pool: 'Swimming pool',
-  kitchen: 'Fully equipped kitchen',
-  parking: 'Free parking',
-  garden: 'Private garden',
-  gym: 'Gym access',
-  view: 'Ocean/Mountain view',
-};
+// Amenity labels mapping - keys for i18n lookup
+const amenityKeys = [
+  'wifi', 'washing', 'tv', 'linens', 'safe', 'coffee', 'outdoor',
+  'checkin', 'ac', 'pool', 'kitchen', 'parking', 'garden', 'gym', 'view'
+];
 // Map image names to imported images
 const imageMap: { [key: string]: string } = {
   "Apat1.png": apat1,
@@ -654,7 +641,10 @@ const ParticularProperty = () => {
               {property.amenities.map((amenityId, index) => {
                 // Check if it's a predefined amenity with an icon
                 const icon = amenityIcons[amenityId];
-                const label = amenityLabels[amenityId] || amenityId;
+                // Use i18n translation for label, fallback to amenityId if not found
+                const label = amenityKeys.includes(amenityId)
+                  ? t(`rental.amenities_list.${amenityId}`, amenityId)
+                  : amenityId;
 
                 return (
                   <div key={index} className="flex items-center gap-2 sm:gap-3">
@@ -958,3 +948,4 @@ const ParticularProperty = () => {
 };
 
 export default ParticularProperty;
+

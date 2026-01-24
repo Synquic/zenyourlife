@@ -10,7 +10,27 @@ const propertyTranslationSchema = new mongoose.Schema({
     title: String,
     description: String
   },
-  amenities: [String]
+  amenities: [String],
+  // Overview section translations
+  overview: {
+    title: String,
+    description1: String,
+    description2: String,
+    highlights: [String],
+    // Features cards translations
+    features: [{
+      title: String,
+      description: String
+    }]
+  },
+  // Location section translations
+  location: {
+    title: String,
+    description: String,
+    places: [{
+      title: String
+    }]
+  }
 }, { _id: false });
 
 const propertySchema = new mongoose.Schema({

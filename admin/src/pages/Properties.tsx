@@ -10,6 +10,7 @@ import {
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL, getImageUrl } from '../config/api'
+import { apiUpload } from '../utils/api'
 
 // Available images for selection with colors
 const availableImages = [
@@ -342,12 +343,7 @@ const Properties = () => {
     uploadFormData.append('image', file)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: uploadFormData
-      })
-
-      const data = await response.json()
+      const data = await apiUpload('/upload/image', uploadFormData)
       console.log('Upload response:', data)
       if (data.success && data.data?.url) {
         const updatedCards = [...overviewSettings.cards]
@@ -359,6 +355,7 @@ const Properties = () => {
       }
     } catch (error) {
       console.error('Error uploading image:', error)
+      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
       setUploadingOverviewImage(null)
     }
@@ -403,12 +400,7 @@ const Properties = () => {
     uploadFormData.append('image', file)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: uploadFormData
-      })
-
-      const data = await response.json()
+      const data = await apiUpload('/upload/image', uploadFormData)
       console.log('Feature image upload response:', data)
 
       if (data.success && data.data?.url) {
@@ -421,7 +413,7 @@ const Properties = () => {
       }
     } catch (error) {
       console.error('Error uploading feature image:', error)
-      alert('Failed to upload image')
+      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
       setUploadingFeatureImage(null)
     }
@@ -567,11 +559,7 @@ const Properties = () => {
     formDataUpload.append('image', file)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: formDataUpload
-      })
-      const data = await response.json()
+      const data = await apiUpload('/upload/image', formDataUpload)
       if (data.success && data.data?.url) {
         setFormData(prev => ({ ...prev, imageUrl: data.data.url }))
       } else {
@@ -579,7 +567,7 @@ const Properties = () => {
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Failed to upload image')
+      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
       setUploadingImage(false)
     }
@@ -630,28 +618,10 @@ const Properties = () => {
     formDataUpload.append('image', file)
 
     try {
-      console.log('Uploading place image to:', `${API_BASE_URL}/upload/image`)
+      console.log('Uploading place image...')
       console.log('File details:', { name: file.name, size: file.size, type: file.type })
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: formDataUpload
-      })
 
-      if (!response.ok) {
-        let errorMessage = `Server returned ${response.status}`
-        try {
-          const errorData = await response.json()
-          console.error('Upload response not OK:', response.status, errorData)
-          errorMessage = errorData.message || errorMessage
-        } catch {
-          const errorText = await response.text()
-          console.error('Upload response not OK:', response.status, errorText)
-        }
-        alert(`Failed to upload image: ${errorMessage}`)
-        return
-      }
-
-      const data = await response.json()
+      const data = await apiUpload('/upload/image', formDataUpload)
       console.log('Upload response:', data)
 
       if (data.success && data.data?.url) {
@@ -665,14 +635,7 @@ const Properties = () => {
       }
     } catch (error: any) {
       console.error('Error uploading place image:', error)
-      // Provide more details about the error
-      let errorMessage = 'Something went wrong!'
-      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        errorMessage = 'Cannot connect to server. Is the backend running on port 5000?'
-      } else if (error.message) {
-        errorMessage = error.message
-      }
-      alert('Failed to upload image: ' + errorMessage)
+      alert('Failed to upload image: ' + (error.message || 'Unknown error'))
     } finally {
       setUploadingPlaceImage(null)
       // Reset the input value to allow re-uploading the same file
@@ -697,11 +660,7 @@ const Properties = () => {
     formDataUpload.append('image', file)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/upload/image`, {
-        method: 'POST',
-        body: formDataUpload
-      })
-      const data = await response.json()
+      const data = await apiUpload('/upload/image', formDataUpload)
       if (data.success && data.data?.url) {
         setFormData(prev => ({
           ...prev,
@@ -712,7 +671,7 @@ const Properties = () => {
       }
     } catch (error) {
       console.error('Error uploading gallery image:', error)
-      alert('Failed to upload image')
+      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
       setUploadingImage(false)
     }

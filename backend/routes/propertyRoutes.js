@@ -16,6 +16,51 @@ const getTranslatedProperty = (property, lang) => {
 
   const translation = propertyObj.translations[lang];
 
+  // Build translated overview if it exists
+  let translatedOverview = propertyObj.overview;
+  if (translation.overview && propertyObj.overview) {
+    // Translate features array if available
+    let translatedFeatures = propertyObj.overview.features || [];
+    if (translation.overview.features?.length > 0 && propertyObj.overview.features?.length > 0) {
+      translatedFeatures = propertyObj.overview.features.map((feature, idx) => ({
+        ...feature,
+        title: translation.overview.features[idx]?.title || feature.title,
+        description: translation.overview.features[idx]?.description || feature.description
+      }));
+    }
+
+    translatedOverview = {
+      ...propertyObj.overview,
+      title: translation.overview.title || propertyObj.overview.title,
+      description1: translation.overview.description1 || propertyObj.overview.description1,
+      description2: translation.overview.description2 || propertyObj.overview.description2,
+      highlights: translation.overview.highlights?.length > 0
+        ? translation.overview.highlights
+        : (propertyObj.overview.highlights || []),
+      features: translatedFeatures
+    };
+  }
+
+  // Build translated location if it exists
+  let translatedLocation = propertyObj.location;
+  if (translation.location && propertyObj.location) {
+    // Translate places array if available
+    let translatedPlaces = propertyObj.location.places || [];
+    if (translation.location.places?.length > 0 && propertyObj.location.places?.length > 0) {
+      translatedPlaces = propertyObj.location.places.map((place, idx) => ({
+        ...place,
+        title: translation.location.places[idx]?.title || place.title
+      }));
+    }
+
+    translatedLocation = {
+      ...propertyObj.location,
+      title: translation.location.title || propertyObj.location.title,
+      description: translation.location.description || propertyObj.location.description,
+      places: translatedPlaces
+    };
+  }
+
   // Return property with translated fields, falling back to original if translation is missing
   return {
     ...propertyObj,
@@ -27,7 +72,9 @@ const getTranslatedProperty = (property, lang) => {
       title: translation.cleanliness?.title || propertyObj.cleanliness?.title,
       description: translation.cleanliness?.description || propertyObj.cleanliness?.description
     },
-    amenities: translation.amenities?.length > 0 ? translation.amenities : (propertyObj.amenities || [])
+    amenities: translation.amenities?.length > 0 ? translation.amenities : (propertyObj.amenities || []),
+    overview: translatedOverview,
+    location: translatedLocation
   };
 };
 

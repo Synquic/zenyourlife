@@ -26,7 +26,8 @@
   "hero": {
     "welcome": "Willkommen bei",
     "title": "Zen Your Life",
-    "subtitle": "Erleben Sie die Kunst der Entspannung und Verjüngung",
+    "subtitle": "Erleben Sie die Kunst der Entspannung und Verjüngung"
+,
     "description": "Entdecken Sie unsere Premium-Wellness-Dienste, die darauf ausgelegt sind, das Gleichgewicht in Körper, Geist und Seele wiederherzustellen.",
     "cta_book": "Termin Buchen",
     "cta_services": "Unsere Dienste"
@@ -419,13 +420,19 @@
     "amenities_list": {
       "wifi": "Schnelles WLAN",
       "washing": "Waschmaschine",
-      "parking": "Kostenloser Parkplatz",
       "tv": "Smart TV",
       "linens": "Frische Bettwäsche und Handtücher",
       "safe": "Sichere Nachbarschaft",
       "coffee": "Kaffeemaschine",
       "outdoor": "Außensitzbereich",
-      "checkin": "Selbst-Check-in"
+      "checkin": "Selbst-Check-in",
+      "ac": "Klimaanlage",
+      "pool": "Schwimmbad",
+      "kitchen": "Voll ausgestattete Küche",
+      "parking": "Kostenloser Parkplatz",
+      "garden": "Privatgarten",
+      "gym": "Fitnesszugang",
+      "view": "Meer-/Bergblick"
     },
     "location": {
       "label": "Lage",

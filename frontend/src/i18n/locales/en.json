@@ -427,13 +427,19 @@
     "amenities_list": {
       "wifi": "High-speed Wi-Fi",
       "washing": "Washing machine",
-      "parking": "Free parking",
       "tv": "Smart TV",
       "linens": "Fresh linens & towels",
       "safe": "Safe neighborhood",
       "coffee": "Coffee maker",
       "outdoor": "Outdoor seating",
-      "checkin": "Self check-in"
+      "checkin": "Self check-in",
+      "ac": "Air conditioning",
+      "pool": "Swimming pool",
+      "kitchen": "Fully equipped kitchen",
+      "parking": "Free parking",
+      "garden": "Private garden",
+      "gym": "Gym access",
+      "view": "Ocean/Mountain view"
     },
     "location": {
       "label": "Location",

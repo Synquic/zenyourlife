@@ -419,13 +419,19 @@
     "amenities_list": {
       "wifi": "WiFi de alta velocidad",
       "washing": "Lavadora",
-      "parking": "Estacionamiento gratuito",
       "tv": "Smart TV",
       "linens": "Ropa de cama y toallas frescas",
       "safe": "Vecindario seguro",
       "coffee": "Cafetera",
       "outdoor": "Asientos al aire libre",
-      "checkin": "Auto check-in"
+      "checkin": "Auto check-in",
+      "ac": "Aire acondicionado",
+      "pool": "Piscina",
+      "kitchen": "Cocina totalmente equipada",
+      "parking": "Estacionamiento gratuito",
+      "garden": "Jardín privado",
+      "gym": "Acceso al gimnasio",
+      "view": "Vista al mar/montaña"
     },
     "location": {
       "label": "Ubicación",
