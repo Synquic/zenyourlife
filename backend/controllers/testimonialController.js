@@ -134,6 +134,11 @@ exports.getTestimonialById = async (req, res) => {
 // Create new testimonial - Auto-translates content to FR/DE/NL
 exports.createTestimonial = async (req, res) => {
   try {
+    // Sanitize propertyId - convert empty string to null (Mongoose can't cast '' to ObjectId)
+    if (req.body.propertyId === '' || req.body.propertyId === undefined) {
+      req.body.propertyId = null;
+    }
+
     // Auto-translate content to all languages and store in DB
     console.log('[Testimonial Create] Auto-translating content...');
     let translations = { fr: {}, de: {}, nl: {} };
@@ -170,6 +175,17 @@ exports.createTestimonial = async (req, res) => {
 // Update testimonial - Auto-translates content to FR/DE/NL
 exports.updateTestimonial = async (req, res) => {
   try {
+    // Sanitize propertyId - convert empty string to null (Mongoose can't cast '' to ObjectId)
+    if (req.body.propertyId === '' || req.body.propertyId === undefined) {
+      req.body.propertyId = null;
+    }
+
+    // Remove immutable/internal fields that shouldn't be in the update
+    delete req.body._id;
+    delete req.body.__v;
+    delete req.body.createdAt;
+    delete req.body.updatedAt;
+
     // Check if translatable fields are being updated
     const translatableFields = ['text', 'role'];
     const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);

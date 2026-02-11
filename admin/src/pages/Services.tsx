@@ -856,8 +856,15 @@ const Services = () => {
       const data = await response.json();
 
       if (data.success) {
+        // Update services list directly from the server response
+        // to avoid race condition where fetchServices() returns stale data
+        if (editingService && data.data) {
+          setServices(prev => prev.map(s => s._id === editingService._id ? data.data : s));
+        } else {
+          // New service — refetch the full list
+          await fetchServices();
+        }
         setShowModal(false);
-        fetchServices();
         setFormData(initialFormData);
         setEditingService(null);
       } else {
@@ -1671,62 +1678,11 @@ const Services = () => {
                 </div>
               </div>
 
-              {/* Image Selection */}
-              <div>
-                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2 sm:mb-3">
-                  Select Image
-                </label>
-                <div className="grid grid-cols-3 gap-1.5 sm:gap-3">
-                  {availableImages.map((img) => (
-                    <button
-                      key={img.name}
-                      type="button"
-                      onClick={() =>
-                        setFormData({ ...formData, image: img.name })
-                      }
-                      className={`relative p-1.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all ${
-                        formData.image === img.name
-                          ? "bg-[#FFEEC3]/20 border-2 border-[#DFB13B] shadow-lg shadow-[#DFB13B]/20"
-                          : "bg-slate-50 border-2 border-transparent hover:border-slate-200"
-                      }`}
-                    >
-                      <div className="h-10 sm:h-16 rounded-lg sm:rounded-xl overflow-hidden mb-1 sm:mb-2">
-                        <img
-                          src={img.src}
-                          alt={img.label}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-[10px] sm:text-xs text-slate-500 text-center truncate">
-                        {img.label}
-                      </p>
-                      {formData.image === img.name && (
-                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 w-4 h-4 sm:w-5 sm:h-5 bg-[#DFB13B] rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-2 h-2 sm:w-3 sm:h-3 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={3}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Custom Image URL or Upload */}
+              {/* Service Image Upload */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
-                  Custom Image{" "}
-                  <span className="font-normal text-slate-400">(Optional - URL or Upload)</span>
+                  Service Image{" "}
+                  <span className="font-normal text-slate-400">(URL or Upload)</span>
                 </label>
 
                 {/* Show uploaded image preview if exists */}
@@ -1782,7 +1738,7 @@ const Services = () => {
                   </button>
                 </div>
                 <p className="text-[10px] sm:text-xs text-slate-400 mt-1.5 sm:mt-2">
-                  If provided, this will override the selected image above
+                  Upload an image or paste an image URL for this service
                 </p>
               </div>
 

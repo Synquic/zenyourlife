@@ -3,6 +3,15 @@ const nodemailer = require('nodemailer');
 const Enrollment = require('../models/Enrollment');
 const { sendCustomerSmsReminder, sendAdminSmsReminder, initializeTwilio } = require('./twilioSmsService');
 
+// Belgium timezone constant
+const BELGIUM_TIMEZONE = 'Europe/Brussels';
+
+// Get current date/time in Belgium timezone
+const getBelgiumNow = () => {
+  const now = new Date();
+  return new Date(now.toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE }));
+};
+
 // Create email transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -16,6 +25,7 @@ const transporter = nodemailer.createTransport({
 const generateCustomerReminderTemplate = (enrollment) => {
   const appointmentDate = new Date(enrollment.appointmentDate);
   const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    timeZone: BELGIUM_TIMEZONE,
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -91,6 +101,7 @@ const generateCustomerReminderTemplate = (enrollment) => {
 const generateAdminReminderTemplate = (enrollment) => {
   const appointmentDate = new Date(enrollment.appointmentDate);
   const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    timeZone: BELGIUM_TIMEZONE,
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -223,20 +234,24 @@ const sendAdminReminder = async (enrollment) => {
   }
 };
 
-// Check and send customer reminders (appointments tomorrow)
+// Check and send customer reminders (appointments tomorrow in Belgium timezone)
 const checkCustomerReminders = async () => {
   try {
-    const now = new Date();
-    const tomorrow = new Date(now);
+    const belgiumNow = getBelgiumNow();
+    console.log(`[Reminder] Belgium time now: ${belgiumNow.toISOString()}`);
+
+    const tomorrow = new Date(belgiumNow);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Set to start of tomorrow
+    // Set to start of tomorrow in Belgium timezone
     const tomorrowStart = new Date(tomorrow);
     tomorrowStart.setHours(0, 0, 0, 0);
 
-    // Set to end of tomorrow
+    // Set to end of tomorrow in Belgium timezone
     const tomorrowEnd = new Date(tomorrow);
     tomorrowEnd.setHours(23, 59, 59, 999);
+
+    console.log(`[Reminder] Looking for appointments between ${tomorrowStart.toISOString()} and ${tomorrowEnd.toISOString()} (Belgium tomorrow)`);
 
     // Find appointments for tomorrow that haven't received customer reminder (EMAIL)
     const emailEnrollments = await Enrollment.find({
@@ -249,7 +264,7 @@ const checkCustomerReminders = async () => {
       status: { $in: ['pending', 'confirmed'] }
     });
 
-    console.log(`Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders`);
+    console.log(`[Reminder] Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders`);
 
     for (const enrollment of emailEnrollments) {
       const sent = await sendCustomerReminder(enrollment);
@@ -257,6 +272,9 @@ const checkCustomerReminders = async () => {
         await Enrollment.findByIdAndUpdate(enrollment._id, {
           reminderSentToCustomer: true
         });
+        console.log(`[Reminder] ✅ Customer email reminder sent for enrollment #${enrollment.enrollmentId}`);
+      } else {
+        console.log(`[Reminder] ❌ Failed to send customer email reminder for enrollment #${enrollment.enrollmentId}`);
       }
     }
 
@@ -271,31 +289,35 @@ const checkCustomerReminders = async () => {
       status: { $in: ['pending', 'confirmed'] }
     });
 
-    console.log(`Found ${smsEnrollments.length} appointments for tomorrow needing SMS reminders`);
+    console.log(`[Reminder] Found ${smsEnrollments.length} appointments for tomorrow needing SMS reminders`);
 
     for (const enrollment of smsEnrollments) {
+      console.log(`[Reminder] Attempting SMS to ${enrollment.phoneNumber} (country: ${enrollment.country}) for enrollment #${enrollment.enrollmentId}`);
       const sent = await sendCustomerSmsReminder(enrollment);
       if (sent) {
         await Enrollment.findByIdAndUpdate(enrollment._id, {
           reminderSentToCustomer: true
         });
+        console.log(`[Reminder] ✅ Customer SMS reminder sent for enrollment #${enrollment.enrollmentId}`);
+      } else {
+        console.log(`[Reminder] ❌ Failed to send customer SMS reminder for enrollment #${enrollment.enrollmentId} - Check Twilio account (trial accounts only send to verified numbers)`);
       }
     }
   } catch (error) {
-    console.error('Error checking customer reminders:', error.message);
+    console.error('[Reminder] Error checking customer reminders:', error.message);
   }
 };
 
-// Check and send admin reminders (appointments in 15 minutes)
+// Check and send admin reminders (appointments in 15 minutes, Belgium timezone)
 const checkAdminReminders = async () => {
   try {
-    const now = new Date();
+    const belgiumNow = getBelgiumNow();
 
-    // Get today's date at midnight
-    const today = new Date(now);
+    // Get today's date at midnight in Belgium timezone
+    const today = new Date(belgiumNow);
     today.setHours(0, 0, 0, 0);
 
-    // Get tomorrow's date at midnight
+    // Get tomorrow's date at midnight in Belgium timezone
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -310,22 +332,24 @@ const checkAdminReminders = async () => {
     });
 
     for (const enrollment of enrollments) {
-      // Parse appointment time
+      // Parse appointment time (stored as Belgium local time like "14:30")
       const [hours, minutes] = enrollment.appointmentTime.split(':').map(Number);
 
-      // Create appointment datetime
-      const appointmentDateTime = new Date(enrollment.appointmentDate);
+      // Create appointment datetime in Belgium timezone
+      const appointmentDateTime = new Date(today);
       appointmentDateTime.setHours(hours, minutes, 0, 0);
 
       // Calculate 15 minutes before appointment
       const reminderTime = new Date(appointmentDateTime);
       reminderTime.setMinutes(reminderTime.getMinutes() - 15);
 
-      // Check if it's time to send (within 5 minute window)
-      const timeDiff = now.getTime() - reminderTime.getTime();
+      // Check if it's time to send (within 5 minute window) using Belgium time
+      const timeDiff = belgiumNow.getTime() - reminderTime.getTime();
 
       // Send if we're within 5 minutes after the reminder time (to account for cron interval)
       if (timeDiff >= 0 && timeDiff <= 5 * 60 * 1000) {
+        console.log(`[Reminder] Admin reminder triggered for enrollment #${enrollment.enrollmentId} at ${enrollment.appointmentTime}`);
+
         // Send email reminder to admin
         const emailSent = await sendAdminReminder(enrollment);
 
@@ -336,11 +360,14 @@ const checkAdminReminders = async () => {
           await Enrollment.findByIdAndUpdate(enrollment._id, {
             reminderSentToAdmin: true
           });
+          console.log(`[Reminder] ✅ Admin reminder sent (email: ${emailSent}, sms: ${smsSent}) for enrollment #${enrollment.enrollmentId}`);
+        } else {
+          console.log(`[Reminder] ❌ Failed to send admin reminder for enrollment #${enrollment.enrollmentId}`);
         }
       }
     }
   } catch (error) {
-    console.error('Error checking admin reminders:', error.message);
+    console.error('[Reminder] Error checking admin reminders:', error.message);
   }
 };
 
@@ -351,20 +378,24 @@ const startReminderScheduler = () => {
   // Initialize Twilio for SMS reminders
   initializeTwilio();
 
-  // Check customer reminders every day at 9:00 AM (for tomorrow's appointments)
+  // Check customer reminders every day at 9:00 AM Belgium time (for tomorrow's appointments)
   cron.schedule('0 9 * * *', () => {
-    console.log('Running customer reminder check at 9:00 AM');
+    console.log('[Reminder] Running customer reminder check at 9:00 AM Belgium time');
     checkCustomerReminders();
+  }, {
+    timezone: BELGIUM_TIMEZONE
   });
 
   // Check admin reminders every 5 minutes (for 15-min-before notifications)
   cron.schedule('*/5 * * * *', () => {
     checkAdminReminders();
+  }, {
+    timezone: BELGIUM_TIMEZONE
   });
 
-  console.log('Reminder scheduler started successfully');
-  console.log('- Customer reminders: Daily at 9:00 AM (for next day appointments)');
-  console.log('- Admin reminders: Every 5 minutes (15 min before appointment)');
+  console.log('Reminder scheduler started successfully (Belgium timezone)');
+  console.log('- Customer reminders: Daily at 9:00 AM Belgium time (for next day appointments)');
+  console.log('- Admin reminders: Every 5 minutes (15 min before appointment, Belgium time)');
   console.log('- SMS reminders: Enabled if Twilio credentials are configured');
 };
 

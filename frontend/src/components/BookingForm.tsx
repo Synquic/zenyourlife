@@ -18,10 +18,21 @@ interface BookingFormProps {
   onSuccess?: () => void;
   selectedService?: Service | null;
   selectedDate?: Date | null;
+  selectedDateStr?: string;
   selectedTime?: string;
 }
 
-const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate = null, selectedTime = '' }: BookingFormProps) => {
+const COUNTRY_CODES: Record<string, string> = {
+  BE: '+32',
+  IN: '+91',
+  US: '+1',
+  GB: '+44',
+  FR: '+33',
+  DE: '+49',
+  NL: '+31',
+}
+
+const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate = null, selectedDateStr = '', selectedTime = '' }: BookingFormProps) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -32,7 +43,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
     gender: "",
     specialRequests: "",
     message: "",
-    reminderPreference: "email", // email or sms
+    reminderSms: false,
   });
   const [showError, setShowError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,20 +96,22 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
       const appointmentDate = selectedDate ? new Date(selectedDate) : new Date();
 
       // Prepare appointment data
+      // Use selectedDateStr (YYYY-MM-DD Belgium calendar date) for timezone-safe storage
+      const fullPhoneNumber = `${COUNTRY_CODES[formData.country] || '+32'} ${formData.phoneNumber}`;
       const appointmentData = {
         serviceId: selectedService?._id,
         serviceTitle: selectedService?.title,
-        selectedDate: appointmentDate.toISOString(),
+        selectedDate: selectedDateStr || appointmentDate.toISOString(),
         selectedTime: selectedTime,
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
+        phoneNumber: fullPhoneNumber,
         country: formData.country,
         gender: formData.gender,
         specialRequests: formData.specialRequests,
         message: formData.message,
-        reminderPreference: formData.reminderPreference
+        reminderPreference: formData.reminderSms ? 'both' : 'email'
       };
 
       // Log complete booking information
@@ -133,7 +146,7 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        phoneNumber: formData.phoneNumber,
+        phoneNumber: fullPhoneNumber,
         country: formData.country,
         gender: formData.gender
       });
@@ -274,14 +287,18 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                       <option value="DE">DE</option>
                       <option value="NL">NL</option>
                     </select>
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      placeholder={t('booking.phone_placeholder')}
-                      value={formData.phoneNumber}
-                      onChange={handleInputChange}
-                      className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
-                    />
+                    <div className="flex-1 flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-[#d4af37] focus-within:border-transparent transition">
+                      <span className="pl-3 sm:pl-4 text-sm sm:text-base text-gray-500 font-medium select-none">
+                        {COUNTRY_CODES[formData.country] || '+32'}
+                      </span>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        className="flex-1 px-2 sm:px-3 py-2.5 sm:py-3 bg-transparent focus:outline-none text-sm sm:text-base"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -309,27 +326,26 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
                     {t('booking.reminder') || 'Reminder Preference'}
                   </label>
                   <div className="flex gap-4 sm:gap-6">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center gap-2">
                       <input
-                        type="radio"
-                        name="reminderPreference"
-                        value="email"
-                        checked={formData.reminderPreference === "email"}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
+                        type="checkbox"
+                        checked={true}
+                        disabled
+                        className="w-4 h-4 accent-[#d4af37] opacity-70"
                       />
-                      <span className="text-sm text-gray-700">{t('booking.reminder_email')}</span>
+                      <span className="text-sm text-gray-700">{t('booking.reminder_email') || 'Email'}</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
-                        type="radio"
-                        name="reminderPreference"
-                        value="sms"
-                        checked={formData.reminderPreference === "sms"}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 text-[#d4af37] border-gray-300 focus:ring-[#d4af37] accent-[#d4af37]"
+                        type="checkbox"
+                        checked={formData.reminderSms as boolean}
+                        onChange={(e) => {
+                          setFormData(prev => ({ ...prev, reminderSms: e.target.checked }))
+                          setShowError(false)
+                        }}
+                        className="w-4 h-4 accent-[#d4af37]"
                       />
-                      <span className="text-sm text-gray-700">{t('booking.reminder_sms')}</span>
+                      <span className="text-sm text-gray-700">{t('booking.reminder_sms') || 'SMS'}</span>
                     </label>
                   </div>
                 </div>

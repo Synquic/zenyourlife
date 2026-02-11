@@ -436,11 +436,11 @@ function generateCustomerEmailTemplate(booking) {
           <div class="section-title">📅 Your Booking Details</div>
           <div class="info-row">
             <span class="label">Check-in Date:</span>
-            <span class="value">${booking.booking.checkInDate.toDateString()}</span>
+            <span class="value">${booking.booking.checkInDate.toLocaleDateString('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
           <div class="info-row">
             <span class="label">Check-out Date:</span>
-            <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toDateString() : 'N/A'}</span>
+            <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toLocaleDateString('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</span>
           </div>
           <div class="info-row">
             <span class="label">Number of Nights:</span>
@@ -567,11 +567,11 @@ function generateAdminEmailTemplate(booking) {
             <div class="section-title">📅 Booking Details</div>
             <div class="info-row">
               <span class="label">Check-in Date:</span>
-              <span class="value">${booking.booking.checkInDate.toDateString()}</span>
+              <span class="value">${booking.booking.checkInDate.toLocaleDateString('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
             </div>
             <div class="info-row">
               <span class="label">Check-out Date:</span>
-              <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toDateString() : 'N/A'}</span>
+              <span class="value">${booking.booking.checkOutDate ? booking.booking.checkOutDate.toLocaleDateString('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</span>
             </div>
             <div class="info-row">
               <span class="label">Number of Nights:</span>

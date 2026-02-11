@@ -1,3 +1,5 @@
+const BELGIUM_TIMEZONE = 'Europe/Brussels';
+
 // Email template for enrollment confirmation
 exports.enrollmentConfirmationEmail = (enrollment) => {
   return `
@@ -87,7 +89,7 @@ exports.enrollmentConfirmationEmail = (enrollment) => {
           <div class="info-box">
             <p style="margin: 5px 0;"><span class="info-label">Enrollment ID:</span> <span class="info-value">#${enrollment.enrollmentId}</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Service:</span> <span class="info-value">${enrollment.serviceTitle}</span></p>
-            <p style="margin: 5px 0;"><span class="info-label">Date:</span> <span class="info-value">${new Date(enrollment.appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
+            <p style="margin: 5px 0;"><span class="info-label">Date:</span> <span class="info-value">${new Date(enrollment.appointmentDate).toLocaleDateString('en-US', { timeZone: BELGIUM_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Time:</span> <span class="info-value">${enrollment.appointmentTime}</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Duration:</span> <span class="info-value">${enrollment.service.duration} minutes</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Price:</span> <span class="info-value">€${enrollment.service.price}</span></p>
@@ -224,7 +226,7 @@ exports.adminNotificationEmail = (enrollment) => {
 
         <div class="info-row">
           <div class="label">Date:</div>
-          <div class="value">${new Date(enrollment.appointmentDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+          <div class="value">${new Date(enrollment.appointmentDate).toLocaleDateString('en-US', { timeZone: BELGIUM_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
         </div>
 
         <div class="info-row">
@@ -263,7 +265,7 @@ exports.adminNotificationEmail = (enrollment) => {
 
         <div class="info-row">
           <div class="label">Booked At:</div>
-          <div class="value">${new Date(enrollment.createdAt).toLocaleString()}</div>
+          <div class="value">${new Date(enrollment.createdAt).toLocaleString('en-BE', { timeZone: BELGIUM_TIMEZONE })}</div>
         </div>
       </div>
     </body>

@@ -9,7 +9,8 @@ export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://zenyourlife
 export const SERVER_BASE_URL = import.meta.env.VITE_SERVER_URL || 'https://zenyourlife.be';
 
 // Helper function to get full image URL from backend paths
-export const getImageUrl = (imagePath: string | undefined): string | null => {
+// Includes cache-busting to prevent browsers from showing stale cached images
+export const getImageUrl = (imagePath: string | undefined, cacheBust?: string | number): string | null => {
   if (!imagePath) return null;
 
   // Always convert localhost URLs to production server (for migration/legacy data)
@@ -22,22 +23,28 @@ export const getImageUrl = (imagePath: string | undefined): string | null => {
       .replace('localhost:3000', SERVER_BASE_URL);
   }
 
-  // If already a full production URL, return as-is
+  let url: string;
+
+  // If already a full production URL, use as-is
   if (processedPath.startsWith('https://zenyourlife.be')) {
-    return processedPath;
+    url = processedPath;
+  } else if (processedPath.startsWith('http://') || processedPath.startsWith('https://')) {
+    // If it's any other full URL, use as-is
+    url = processedPath;
+  } else if (processedPath.startsWith('/')) {
+    // If relative path starting with /, prepend server base URL
+    url = `${SERVER_BASE_URL}${processedPath}`;
+  } else {
+    // For paths without leading slash
+    url = `${SERVER_BASE_URL}/${processedPath}`;
   }
 
-  // If it's any other full URL, return as-is
-  if (processedPath.startsWith('http://') || processedPath.startsWith('https://')) {
-    return processedPath;
+  // Add cache-busting query param for uploaded images
+  if (url.includes('/uploads/')) {
+    const v = cacheBust || Date.now();
+    url += `?v=${v}`;
   }
 
-  // If relative path starting with /, prepend server base URL
-  if (processedPath.startsWith('/')) {
-    return `${SERVER_BASE_URL}${processedPath}`;
-  }
-
-  // For paths without leading slash
-  return `${SERVER_BASE_URL}/${processedPath}`;
+  return url;
 };
 

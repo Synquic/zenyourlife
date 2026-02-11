@@ -2,7 +2,7 @@ const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
 const nodemailer = require('nodemailer');
-const { BELGIUM_TIMEZONE } = require('../utils/timezone');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium } = require('../utils/timezone');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -270,19 +270,21 @@ exports.createEnrollment = async (req, res) => {
       });
     }
 
+    // Convert selectedDate to proper Belgium midnight UTC timestamp
+    // This ensures consistent storage regardless of which timezone the user booked from
+    const appointmentDateUTC = getStartOfDayBelgium(selectedDate);
+
     // Get day of the week from the date in Belgium timezone
-    const date = new Date(selectedDate);
-    // Use Intl.DateTimeFormat to get the correct day in Belgium timezone
     const appointmentDay = new Intl.DateTimeFormat('en-US', {
       timeZone: BELGIUM_TIMEZONE,
       weekday: 'long'
-    }).format(date);
+    }).format(appointmentDateUTC);
 
     // Create enrollment (enrollmentId will be auto-generated)
     const enrollment = new Enrollment({
       service: serviceId,
       serviceTitle: serviceTitle || service.title,
-      appointmentDate: selectedDate,
+      appointmentDate: appointmentDateUTC,
       appointmentDay: appointmentDay,
       appointmentTime: selectedTime,
       firstName,
@@ -303,7 +305,7 @@ exports.createEnrollment = async (req, res) => {
     await Appointment.create({
       service: serviceId,
       serviceTitle: serviceTitle || service.title,
-      appointmentDate: selectedDate,
+      appointmentDate: appointmentDateUTC,
       appointmentTime: selectedTime,
       firstName,
       lastName,

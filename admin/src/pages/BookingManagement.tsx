@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle, ToggleLeft, ToggleRight, Clock, Save, Clock3, Settings2, CalendarDays, Edit3 } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle, ToggleLeft, ToggleRight, Clock, Save, Clock3, Settings2, CalendarDays, Edit3, ChevronLeft, ChevronRight } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
@@ -71,9 +71,28 @@ const BookingManagement = () => {
   const [selectedDate, setSelectedDate] = useState('')
   const [blockReason, setBlockReason] = useState('')
   const [blockType, setBlockType] = useState<'full' | 'slots'>('full')
+  const [blockMode, setBlockMode] = useState<'single' | 'range'>('single')
+  const [blockEndDate, setBlockEndDate] = useState('')
   const [selectedBlockSlots, setSelectedBlockSlots] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [showPastDates, setShowPastDates] = useState(false)
+
+  // Filter state for blocked dates
+  const [filterFrom, setFilterFrom] = useState('')
+  const [filterTo, setFilterTo] = useState('')
+  const [activeRange, setActiveRange] = useState<string | null>(null)
+  const [openPicker, setOpenPicker] = useState<'from' | 'to' | null>(null)
+  const [pickerMonth, setPickerMonth] = useState(new Date())
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  // Filter state for past blocked dates
+  const [pastFilterFrom, setPastFilterFrom] = useState('')
+  const [pastFilterTo, setPastFilterTo] = useState('')
+  const [pastActiveRange, setPastActiveRange] = useState<string | null>(null)
+  const [pastOpenPicker, setPastOpenPicker] = useState<'from' | 'to' | null>(null)
+  const [pastPickerMonth, setPastPickerMonth] = useState(new Date())
+  const pastPickerRef = useRef<HTMLDivElement>(null)
 
   // Fetch settings
   const fetchSettings = async () => {
@@ -134,6 +153,113 @@ const BookingManagement = () => {
     }
     loadData()
   }, [])
+
+  // Close picker on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setOpenPicker(null)
+      }
+    }
+    if (openPicker) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openPicker])
+
+  // Close past picker on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (pastPickerRef.current && !pastPickerRef.current.contains(e.target as Node)) {
+        setPastOpenPicker(null)
+      }
+    }
+    if (pastOpenPicker) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [pastOpenPicker])
+
+  // Open picker for a field
+  const handleOpenPicker = (field: 'from' | 'to') => {
+    const current = field === 'from' ? filterFrom : filterTo
+    if (current) {
+      setPickerMonth(new Date(current + 'T00:00:00'))
+    } else {
+      setPickerMonth(new Date())
+    }
+    setOpenPicker(field)
+  }
+
+  // Select a date from the picker
+  const handlePickDate = (dateStr: string) => {
+    if (openPicker === 'from') setFilterFrom(dateStr)
+    else if (openPicker === 'to') setFilterTo(dateStr)
+    setOpenPicker(null)
+    setActiveRange(null) // custom pick clears the range tab
+  }
+
+  // Quick range selection
+  const handleQuickRange = (days: number, label: string) => {
+    const now = new Date()
+    const fromStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    const end = new Date(now)
+    end.setDate(end.getDate() + days)
+    const toStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
+    setFilterFrom(fromStr)
+    setFilterTo(toStr)
+    setActiveRange(label)
+    setOpenPicker(null)
+  }
+
+  // Clear all filters
+  const handleClearFilter = () => {
+    setFilterFrom('')
+    setFilterTo('')
+    setActiveRange(null)
+    setOpenPicker(null)
+  }
+
+  // Past filter handlers
+  const handleOpenPastPicker = (field: 'from' | 'to') => {
+    const current = field === 'from' ? pastFilterFrom : pastFilterTo
+    if (current) {
+      setPastPickerMonth(new Date(current + 'T00:00:00'))
+    } else {
+      setPastPickerMonth(new Date())
+    }
+    setPastOpenPicker(field)
+  }
+
+  const handlePickPastDate = (dateStr: string) => {
+    if (pastOpenPicker === 'from') setPastFilterFrom(dateStr)
+    else if (pastOpenPicker === 'to') setPastFilterTo(dateStr)
+    setPastOpenPicker(null)
+    setPastActiveRange(null)
+  }
+
+  const handlePastQuickRange = (days: number, label: string) => {
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const toStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
+    const start = new Date()
+    start.setDate(start.getDate() - days)
+    const fromStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
+    setPastFilterFrom(fromStr)
+    setPastFilterTo(toStr)
+    setPastActiveRange(label)
+    setPastOpenPicker(null)
+  }
+
+  const handleClearPastFilter = () => {
+    setPastFilterFrom('')
+    setPastFilterTo('')
+    setPastActiveRange(null)
+    setPastOpenPicker(null)
+  }
+
+  // Format YYYY-MM-DD to readable string
+  const formatFilterDate = (dateStr: string) => {
+    if (!dateStr) return ''
+    const d = new Date(dateStr + 'T00:00:00')
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
 
   // Handle editing a day's schedule
   const handleEditDay = (day: DayName) => {
@@ -207,37 +333,72 @@ const BookingManagement = () => {
     setEditingDaySlots(editingDaySlots.filter(s => s !== slot))
   }
 
+  // Generate array of YYYY-MM-DD strings between two dates (inclusive)
+  const getDateRange = (startStr: string, endStr: string): string[] => {
+    const dates: string[] = []
+    const current = new Date(startStr + 'T00:00:00')
+    const end = new Date(endStr + 'T00:00:00')
+    while (current <= end) {
+      const y = current.getFullYear()
+      const m = String(current.getMonth() + 1).padStart(2, '0')
+      const d = String(current.getDate()).padStart(2, '0')
+      dates.push(`${y}-${m}-${d}`)
+      current.setDate(current.getDate() + 1)
+    }
+    return dates
+  }
+
   // Block date handlers
   const handleBlockDate = async () => {
     if (!selectedDate) return
+    if (blockMode === 'range' && !blockEndDate) return
 
     setSubmitting(true)
     try {
-      const payload: { date: string; reason: string; blockedTimeSlots?: string[] } = {
-        date: selectedDate,
-        reason: blockReason
+      const datesToBlock = blockMode === 'range'
+        ? getDateRange(selectedDate, blockEndDate)
+        : [selectedDate]
+
+      let successCount = 0
+      let failCount = 0
+
+      for (const dateStr of datesToBlock) {
+        const payload: { date: string; reason: string; blockedTimeSlots?: string[] } = {
+          date: dateStr,
+          reason: blockReason
+        }
+
+        if (blockMode === 'single' && blockType === 'slots' && selectedBlockSlots.length > 0) {
+          payload.blockedTimeSlots = selectedBlockSlots
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/blocked-dates`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+          const data = await response.json()
+          if (data.success) successCount++
+          else failCount++
+        } catch {
+          failCount++
+        }
       }
 
-      if (blockType === 'slots' && selectedBlockSlots.length > 0) {
-        payload.blockedTimeSlots = selectedBlockSlots
-      }
+      await fetchBlockedDates()
+      setShowBlockModal(false)
+      setSelectedDate('')
+      setBlockEndDate('')
+      setBlockReason('')
+      setBlockType('full')
+      setBlockMode('single')
+      setSelectedBlockSlots([])
 
-      const response = await fetch(`${API_BASE_URL}/blocked-dates`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      const data = await response.json()
-
-      if (data.success) {
-        await fetchBlockedDates()
-        setShowBlockModal(false)
-        setSelectedDate('')
-        setBlockReason('')
-        setBlockType('full')
-        setSelectedBlockSlots([])
-      } else {
-        alert(data.message || 'Failed to block date')
+      if (failCount > 0 && successCount > 0) {
+        alert(`Blocked ${successCount} date(s). ${failCount} date(s) failed (may already be blocked).`)
+      } else if (failCount > 0 && successCount === 0) {
+        alert('Failed to block dates. They may already be blocked.')
       }
     } catch (error) {
       console.error('Error blocking date:', error)
@@ -332,6 +493,59 @@ const BookingManagement = () => {
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
+
+  // Split blocked dates into future and past
+  const { futureBlockedDates, pastBlockedDates } = useMemo(() => {
+    const now = new Date()
+    now.setHours(0, 0, 0, 0)
+    const future: typeof blockedDates = []
+    const past: typeof blockedDates = []
+    blockedDates.forEach(bd => {
+      const d = new Date(bd.date)
+      d.setHours(0, 0, 0, 0)
+      if (d < now) past.push(bd)
+      else future.push(bd)
+    })
+    return { futureBlockedDates: future, pastBlockedDates: past }
+  }, [blockedDates])
+
+  // Filter blocked dates by date range (only future dates)
+  const filteredBlockedDates = useMemo(() => {
+    if (!filterFrom && !filterTo) return futureBlockedDates
+
+    return futureBlockedDates.filter(bd => {
+      const d = new Date(bd.date)
+      d.setHours(0, 0, 0, 0)
+      if (filterFrom) {
+        const from = new Date(filterFrom + 'T00:00:00')
+        if (d < from) return false
+      }
+      if (filterTo) {
+        const to = new Date(filterTo + 'T00:00:00')
+        if (d > to) return false
+      }
+      return true
+    })
+  }, [futureBlockedDates, filterFrom, filterTo])
+
+  // Filter past blocked dates by date range
+  const filteredPastBlockedDates = useMemo(() => {
+    if (!pastFilterFrom && !pastFilterTo) return pastBlockedDates
+
+    return pastBlockedDates.filter(bd => {
+      const d = new Date(bd.date)
+      d.setHours(0, 0, 0, 0)
+      if (pastFilterFrom) {
+        const from = new Date(pastFilterFrom + 'T00:00:00')
+        if (d < from) return false
+      }
+      if (pastFilterTo) {
+        const to = new Date(pastFilterTo + 'T00:00:00')
+        if (d > to) return false
+      }
+      return true
+    })
+  }, [pastBlockedDates, pastFilterFrom, pastFilterTo])
 
   // Stats
   const workingDaysCount = settings ? Object.values(settings.weeklySchedule).filter(d => d.isWorking).length : 0
@@ -732,7 +946,9 @@ const BookingManagement = () => {
                 </div>
                 </div>
               ) : (
-                /* Blocked Dates Tab - Modern Card */
+                /* Blocked Dates Tab */
+                <div className="space-y-6">
+                {/* Upcoming Blocked Dates Card */}
                 <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between p-4 bg-gradient-to-r from-red-50 to-rose-50 border-b border-slate-100">
                     <div className="flex items-center gap-3">
@@ -745,17 +961,158 @@ const BookingManagement = () => {
                       </div>
                     </div>
                     <span className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-semibold">
-                      {blockedDates.length} blocked
+                      {futureBlockedDates.length} upcoming
                     </span>
                   </div>
 
-                  {blockedDates.length === 0 ? (
+                  {/* Date Range Filter */}
+                  {futureBlockedDates.length > 0 && (
+                    <div className="px-4 sm:px-6 py-3 border-b border-slate-100 relative" ref={pickerRef}>
+                      {/* Quick Range Tabs */}
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        {[
+                          { label: '7 Days', days: 7 },
+                          { label: '15 Days', days: 15 },
+                          { label: '30 Days', days: 30 },
+                        ].map(({ label, days }) => (
+                          <button
+                            key={label}
+                            onClick={() => handleQuickRange(days, label)}
+                            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                              activeRange === label
+                                ? 'bg-gradient-to-r from-[#DFB13B] to-[#C9A032] text-white shadow-md shadow-[#DFB13B]/25'
+                                : 'bg-slate-100 text-slate-600 hover:bg-[#DFB13B]/15 hover:text-[#8B7B2A]'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+
+                        {(filterFrom || filterTo) && (
+                          <div className="flex items-center gap-2 ml-auto">
+                            <span className="text-xs font-medium text-slate-500">
+                              {filteredBlockedDates.length} of {futureBlockedDates.length}
+                            </span>
+                            <button
+                              onClick={handleClearFilter}
+                              className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-500 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                              Clear
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Custom Date Range */}
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                        {/* From button */}
+                        <button
+                          onClick={() => handleOpenPicker('from')}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
+                            filterFrom
+                              ? 'bg-[#DFB13B]/10 border-[#DFB13B]/30 text-[#8B7B2A]'
+                              : 'bg-white border-slate-200 text-slate-400 hover:border-[#DFB13B]/40'
+                          } ${openPicker === 'from' ? 'ring-2 ring-[#DFB13B]/30' : ''}`}
+                        >
+                          <CalendarDays className="w-4 h-4" />
+                          <span className="text-[11px] font-semibold uppercase tracking-wide">From:</span>
+                          <span className="font-medium">{filterFrom ? formatFilterDate(filterFrom) : 'Select'}</span>
+                        </button>
+
+                        <span className="text-slate-300 text-sm">to</span>
+
+                        {/* To button */}
+                        <button
+                          onClick={() => handleOpenPicker('to')}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
+                            filterTo
+                              ? 'bg-[#DFB13B]/10 border-[#DFB13B]/30 text-[#8B7B2A]'
+                              : 'bg-white border-slate-200 text-slate-400 hover:border-[#DFB13B]/40'
+                          } ${openPicker === 'to' ? 'ring-2 ring-[#DFB13B]/30' : ''}`}
+                        >
+                          <CalendarDays className="w-4 h-4" />
+                          <span className="text-[11px] font-semibold uppercase tracking-wide">To:</span>
+                          <span className="font-medium">{filterTo ? formatFilterDate(filterTo) : 'Select'}</span>
+                        </button>
+                      </div>
+
+                      {/* Custom Calendar Dropdown */}
+                      {openPicker && (() => {
+                        const viewYear = pickerMonth.getFullYear()
+                        const viewMonthIdx = pickerMonth.getMonth()
+                        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
+                        const weekDays = ['Mo','Tu','We','Th','Fr','Sa','Su']
+                        const daysInMonth = new Date(viewYear, viewMonthIdx + 1, 0).getDate()
+                        let startDay = new Date(viewYear, viewMonthIdx, 1).getDay() - 1
+                        if (startDay < 0) startDay = 6
+
+                        const cells: (number | null)[] = []
+                        for (let i = 0; i < startDay; i++) cells.push(null)
+                        for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+
+                        const activeValue = openPicker === 'from' ? filterFrom : filterTo
+
+                        return (
+                          <div className="absolute z-50 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 w-[280px]">
+                            {/* Month nav */}
+                            <div className="flex items-center justify-between mb-3">
+                              <button
+                                onClick={() => setPickerMonth(new Date(viewYear, viewMonthIdx - 1, 1))}
+                                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                              >
+                                <ChevronLeft className="w-4 h-4 text-slate-500" />
+                              </button>
+                              <span className="text-sm font-bold text-slate-800">{monthNames[viewMonthIdx]} {viewYear}</span>
+                              <button
+                                onClick={() => setPickerMonth(new Date(viewYear, viewMonthIdx + 1, 1))}
+                                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                              >
+                                <ChevronRight className="w-4 h-4 text-slate-500" />
+                              </button>
+                            </div>
+
+                            {/* Weekday headers */}
+                            <div className="grid grid-cols-7 mb-1">
+                              {weekDays.map(wd => (
+                                <div key={wd} className="text-center text-[10px] font-semibold text-slate-400 py-1">{wd}</div>
+                              ))}
+                            </div>
+
+                            {/* Day cells */}
+                            <div className="grid grid-cols-7 gap-0.5">
+                              {cells.map((day, idx) => {
+                                if (day === null) return <div key={`e-${idx}`} className="w-8 h-8" />
+                                const dateStr = `${viewYear}-${String(viewMonthIdx + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                                const isSelected = dateStr === activeValue
+                                return (
+                                  <button
+                                    key={day}
+                                    onClick={() => handlePickDate(dateStr)}
+                                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-all flex items-center justify-center ${
+                                      isSelected
+                                        ? 'bg-gradient-to-br from-[#DFB13B] to-[#C9A032] text-white font-bold shadow-md shadow-[#DFB13B]/30'
+                                        : 'text-slate-700 hover:bg-[#DFB13B]/10'
+                                    }`}
+                                  >
+                                    {day}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })()}
+                    </div>
+                  )}
+
+                  {futureBlockedDates.length === 0 && !filterFrom && !filterTo ? (
                     <div className="flex flex-col items-center justify-center py-16 text-slate-500">
                       <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
                         <CalendarCheck className="w-10 h-10 text-slate-400" />
                       </div>
-                      <p className="font-semibold text-slate-700 text-lg">No blocked dates</p>
-                      <p className="text-sm text-slate-400 mt-1">All dates follow the weekly schedule</p>
+                      <p className="font-semibold text-slate-700 text-lg">No upcoming blocked dates</p>
+                      <p className="text-sm text-slate-400 mt-1">All future dates follow the weekly schedule</p>
                       <button
                         onClick={() => setShowBlockModal(true)}
                         className="mt-4 flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl text-sm font-semibold hover:shadow-lg hover:shadow-red-500/30 transition-all shadow-md"
@@ -764,26 +1121,35 @@ const BookingManagement = () => {
                         Block a Date
                       </button>
                     </div>
+                  ) : filteredBlockedDates.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-slate-500">
+                      <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mb-3">
+                        <CalendarCheck className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <p className="font-semibold text-slate-600">No blocked dates in this range</p>
+                      <p className="text-sm text-slate-400 mt-1">Try adjusting the date range</p>
+                      <button
+                        onClick={handleClearFilter}
+                        className="mt-3 text-sm text-red-500 hover:text-red-700 font-semibold"
+                      >
+                        Clear Filter
+                      </button>
+                    </div>
                   ) : (
                     <div className="divide-y divide-slate-100">
-                      {blockedDates.map((blockedDate) => {
-                        const date = new Date(blockedDate.date)
-                        const isPast = date < today
-
+                      {filteredBlockedDates.map((blockedDate) => {
                         return (
                           <div
                             key={blockedDate._id}
                             className={`px-4 sm:px-6 py-4 hover:bg-slate-50/50 transition-colors ${
                               !blockedDate.isActive ? 'opacity-60' : ''
-                            } ${isPast ? 'bg-slate-50/30' : ''}`}
+                            }`}
                           >
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
                               <div className="flex items-start gap-3 sm:gap-4">
                                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex flex-col items-center justify-center text-white font-semibold shadow-sm shrink-0 ${
                                   !blockedDate.isActive
                                     ? 'bg-slate-400'
-                                    : isPast
-                                    ? 'bg-slate-500'
                                     : blockedDate.isFullDayBlocked
                                     ? 'bg-gradient-to-br from-red-500 to-red-600'
                                     : 'bg-gradient-to-br from-purple-500 to-purple-600'
@@ -808,11 +1174,6 @@ const BookingManagement = () => {
                                     ) : (
                                       <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700">
                                         {blockedDate.blockedTimeSlots.length} Slot{blockedDate.blockedTimeSlots.length !== 1 ? 's' : ''}
-                                      </span>
-                                    )}
-                                    {isPast && (
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600">
-                                        Past
                                       </span>
                                     )}
                                     {!blockedDate.isActive && (
@@ -908,7 +1269,239 @@ const BookingManagement = () => {
                       })}
                     </div>
                   )}
+
                 </div>
+
+                {/* Past Blocked Dates - Separate Card */}
+                {pastBlockedDates.length > 0 && (
+                  <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden mt-6">
+                    <button
+                      onClick={() => setShowPastDates(!showPastDates)}
+                      className="w-full px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-slate-400 to-slate-500 rounded-xl flex items-center justify-center shadow-sm">
+                          <Clock3 className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="text-left">
+                          <h3 className="font-bold text-slate-700 text-sm sm:text-base">Past Blocked Dates</h3>
+                          <p className="text-[10px] sm:text-xs text-slate-400">Previously blocked dates history</p>
+                        </div>
+                        <span className="px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-xs font-semibold">
+                          {pastBlockedDates.length}
+                        </span>
+                      </div>
+                      <ChevronRight className={`w-5 h-5 text-slate-400 transition-transform duration-200 ${showPastDates ? 'rotate-90' : ''}`} />
+                    </button>
+
+                    {showPastDates && (
+                      <>
+                        {/* Past Dates Filter */}
+                        <div className="px-4 sm:px-6 py-3 border-t border-b border-slate-100 bg-slate-50/50 relative" ref={pastPickerRef}>
+                          <div className="flex flex-wrap items-center gap-2 mb-3">
+                            {[
+                              { label: 'Last 7', days: 7 },
+                              { label: 'Last 15', days: 15 },
+                              { label: 'Last 30', days: 30 },
+                            ].map(({ label, days }) => (
+                              <button
+                                key={label}
+                                onClick={() => handlePastQuickRange(days, label)}
+                                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                                  pastActiveRange === label
+                                    ? 'bg-gradient-to-r from-slate-500 to-slate-600 text-white shadow-sm'
+                                    : 'bg-white text-slate-500 hover:bg-slate-100 border border-slate-200'
+                                }`}
+                              >
+                                {label}
+                              </button>
+                            ))}
+
+                            {(pastFilterFrom || pastFilterTo) && (
+                              <div className="flex items-center gap-2 ml-auto">
+                                <span className="text-xs font-medium text-slate-400">
+                                  {filteredPastBlockedDates.length} of {pastBlockedDates.length}
+                                </span>
+                                <button
+                                  onClick={handleClearPastFilter}
+                                  className="flex items-center gap-1 px-2.5 py-1.5 bg-red-50 text-red-400 hover:bg-red-100 rounded-lg text-xs font-medium transition-colors"
+                                >
+                                  <X className="w-3 h-3" />
+                                  Clear
+                                </button>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                            <button
+                              onClick={() => handleOpenPastPicker('from')}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
+                                pastFilterFrom
+                                  ? 'bg-slate-100 border-slate-300 text-slate-600'
+                                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                              } ${pastOpenPicker === 'from' ? 'ring-2 ring-slate-300' : ''}`}
+                            >
+                              <CalendarDays className="w-4 h-4" />
+                              <span className="text-[11px] font-semibold uppercase tracking-wide">From:</span>
+                              <span className="font-medium">{pastFilterFrom ? formatFilterDate(pastFilterFrom) : 'Select'}</span>
+                            </button>
+
+                            <span className="text-slate-300 text-sm">to</span>
+
+                            <button
+                              onClick={() => handleOpenPastPicker('to')}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition-all ${
+                                pastFilterTo
+                                  ? 'bg-slate-100 border-slate-300 text-slate-600'
+                                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'
+                              } ${pastOpenPicker === 'to' ? 'ring-2 ring-slate-300' : ''}`}
+                            >
+                              <CalendarDays className="w-4 h-4" />
+                              <span className="text-[11px] font-semibold uppercase tracking-wide">To:</span>
+                              <span className="font-medium">{pastFilterTo ? formatFilterDate(pastFilterTo) : 'Select'}</span>
+                            </button>
+                          </div>
+
+                          {/* Calendar Dropdown for Past Filter */}
+                          {pastOpenPicker && (() => {
+                            const viewYear = pastPickerMonth.getFullYear()
+                            const viewMonthIdx = pastPickerMonth.getMonth()
+                            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
+                            const weekDays = ['Mo','Tu','We','Th','Fr','Sa','Su']
+                            const daysInMonth = new Date(viewYear, viewMonthIdx + 1, 0).getDate()
+                            let startDay = new Date(viewYear, viewMonthIdx, 1).getDay() - 1
+                            if (startDay < 0) startDay = 6
+
+                            const cells: (number | null)[] = []
+                            for (let i = 0; i < startDay; i++) cells.push(null)
+                            for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+
+                            const activeValue = pastOpenPicker === 'from' ? pastFilterFrom : pastFilterTo
+
+                            return (
+                              <div className="absolute z-50 mt-2 bg-white rounded-2xl shadow-xl border border-slate-200 p-4 w-[280px]">
+                                <div className="flex items-center justify-between mb-3">
+                                  <button
+                                    onClick={() => setPastPickerMonth(new Date(viewYear, viewMonthIdx - 1, 1))}
+                                    className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                                  >
+                                    <ChevronLeft className="w-4 h-4 text-slate-500" />
+                                  </button>
+                                  <span className="text-sm font-bold text-slate-800">{monthNames[viewMonthIdx]} {viewYear}</span>
+                                  <button
+                                    onClick={() => setPastPickerMonth(new Date(viewYear, viewMonthIdx + 1, 1))}
+                                    className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors"
+                                  >
+                                    <ChevronRight className="w-4 h-4 text-slate-500" />
+                                  </button>
+                                </div>
+
+                                <div className="grid grid-cols-7 mb-1">
+                                  {weekDays.map(wd => (
+                                    <div key={wd} className="text-center text-[10px] font-semibold text-slate-400 py-1">{wd}</div>
+                                  ))}
+                                </div>
+
+                                <div className="grid grid-cols-7 gap-0.5">
+                                  {cells.map((day, idx) => {
+                                    if (day === null) return <div key={`e-${idx}`} className="w-8 h-8" />
+                                    const dateStr = `${viewYear}-${String(viewMonthIdx + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                                    const isSelected = dateStr === activeValue
+                                    return (
+                                      <button
+                                        key={day}
+                                        onClick={() => handlePickPastDate(dateStr)}
+                                        className={`w-8 h-8 rounded-lg text-xs font-medium transition-all flex items-center justify-center ${
+                                          isSelected
+                                            ? 'bg-gradient-to-br from-slate-500 to-slate-600 text-white font-bold shadow-md'
+                                            : 'text-slate-700 hover:bg-slate-100'
+                                        }`}
+                                      >
+                                        {day}
+                                      </button>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )
+                          })()}
+                        </div>
+
+                        {/* Past dates list */}
+                        {filteredPastBlockedDates.length === 0 ? (
+                          <div className="px-4 sm:px-6 py-10 text-center">
+                            <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                              <CalendarCheck className="w-7 h-7 text-slate-300" />
+                            </div>
+                            <p className="text-sm text-slate-400 font-semibold">No past blocked dates in this range</p>
+                            <button
+                              onClick={handleClearPastFilter}
+                              className="mt-2 text-xs text-red-400 hover:text-red-600 font-semibold"
+                            >
+                              Clear Filter
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-slate-100">
+                            {filteredPastBlockedDates.map((blockedDate) => (
+                              <div
+                                key={blockedDate._id}
+                                className="px-4 sm:px-6 py-3 hover:bg-slate-50/50 transition-colors"
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center text-white font-semibold bg-slate-400 shrink-0">
+                                      <span className="text-[8px] uppercase tracking-wide opacity-90">
+                                        {new Date(blockedDate.date).toLocaleDateString('en-US', { month: 'short' })}
+                                      </span>
+                                      <span className="text-sm font-bold -mt-0.5">
+                                        {new Date(blockedDate.date).getDate()}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <p className="text-sm font-medium text-slate-600">{formatDate(blockedDate.date)}</p>
+                                      <div className="flex items-center gap-2 mt-0.5">
+                                        {blockedDate.isFullDayBlocked ? (
+                                          <span className="text-[10px] font-medium text-slate-400">Full Day</span>
+                                        ) : (
+                                          <span className="text-[10px] font-medium text-slate-400">
+                                            {blockedDate.blockedTimeSlots.length} Slot{blockedDate.blockedTimeSlots.length !== 1 ? 's' : ''}
+                                          </span>
+                                        )}
+                                        {blockedDate.reason && (
+                                          <span className="text-[10px] text-slate-400">— {blockedDate.reason}</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      if (deleteConfirm === blockedDate._id) {
+                                        handleDeleteBlock(blockedDate._id)
+                                      } else {
+                                        setDeleteConfirm(blockedDate._id)
+                                      }
+                                    }}
+                                    className={`p-1.5 rounded-lg transition-colors shrink-0 ${
+                                      deleteConfirm === blockedDate._id
+                                        ? 'bg-red-500 text-white hover:bg-red-600'
+                                        : 'hover:bg-red-50 text-slate-300 hover:text-red-400'
+                                    }`}
+                                    title={deleteConfirm === blockedDate._id ? 'Click again to confirm delete' : 'Delete'}
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
               )}
             </>
           )}
@@ -923,6 +1516,7 @@ const BookingManagement = () => {
         >
           <div
             className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto transform transition-all"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modern Header with Gradient & Pattern */}
@@ -937,8 +1531,8 @@ const BookingManagement = () => {
                     <CalendarOff className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold">Block Date</h3>
-                    <p className="text-white/80 text-sm mt-0.5">Block full day or specific time slots</p>
+                    <h3 className="text-xl font-bold">Block {blockMode === 'range' ? 'Dates' : 'Date'}</h3>
+                    <p className="text-white/80 text-sm mt-0.5">{blockMode === 'range' ? 'Block multiple days at once' : 'Block full day or specific time slots'}</p>
                   </div>
                 </div>
                 <button
@@ -951,59 +1545,136 @@ const BookingManagement = () => {
             </div>
 
             <div className="p-6 space-y-5">
-              {/* Date Selection */}
+              {/* Block Mode Toggle: Single Date / Date Range */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Select Date
+                  Block Mode
                 </label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => {
-                    setSelectedDate(e.target.value)
-                    setSelectedBlockSlots([])
-                  }}
-                  min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
-                />
-              </div>
-
-              {/* Block Type Selection */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Block Type
-                </label>
-                <div className="flex gap-3">
+                <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
                   <button
                     onClick={() => {
+                      setBlockMode('single')
+                      setBlockEndDate('')
+                    }}
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                      blockMode === 'single'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                  >
+                    Single Date
+                  </button>
+                  <button
+                    onClick={() => {
+                      setBlockMode('range')
                       setBlockType('full')
                       setSelectedBlockSlots([])
                     }}
-                    className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
-                      blockType === 'full'
-                        ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/30'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                      blockMode === 'range'
+                        ? 'bg-white text-slate-800 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
                     }`}
                   >
-                    <CalendarOff className="w-4 h-4" />
-                    Full Day
-                  </button>
-                  <button
-                    onClick={() => setBlockType('slots')}
-                    className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
-                      blockType === 'slots'
-                        ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg shadow-purple-500/30'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Clock className="w-4 h-4" />
-                    Specific Slots
+                    Date Range
                   </button>
                 </div>
               </div>
 
-              {/* Time Slots Selection */}
-              {blockType === 'slots' && selectedDate && (
+              {/* Date Selection */}
+              {blockMode === 'single' ? (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Select Date
+                  </label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => {
+                      setSelectedDate(e.target.value)
+                      setSelectedBlockSlots([])
+                    }}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      From Date
+                    </label>
+                    <input
+                      type="date"
+                      value={selectedDate}
+                      onChange={(e) => {
+                        setSelectedDate(e.target.value)
+                        if (blockEndDate && e.target.value > blockEndDate) {
+                          setBlockEndDate('')
+                        }
+                      }}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      To Date
+                    </label>
+                    <input
+                      type="date"
+                      value={blockEndDate}
+                      onChange={(e) => setBlockEndDate(e.target.value)}
+                      min={selectedDate || new Date().toISOString().split('T')[0]}
+                      className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
+                    />
+                  </div>
+                  {selectedDate && blockEndDate && (
+                    <p className="text-xs text-slate-500 font-medium">
+                      {Math.round((new Date(blockEndDate + 'T00:00:00').getTime() - new Date(selectedDate + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24)) + 1} day(s) will be blocked
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Block Type Selection - Only for single date mode */}
+              {blockMode === 'single' && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    Block Type
+                  </label>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setBlockType('full')
+                        setSelectedBlockSlots([])
+                      }}
+                      className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
+                        blockType === 'full'
+                          ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-lg shadow-red-500/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      <CalendarOff className="w-4 h-4" />
+                      Full Day
+                    </button>
+                    <button
+                      onClick={() => setBlockType('slots')}
+                      className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
+                        blockType === 'slots'
+                          ? 'bg-gradient-to-r from-purple-500 to-violet-500 text-white shadow-lg shadow-purple-500/30'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      <Clock className="w-4 h-4" />
+                      Specific Slots
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Time Slots Selection - Only for single date + slots mode */}
+              {blockMode === 'single' && blockType === 'slots' && selectedDate && (
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-2">
                     Select Time Slots to Block
@@ -1043,19 +1714,19 @@ const BookingManagement = () => {
               {/* Reason Input */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
-                  Reason <span className="text-slate-400 font-normal">(Optional)</span>
+                  Reason <span className="text-red-400 font-normal">*</span>
                 </label>
                 <input
                   type="text"
                   value={blockReason}
                   onChange={(e) => setBlockReason(e.target.value)}
-                  placeholder="e.g., Holiday, Personal day, etc."
+                  placeholder="e.g., Holiday, Vacation, Personal day, etc."
                   className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm placeholder-slate-400"
                 />
               </div>
 
               {/* Summary Preview */}
-              {selectedDate && (
+              {blockMode === 'single' && selectedDate && (
                 <div className={`p-4 rounded-xl ${blockType === 'full' ? 'bg-gradient-to-r from-red-50 to-rose-50 border border-red-100' : 'bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100'}`}>
                   <p className={`text-sm font-semibold ${blockType === 'full' ? 'text-red-700' : 'text-purple-700'}`}>
                     Blocking: {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
@@ -1075,6 +1746,16 @@ const BookingManagement = () => {
                   </p>
                 </div>
               )}
+              {blockMode === 'range' && selectedDate && blockEndDate && (
+                <div className="p-4 rounded-xl bg-gradient-to-r from-red-50 to-rose-50 border border-red-100">
+                  <p className="text-sm font-semibold text-red-700">
+                    Blocking {Math.round((new Date(blockEndDate + 'T00:00:00').getTime() - new Date(selectedDate + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24)) + 1} days
+                  </p>
+                  <p className="text-xs mt-1 text-red-600">
+                    From {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} to {new Date(blockEndDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} — all appointments will be blocked.
+                  </p>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-2">
@@ -1082,8 +1763,10 @@ const BookingManagement = () => {
                   onClick={() => {
                     setShowBlockModal(false)
                     setBlockType('full')
+                    setBlockMode('single')
                     setSelectedBlockSlots([])
                     setSelectedDate('')
+                    setBlockEndDate('')
                     setBlockReason('')
                   }}
                   className="px-6 py-3.5 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all font-semibold text-sm"
@@ -1092,18 +1775,25 @@ const BookingManagement = () => {
                 </button>
                 <button
                   onClick={handleBlockDate}
-                  disabled={!selectedDate || submitting || (blockType === 'slots' && selectedBlockSlots.length === 0)}
+                  disabled={
+                    !selectedDate || submitting || !blockReason.trim() ||
+                    (blockMode === 'single' && blockType === 'slots' && selectedBlockSlots.length === 0) ||
+                    (blockMode === 'range' && !blockEndDate)
+                  }
                   className="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl hover:shadow-lg hover:shadow-red-500/30 transition-all font-semibold flex items-center justify-center gap-2.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none text-sm"
                 >
                   {submitting ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Blocking...
+                      Blocking{blockMode === 'range' ? ' dates...' : '...'}
                     </>
                   ) : (
                     <>
                       <CalendarOff className="w-4 h-4" />
-                      Block {blockType === 'full' ? 'Full Day' : 'Slots'}
+                      {blockMode === 'range'
+                        ? `Block ${selectedDate && blockEndDate ? Math.round((new Date(blockEndDate + 'T00:00:00').getTime() - new Date(selectedDate + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24)) + 1 + ' Days' : 'Dates'}`
+                        : `Block ${blockType === 'full' ? 'Full Day' : 'Slots'}`
+                      }
                     </>
                   )}
                 </button>

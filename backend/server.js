@@ -33,8 +33,15 @@ app.use(xssSanitize); // Prevent XSS attacks
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve uploaded files statically with no-cache headers
+// This prevents browsers from showing stale/old images after an upload update
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 // Serve static files for frontend and admin (in production)
 if (process.env.SERVER_ENV === 'production') {

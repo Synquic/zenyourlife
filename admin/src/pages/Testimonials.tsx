@@ -268,13 +268,15 @@ const Testimonials = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ ...testimonial, isActive: !testimonial.isActive })
+        body: JSON.stringify({ isActive: !testimonial.isActive })
       })
 
       const data = await response.json()
 
       if (data.success) {
         fetchTestimonials()
+      } else {
+        console.error('Toggle status failed:', data.message)
       }
     } catch (err) {
       console.error('Error toggling status:', err)

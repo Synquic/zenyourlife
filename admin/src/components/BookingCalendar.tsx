@@ -36,6 +36,7 @@ interface DayStatus {
   bookings: Booking[]
   blockedSlots: string[]
   isFullDayBlocked: boolean
+  blockReason?: string
   isWorkingDay: boolean
   availableSlots: number
   bookedSlots: number
@@ -149,6 +150,7 @@ const BookingCalendar = () => {
       bookings: dayBookings,
       blockedSlots,
       isFullDayBlocked,
+      blockReason: blockedDate?.reason,
       isWorkingDay,
       availableSlots,
       bookedSlots,
@@ -346,7 +348,13 @@ const BookingCalendar = () => {
                 {/* Status Text */}
                 <div className="space-y-0.5 sm:space-y-1 text-left">
                   {dayStatus.status === 'blocked' && (
-                    <div className="text-[8px] sm:text-xs font-medium text-slate-600 hidden sm:block">Blocked</div>
+                    <div className="hidden sm:block">
+                      {dayStatus.blockReason ? (
+                        <div className="text-[9px] sm:text-[11px] font-semibold text-red-500 truncate max-w-[80px] lg:max-w-[100px]" title={dayStatus.blockReason}>{dayStatus.blockReason}</div>
+                      ) : (
+                        <div className="text-[8px] sm:text-xs font-medium text-slate-600">Blocked</div>
+                      )}
+                    </div>
                   )}
 
                   {dayStatus.status === 'non-working' && (
@@ -452,7 +460,7 @@ const BookingCalendar = () => {
                     {selectedDay.status === 'available' && 'All slots available'}
                     {selectedDay.status === 'partial' && `${selectedDay.availableSlots} of ${selectedDay.totalSlots} slots available`}
                     {selectedDay.status === 'full' && 'Fully booked'}
-                    {selectedDay.status === 'blocked' && 'Day is blocked'}
+                    {selectedDay.status === 'blocked' && (selectedDay.blockReason ? `Blocked: ${selectedDay.blockReason}` : 'Day is blocked')}
                     {selectedDay.status === 'non-working' && 'Non-working day'}
                   </span>
                 </div>
@@ -536,6 +544,9 @@ const BookingCalendar = () => {
                       <Ban className="w-3.5 h-3.5 text-slate-600" />
                     </div>
                     Blocked Time Slots
+                    {selectedDay.blockReason && (
+                      <span className="text-xs text-slate-400 font-normal ml-1">— {selectedDay.blockReason}</span>
+                    )}
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedDay.blockedSlots.map(slot => (
@@ -557,7 +568,11 @@ const BookingCalendar = () => {
                     <Ban className="w-7 h-7 text-slate-500" />
                   </div>
                   <p className="text-slate-700 font-semibold">This day is fully blocked</p>
-                  <p className="text-sm text-slate-500 mt-1">No bookings can be made</p>
+                  {selectedDay.blockReason ? (
+                    <p className="text-sm text-slate-500 mt-1">Reason: <span className="font-medium text-slate-600">{selectedDay.blockReason}</span></p>
+                  ) : (
+                    <p className="text-sm text-slate-500 mt-1">No bookings can be made</p>
+                  )}
                 </div>
               )}
 

@@ -119,13 +119,14 @@ const sendAdminNotificationEmail = async (contactData) => {
           <div class="info-row" style="border-bottom: none;">
             <span class="info-label">Date:</span>
             <span class="info-value">${new Date().toLocaleString('en-US', {
+              timeZone: 'Europe/Brussels',
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit'
-            })}</span>
+            })} (Brussels time)</span>
           </div>
 
           <div class="message-box">

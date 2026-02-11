@@ -61,6 +61,7 @@ const formatPhoneNumber = (phoneNumber, countryCode = 'BE') => {
 const generateCustomerSmsReminder = (enrollment) => {
   const appointmentDate = new Date(enrollment.appointmentDate);
   const formattedDate = appointmentDate.toLocaleDateString('en-GB', {
+    timeZone: 'Europe/Brussels',
     weekday: 'long',
     day: 'numeric',
     month: 'long'
@@ -102,22 +103,36 @@ const sendSms = async (to, message) => {
   if (!twilioClient) {
     const initialized = initializeTwilio();
     if (!initialized) {
-      console.log('Twilio not initialized, cannot send SMS');
+      console.log('[Twilio] Not initialized, cannot send SMS');
       return false;
     }
   }
 
   try {
+    console.log(`[Twilio] Sending SMS from ${process.env.TWILIO_PHONE_NUMBER} to ${to}`);
     const result = await twilioClient.messages.create({
       body: message,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: to
     });
 
-    console.log(`SMS sent successfully to ${to}. SID: ${result.sid}`);
+    console.log(`[Twilio] ✅ SMS sent successfully to ${to}. SID: ${result.sid}, Status: ${result.status}`);
     return true;
   } catch (error) {
-    console.error('Error sending SMS:', error.message);
+    console.error(`[Twilio] ❌ Error sending SMS to ${to}:`, error.message);
+    if (error.code === 21608) {
+      console.error('[Twilio] The "from" phone number is not enabled for SMS. Check your Twilio phone number capabilities.');
+    } else if (error.code === 21211) {
+      console.error(`[Twilio] Invalid "to" phone number: ${to}. Check phone number formatting.`);
+    } else if (error.code === 21608 || error.code === 21614) {
+      console.error('[Twilio] Phone number is not SMS-capable or not valid for the destination country.');
+    } else if (error.code === 21610) {
+      console.error('[Twilio] Recipient has opted out of SMS messages.');
+    } else if (error.code === 21408) {
+      console.error('[Twilio] Permission not enabled for the destination country. Check Twilio Geographic Permissions.');
+    } else if (error.code === 21219) {
+      console.error('[Twilio] TRIAL ACCOUNT: You can only send SMS to verified phone numbers. Add the recipient at https://console.twilio.com/us1/develop/phone-numbers/manage/verified');
+    }
     return false;
   }
 };

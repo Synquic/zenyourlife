@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { X, AlertCircle, Calendar, Clock } from "lucide-react";
+import { X, AlertCircle, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { API_BASE_URL } from "../config/api";
 import { getBelgiumNow, generateBelgiumDates } from "../utils/timezone";
@@ -55,6 +55,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   const [selectedTime, setSelectedTime] = useState<number | null>(null);
   const [showBookingFormModal, setShowBookingFormModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState<Date | null>(null); // tracks which month is displayed
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -65,7 +66,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
 
   // Generate dates from today onwards for 30 days with corresponding day names
   // Using Belgium timezone since business is located in Belgium
-  const dates = generateBelgiumDates(30);
+  const dates = generateBelgiumDates(365);
 
   const dayNames: DayName[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -234,16 +235,18 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
     const fetchBookedSlots = async () => {
       setLoadingSlots(true);
       try {
-        const appointmentDate = dates[selectedDate].fullDate;
+        // Use dateStr (YYYY-MM-DD Belgium calendar date) instead of toISOString()
+        // This ensures the same date is queried regardless of the user's timezone
+        const dateStr = dates[selectedDate].dateStr;
 
         const response = await fetch(
-          `${API_BASE_URL}/appointments/booked-slots?date=${appointmentDate.toISOString()}`
+          `${API_BASE_URL}/appointments/booked-slots?date=${dateStr}`
         );
         const data = await response.json();
 
         if (data.success) {
           console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-          console.log('📅 FETCHED BOOKED SLOTS FOR DATE:', appointmentDate.toLocaleDateString());
+          console.log('📅 FETCHED BOOKED SLOTS FOR DATE:', dateStr);
           console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
           console.log('Booked slots array:', data.bookedSlots);
           console.log('Number of booked slots:', data.count);
@@ -303,7 +306,12 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 {t('booking.select_date')}
               </h2>
               <button
-                onClick={() => setShowCalendarModal(true)}
+                onClick={() => {
+                  // Initialize calendar to the month of the first available date
+                  const firstDate = dates[0].fullDate;
+                  setCalendarMonth(new Date(firstDate.getFullYear(), firstDate.getMonth(), 1));
+                  setShowCalendarModal(true);
+                }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition"
                 title={t('booking.view_all_dates')}
               >
@@ -333,8 +341,9 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                           <div className="w-px h-[80%] bg-gray-300 rotate-45 absolute"></div>
                         </div>
                       )}
-                      <span className={`text-[10px] sm:text-xs font-medium mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
-                      <span className={`text-base sm:text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
+                      <span className={`text-[10px] sm:text-xs font-medium mb-0.5 ${isBlocked ? 'opacity-40' : ''}`}>{item.day}</span>
+                      <span className={`text-base sm:text-lg font-semibold ${isBlocked ? 'opacity-40' : ''}`}>{item.date}</span>
+                      <span className={`text-[9px] sm:text-[10px] font-semibold mt-0.5 ${isBlocked ? 'text-gray-400' : selectedDate === index ? 'text-white/90' : 'text-gray-500'}`}>{item.month}</span>
                     </button>
                   );
                 })}
@@ -509,6 +518,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 }}
                 selectedService={selectedService}
                 selectedDate={dates[selectedDate].fullDate}
+                selectedDateStr={dates[selectedDate].dateStr}
                 selectedTime={availableTimeSlots[selectedTime]}
               />
             </div>
@@ -516,74 +526,172 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
         </div>
       )}
 
-      {/* Calendar Modal - Show all 30 dates */}
-      {showCalendarModal && (
-        <div className="fixed inset-0 z-[65] flex items-center justify-center p-2 sm:p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowCalendarModal(false)}
-          ></div>
+      {/* Calendar Modal - Proper month-based calendar */}
+      {showCalendarModal && (() => {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const weekDayHeaders = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 
-          {/* Modal Content */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl relative z-10 max-h-[85vh] sm:max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-4 sm:p-6 rounded-t-2xl sm:rounded-t-3xl flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">{t('booking.select_date')}</h2>
+        // Determine available date range from the dates array
+        const firstAvailableDate = dates[0].fullDate;
+        const lastAvailableDate = dates[dates.length - 1].fullDate;
+
+        // Current calendar month (default to first available date's month)
+        const viewMonth = calendarMonth || new Date(firstAvailableDate.getFullYear(), firstAvailableDate.getMonth(), 1);
+        const viewYear = viewMonth.getFullYear();
+        const viewMonthIndex = viewMonth.getMonth();
+
+        // Get first day of month and total days
+        const firstDayOfMonth = new Date(viewYear, viewMonthIndex, 1);
+        const daysInMonth = new Date(viewYear, viewMonthIndex + 1, 0).getDate();
+
+        // Get day of week for first day (0=Sun, convert to Mon=0)
+        let startDayOfWeek = firstDayOfMonth.getDay() - 1;
+        if (startDayOfWeek < 0) startDayOfWeek = 6; // Sunday becomes 6
+
+        // Build calendar grid cells
+        const calendarCells: Array<{ day: number | null; dateIndex: number | null; fullDate: Date | null }> = [];
+
+        // Empty cells before first day
+        for (let i = 0; i < startDayOfWeek; i++) {
+          calendarCells.push({ day: null, dateIndex: null, fullDate: null });
+        }
+
+        // Day cells
+        for (let day = 1; day <= daysInMonth; day++) {
+          const cellDate = new Date(viewYear, viewMonthIndex, day);
+          cellDate.setHours(0, 0, 0, 0);
+
+          // Find matching index in the dates array
+          let matchIndex: number | null = null;
+          for (let i = 0; i < dates.length; i++) {
+            const d = new Date(dates[i].fullDate);
+            d.setHours(0, 0, 0, 0);
+            if (d.getTime() === cellDate.getTime()) {
+              matchIndex = i;
+              break;
+            }
+          }
+
+          calendarCells.push({ day, dateIndex: matchIndex, fullDate: cellDate });
+        }
+
+        // Can navigate to previous/next month?
+        const prevMonth = new Date(viewYear, viewMonthIndex - 1, 1);
+        const nextMonth = new Date(viewYear, viewMonthIndex + 1, 1);
+        const canGoPrev = prevMonth.getFullYear() > firstAvailableDate.getFullYear() ||
+          (prevMonth.getFullYear() === firstAvailableDate.getFullYear() && prevMonth.getMonth() >= firstAvailableDate.getMonth());
+        const canGoNext = nextMonth.getFullYear() < lastAvailableDate.getFullYear() ||
+          (nextMonth.getFullYear() === lastAvailableDate.getFullYear() && nextMonth.getMonth() <= lastAvailableDate.getMonth());
+
+        return (
+          <div className="fixed inset-0 z-[65] flex items-center justify-center p-2 sm:p-4">
+            {/* Backdrop */}
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowCalendarModal(false)}
+            ></div>
+
+            {/* Modal Content */}
+            <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full shadow-2xl relative z-10">
+              {/* Header with month navigation */}
+              <div className="border-b border-gray-200 p-4 sm:p-5 rounded-t-2xl sm:rounded-t-3xl">
+                <div className="flex items-center justify-between mb-1">
+                  <h2 className="text-lg font-semibold text-gray-900">{t('booking.select_date')}</h2>
+                  <button
+                    onClick={() => setShowCalendarModal(false)}
+                    className="p-1.5 hover:bg-gray-100 rounded-full transition"
+                  >
+                    <X className="w-5 h-5 text-gray-600" />
+                  </button>
+                </div>
+
+                {/* Month navigation */}
+                <div className="flex items-center justify-between mt-3">
+                  <button
+                    onClick={() => canGoPrev && setCalendarMonth(prevMonth)}
+                    disabled={!canGoPrev}
+                    className={`p-2 rounded-full transition ${canGoPrev ? 'hover:bg-gray-100 text-gray-700' : 'text-gray-200 cursor-not-allowed'}`}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <span className="text-base font-semibold text-gray-800">
+                    {monthNames[viewMonthIndex]} {viewYear}
+                  </span>
+                  <button
+                    onClick={() => canGoNext && setCalendarMonth(nextMonth)}
+                    disabled={!canGoNext}
+                    className={`p-2 rounded-full transition ${canGoNext ? 'hover:bg-gray-100 text-gray-700' : 'text-gray-200 cursor-not-allowed'}`}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="p-4 sm:p-5">
+                {/* Weekday headers */}
+                <div className="grid grid-cols-7 gap-1 mb-2">
+                  {weekDayHeaders.map((wd) => (
+                    <div key={wd} className="text-center text-[11px] font-semibold text-gray-400 py-1">
+                      {wd}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Date cells */}
+                <div className="grid grid-cols-7 gap-1">
+                  {calendarCells.map((cell, idx) => {
+                    if (cell.day === null) {
+                      return <div key={`empty-${idx}`} className="aspect-square" />;
+                    }
+
+                    const isOutOfRange = cell.dateIndex === null;
+                    const isBlocked = !isOutOfRange && isDateFullyBlocked(cell.fullDate!);
+                    const isSelected = !isOutOfRange && selectedDate === cell.dateIndex;
+                    const isDisabled = isOutOfRange || isBlocked;
+
+                    return (
+                      <button
+                        key={`day-${cell.day}`}
+                        onClick={() => {
+                          if (!isDisabled && cell.dateIndex !== null) {
+                            handleDateSelect(cell.dateIndex);
+                            setShowCalendarModal(false);
+                          }
+                        }}
+                        disabled={isDisabled}
+                        className={`aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all relative ${
+                          isOutOfRange
+                            ? "text-gray-200 cursor-default"
+                            : isBlocked
+                            ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                            : isSelected
+                            ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white font-bold shadow-md"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
+                        {isBlocked && !isOutOfRange && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-px h-[60%] bg-gray-300 rotate-45 absolute"></div>
+                          </div>
+                        )}
+                        <span className={isBlocked ? 'opacity-40' : ''}>{cell.day}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Legend */}
                 {blockedDatesInfo.length > 0 && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-[10px] text-gray-400 mt-3 text-center">
                     {t('booking.blocked_dates_legend')}
                   </p>
                 )}
               </div>
-              <button
-                onClick={() => setShowCalendarModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition"
-              >
-                <X className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="p-4 sm:p-6">
-              <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 sm:gap-2">
-                {dates.map((item, index) => {
-                  const isBlocked = isDateFullyBlocked(item.fullDate);
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        if (!isBlocked) {
-                          handleDateSelect(index);
-                          setShowCalendarModal(false);
-                        }
-                      }}
-                      disabled={isBlocked}
-                      className={`flex flex-col items-center justify-center py-2 sm:py-3 px-1 sm:px-2 rounded-lg transition-all relative ${
-                        isBlocked
-                          ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                          : selectedDate === index
-                          ? "bg-gradient-to-br from-[#f8e7b5] via-[#d8a93d] to-[#6b4b09] text-white border-2 border-gray-800 shadow-lg"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200 hover:shadow-md"
-                      }`}
-                      title={isBlocked ? t('booking.date_unavailable') : ''}
-                    >
-                      {isBlocked && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-px h-[80%] bg-gray-300 rotate-45 absolute"></div>
-                        </div>
-                      )}
-                      <span className={`text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1 ${isBlocked ? 'opacity-50' : ''}`}>{item.day}</span>
-                      <span className={`text-sm sm:text-lg font-semibold ${isBlocked ? 'opacity-50' : ''}`}>{item.date}</span>
-                    </button>
-                  );
-                })}
-              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </>
   );
 };

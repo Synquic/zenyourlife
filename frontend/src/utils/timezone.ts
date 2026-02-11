@@ -89,19 +89,26 @@ export const isDateAvailable = (date: Date, timeSlots: string[], minAdvanceHours
 export const generateBelgiumDates = (numberOfDays: number): Array<{
   day: string;
   date: number;
+  month: string;
   fullDate: Date;
+  dateStr: string;
   dayOffset: number;
 }> => {
   const days = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const today = getBelgiumToday();
 
   return Array.from({ length: numberOfDays }, (_, i) => {
     const date = new Date(today);
     date.setDate(today.getDate() + i + 1); // Start from tomorrow
+    // dateStr is the Belgium calendar date as YYYY-MM-DD (timezone-safe for API calls)
+    const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
     return {
       day: days[date.getDay()],
       date: date.getDate(),
+      month: months[date.getMonth()],
       fullDate: date,
+      dateStr,
       dayOffset: i + 1
     };
   });
