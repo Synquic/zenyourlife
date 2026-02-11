@@ -338,6 +338,7 @@ exports.createEnrollment = async (req, res) => {
     console.log('📅 APPOINTMENT SCHEDULE:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('  Date:', new Date(enrollment.appointmentDate).toLocaleDateString('en-US', {
+      timeZone: BELGIUM_TIMEZONE,
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -373,8 +374,8 @@ exports.createEnrollment = async (req, res) => {
     console.log('ℹ️  STATUS INFORMATION:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('  Status:', enrollment.status.toUpperCase());
-    console.log('  Created At:', new Date(enrollment.createdAt).toLocaleString());
-    console.log('  Updated At:', new Date(enrollment.updatedAt).toLocaleString());
+    console.log('  Created At:', new Date(enrollment.createdAt).toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE }));
+    console.log('  Updated At:', new Date(enrollment.updatedAt).toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE }));
 
     console.log('\n╔════════════════════════════════════════════════════════════════╗');
     console.log('║                  ✅ ENROLLMENT SAVED SUCCESSFULLY               ║');
