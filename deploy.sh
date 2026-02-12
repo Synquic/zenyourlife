@@ -59,14 +59,25 @@ echo -e "${GREEN}✓ Image compressed (${IMAGE_SIZE})${NC}"
 echo ""
 
 # Step 5: Upload to server
-echo -e "${YELLOW}[5/8] Uploading image to server...${NC}"
+echo -e "${YELLOW}[5/9] Uploading image to server...${NC}"
 sshpass -p "${SSH_PASS}" rsync -avz --progress -e "ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no" \
     ${ARCHIVE_NAME} ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/
 echo -e "${GREEN}✓ Upload complete${NC}"
 echo ""
 
-# Step 6: Deploy on server
-echo -e "${YELLOW}[6/8] Deploying on server...${NC}"
+# Step 6: Upload .env file to server
+echo -e "${YELLOW}[6/9] Uploading .env configuration to server...${NC}"
+if [ -f .env ]; then
+    sshpass -p "${SSH_PASS}" scp -P ${SSH_PORT} -o StrictHostKeyChecking=no \
+        .env ${SSH_USER}@${SERVER_IP}:${DEPLOY_PATH}/.env
+    echo -e "${GREEN}✓ .env file uploaded${NC}"
+else
+    echo -e "${RED}⚠ Warning: .env file not found in root directory${NC}"
+fi
+echo ""
+
+# Step 7: Deploy on server
+echo -e "${YELLOW}[7/9] Deploying on server...${NC}"
 sshpass -p "${SSH_PASS}" ssh -p ${SSH_PORT} -o StrictHostKeyChecking=no ${SSH_USER}@${SERVER_IP} << 'EOF'
 cd /app/zenyourlife
 
@@ -97,8 +108,8 @@ EOF
 echo -e "${GREEN}✓ Deployment complete${NC}"
 echo ""
 
-# Step 7: Verify deployment
-echo -e "${YELLOW}[7/8] Verifying deployment...${NC}"
+# Step 8: Verify deployment
+echo -e "${YELLOW}[8/9] Verifying deployment...${NC}"
 sleep 5
 if curl -s -o /dev/null -w "%{http_code}" https://zenyourlife.be/api/health | grep -q "200"; then
     echo -e "${GREEN}✓ Health check passed${NC}"
@@ -107,8 +118,8 @@ else
 fi
 echo ""
 
-# Step 8: Sync server uploads back to local
-echo -e "${YELLOW}[8/8] Syncing server uploads to local...${NC}"
+# Step 9: Sync server uploads back to local
+echo -e "${YELLOW}[9/9] Syncing server uploads to local...${NC}"
 mkdir -p backend/uploads
 mkdir -p backend/uploads-backup
 
