@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Calendar, Clock } from "lucide-react";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import { API_BASE_URL } from "../config/api";
 
@@ -214,9 +214,51 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
     <>
       <div className="bg-gray-50 p-0 -mt-4">
         <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 w-full max-w-6xl mx-auto">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8 text-center sm:text-left">
+          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center sm:text-left">
             {t('booking.title')}
           </h1>
+
+          {/* Selected Date & Time Summary */}
+          {(selectedDate || selectedTime) && (
+            <div className="mb-5 sm:mb-6 bg-gradient-to-r from-[#fdf6e3] to-[#fef9ed] border border-[#e8d5a0] rounded-xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
+              {selectedDate && (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#d4a017] to-[#8b6914] flex items-center justify-center shrink-0">
+                    <Calendar className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] sm:text-[11px] text-[#8b6914] font-medium uppercase tracking-wide">{t('booking.date')}</p>
+                    <p className="text-sm sm:text-base font-semibold text-gray-900">
+                      {selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              )}
+              {selectedDate && selectedTime && (
+                <div className="w-px h-8 bg-[#e8d5a0]"></div>
+              )}
+              {selectedTime && (
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium uppercase tracking-wide">{t('booking.time')}</p>
+                    <p className="text-sm sm:text-base font-semibold text-gray-900">{selectedTime}</p>
+                  </div>
+                </div>
+              )}
+              {selectedService && (
+                <>
+                  <div className="w-px h-8 bg-[#e8d5a0] hidden sm:block"></div>
+                  <div className="hidden sm:block">
+                    <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium uppercase tracking-wide">{t('booking.service')}</p>
+                    <p className="text-sm font-semibold text-gray-900">{selectedService.title}</p>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
