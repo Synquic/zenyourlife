@@ -319,7 +319,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                     <Calendar className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-sm font-semibold text-gray-900">{t('booking.select_date')}</h2>
+                    <h2 className="text-sm font-semibold text-gray-900">{selectedDate !== null ? t('booking.selected_date') : t('booking.select_date')}</h2>
                     {selectedDate !== null && (
                       <p className="text-[11px] text-[#b8860b] font-medium">
                         {dates[selectedDate].fullDate.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
@@ -419,7 +419,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900">
-                    {t('booking.select_time')}
+                    {selectedTime !== null ? t('booking.selected_time') : t('booking.select_time')}
                     {loadingSlots && (
                       <span className="ml-2 text-[11px] text-gray-400 font-normal">({t('booking.loading_availability')})</span>
                     )}
@@ -551,37 +551,33 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
 
       {/* BookingForm Modal */}
       {showBookingFormModal && selectedDate !== null && selectedTime !== null && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div className="bg-gray-50 rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {/* Close Button */}
-            <button
-              onClick={() => setShowBookingFormModal(false)}
-              className="absolute top-6 right-6 bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition z-50"
-            >
-              <X className="w-5 h-5 text-gray-600" />
-            </button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowBookingFormModal(false)}
+          ></div>
 
-            {/* BookingForm Component */}
-            <div className="relative pt-4">
-              <BookingForm
-                onClose={() => setShowBookingFormModal(false)}
-                onSuccess={() => {
-                  setShowBookingFormModal(false);
-                  // Refresh booked slots after successful booking
-                  setRefreshKey(prev => prev + 1);
-                  // Reset selected time
-                  setSelectedTime(null);
-                  // Call parent's onSuccess to show approved modal at Booking level
-                  if (onSuccess) {
-                    onSuccess();
-                  }
-                }}
-                selectedService={selectedService}
-                selectedDate={dates[selectedDate].fullDate}
-                selectedDateStr={dates[selectedDate].dateStr}
-                selectedTime={availableTimeSlots[selectedTime]}
-              />
-            </div>
+          {/* Modal Content */}
+          <div className="relative z-10 w-full max-w-4xl">
+            <BookingForm
+              onClose={() => setShowBookingFormModal(false)}
+              onSuccess={() => {
+                setShowBookingFormModal(false);
+                // Refresh booked slots after successful booking
+                setRefreshKey(prev => prev + 1);
+                // Reset selected time
+                setSelectedTime(null);
+                // Call parent's onSuccess to show approved modal at Booking level
+                if (onSuccess) {
+                  onSuccess();
+                }
+              }}
+              selectedService={selectedService}
+              selectedDate={dates[selectedDate].fullDate}
+              selectedDateStr={dates[selectedDate].dateStr}
+              selectedTime={availableTimeSlots[selectedTime]}
+            />
           </div>
         </div>
       )}

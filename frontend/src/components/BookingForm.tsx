@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AlertCircle, Loader2, Calendar, Clock } from "lucide-react";
+import { AlertCircle, Loader2, Calendar, Clock, X, Sparkles } from "lucide-react";
 import MasterPrimaryButton from "../assets/Master Primary Button (4).png";
 import { API_BASE_URL } from "../config/api";
 
@@ -211,257 +211,234 @@ const BookingForm = ({ onClose, onSuccess, selectedService = null, selectedDate 
   };
 
   return (
-    <>
-      <div className="bg-gray-50 p-0 -mt-4">
-        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 w-full max-w-6xl mx-auto">
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 text-center sm:text-left">
-            {t('booking.title')}
-          </h1>
-
-          {/* Selected Date & Time Summary */}
-          {(selectedDate || selectedTime) && (
-            <div className="mb-5 sm:mb-6 bg-gradient-to-r from-[#fdf6e3] to-[#fef9ed] border border-[#e8d5a0] rounded-xl p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
-              {selectedDate && (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#d4a017] to-[#8b6914] flex items-center justify-center shrink-0">
-                    <Calendar className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] sm:text-[11px] text-[#8b6914] font-medium uppercase tracking-wide">{t('booking.date')}</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900">
-                      {selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
+    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-4xl mx-auto">
+      {/* Golden header banner with appointment summary */}
+      <div className="bg-gradient-to-r from-[#8b6914] via-[#d4a017] to-[#b8860b] px-6 py-5 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-2 transition"
+        >
+          <X className="w-5 h-5 text-white" />
+        </button>
+        <div className="flex items-center gap-4 pr-10">
+          <div className="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div className="min-w-0">
+            <h1 className="text-white font-bold text-lg leading-tight">{t('booking.title')}</h1>
+            <div className="flex items-center gap-3 mt-1 flex-wrap">
+              {selectedService && (
+                <span className="text-white/95 text-sm font-medium">{selectedService.title}</span>
               )}
-              {selectedDate && selectedTime && (
-                <div className="w-px h-8 bg-[#e8d5a0]"></div>
+              {selectedService && (selectedDate || selectedTime) && (
+                <span className="text-white/40 text-sm">|</span>
+              )}
+              {selectedDate && (
+                <span className="flex items-center gap-1.5 text-white/85 text-sm">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {selectedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                </span>
               )}
               {selectedTime && (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center shrink-0">
-                    <Clock className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium uppercase tracking-wide">{t('booking.time')}</p>
-                    <p className="text-sm sm:text-base font-semibold text-gray-900">{selectedTime}</p>
-                  </div>
-                </div>
-              )}
-              {selectedService && (
-                <>
-                  <div className="w-px h-8 bg-[#e8d5a0] hidden sm:block"></div>
-                  <div className="hidden sm:block">
-                    <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium uppercase tracking-wide">{t('booking.service')}</p>
-                    <p className="text-sm font-semibold text-gray-900">{selectedService.title}</p>
-                  </div>
-                </>
+                <span className="flex items-center gap-1.5 text-white/85 text-sm">
+                  <Clock className="w-3.5 h-3.5" />
+                  {selectedTime}
+                </span>
               )}
             </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {/* Left Column - Form Fields */}
-              <div className="space-y-3 sm:space-y-4">
-                {/* First Name */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.first_name')} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    placeholder={t('booking.first_name')}
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Last Name */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.last_name')} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    placeholder={t('booking.last_name')}
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.email')} <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder={t('booking.email')}
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Phone Number with Country Code */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.phone') || 'Phone Number'} <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-2">
-                    <select
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      className="px-2 sm:px-3 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base w-20 sm:w-24"
-                    >
-                      <option value="BE">BE</option>
-                      <option value="IN">IN</option>
-                      <option value="US">US</option>
-                      <option value="GB">GB</option>
-                      <option value="FR">FR</option>
-                      <option value="DE">DE</option>
-                      <option value="NL">NL</option>
-                    </select>
-                    <div className="flex-1 flex items-center bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-2 focus-within:ring-[#d4af37] focus-within:border-transparent transition">
-                      <span className="pl-3 sm:pl-4 text-sm sm:text-base text-gray-500 font-medium select-none">
-                        {COUNTRY_CODES[formData.country] || '+32'}
-                      </span>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleInputChange}
-                        className="flex-1 px-2 sm:px-3 py-2.5 sm:py-3 bg-transparent focus:outline-none text-sm sm:text-base"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Gender Type */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.gender')} <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="gender"
-                    value={formData.gender}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition appearance-none text-sm sm:text-base"
-                  >
-                    <option value="">{t('booking.select_gender')}</option>
-                    <option value="male">{t('booking.male')}</option>
-                    <option value="female">{t('booking.female')}</option>
-                    <option value="other">{t('booking.other')}</option>
-                  </select>
-                </div>
-
-                {/* Reminder */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.reminder') || 'Reminder Preference'}
-                  </label>
-                  <div className="flex gap-4 sm:gap-6">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={true}
-                        disabled
-                        className="w-4 h-4 accent-[#d4af37] opacity-70"
-                      />
-                      <span className="text-sm text-gray-700">{t('booking.reminder_email') || 'Email'}</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.reminderSms as boolean}
-                        onChange={(e) => {
-                          setFormData(prev => ({ ...prev, reminderSms: e.target.checked }))
-                          setShowError(false)
-                        }}
-                        className="w-4 h-4 accent-[#d4af37]"
-                      />
-                      <span className="text-sm text-gray-700">{t('booking.reminder_sms') || 'SMS'}</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column - Special Requests and Message */}
-              <div className="flex flex-col gap-3 sm:gap-4">
-                {/* Special Requests */}
-                <div>
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.special_requests')}
-                  </label>
-                  <input
-                    type="text"
-                    name="specialRequests"
-                    placeholder={t('booking.special_requests')}
-                    value={formData.specialRequests}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Message */}
-                <div className="flex-1">
-                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1.5">
-                    {t('booking.message') || 'Message'}
-                  </label>
-                  <textarea
-                    name="message"
-                    placeholder={t('booking.message_placeholder')}
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    className="w-full h-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:border-transparent transition resize-none min-h-[120px] sm:min-h-[200px] text-sm sm:text-base"
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {showError && (
-              <div className="mt-4 sm:mt-6 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-lg shadow-md flex items-center gap-2 sm:gap-3 animate-pulse">
-                <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
-                <p className="font-medium text-sm sm:text-base">
-                  {t('booking.fill_required')}
-                </p>
-              </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="flex justify-center mt-6 sm:mt-8">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="relative bg-white/30 backdrop-blur-lg border-2 border-[#B8860B]/50 text-gray-900 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full font-medium hover:bg-white/40 hover:border-[#B8860B] transition-all shadow-[0_8px_32px_0_rgba(184,134,11,0.2)] flex items-center gap-2 overflow-hidden group disabled:opacity-70 disabled:cursor-not-allowed text-sm sm:text-base"
-              >
-                {/* Glass shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-transparent opacity-50"></div>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin relative z-10" />
-                    <span className="relative z-10">{t('booking.submitting') || 'Submitting...'}</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="relative z-10">{t('booking.submit_form')}</span>
-                    <img src={MasterPrimaryButton} alt="" className="h-4 sm:h-5 w-auto relative z-10" />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
-    </>
+
+      {/* Form body */}
+      <div className="px-6 py-6 sm:px-8 sm:py-7">
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+            {/* First Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.first_name')} <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="firstName"
+                placeholder={t('booking.first_name')}
+                value={formData.firstName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition text-sm"
+              />
+            </div>
+
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.last_name')} <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                placeholder={t('booking.last_name')}
+                value={formData.lastName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition text-sm"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.email')} <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                placeholder={t('booking.email')}
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition text-sm"
+              />
+            </div>
+
+            {/* Phone Number with Country Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.phone') || 'Phone Number'} <span className="text-red-400">*</span>
+              </label>
+              <div className="flex gap-2">
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="px-2.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition text-sm w-[72px]"
+                >
+                  <option value="BE">BE</option>
+                  <option value="IN">IN</option>
+                  <option value="US">US</option>
+                  <option value="GB">GB</option>
+                  <option value="FR">FR</option>
+                  <option value="DE">DE</option>
+                  <option value="NL">NL</option>
+                </select>
+                <div className="flex-1 flex items-center bg-gray-50 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-[#d4af37]/40 focus-within:border-[#d4af37] transition">
+                  <span className="pl-3 text-sm text-gray-400 font-medium select-none">
+                    {COUNTRY_CODES[formData.country] || '+32'}
+                  </span>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    className="flex-1 px-2 py-2.5 bg-transparent focus:outline-none text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Gender */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.gender')} <span className="text-red-400">*</span>
+              </label>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition appearance-none text-sm"
+              >
+                <option value="">{t('booking.select_gender')}</option>
+                <option value="male">{t('booking.male')}</option>
+                <option value="female">{t('booking.female')}</option>
+                <option value="other">{t('booking.other')}</option>
+              </select>
+            </div>
+
+            {/* Special Requests */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.special_requests')}
+              </label>
+              <input
+                type="text"
+                name="specialRequests"
+                placeholder={t('booking.special_requests')}
+                value={formData.specialRequests}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition text-sm"
+              />
+            </div>
+
+            {/* Message - full width */}
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">
+                {t('booking.message') || 'Message'}
+              </label>
+              <textarea
+                name="message"
+                placeholder={t('booking.message_placeholder')}
+                value={formData.message}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] transition resize-none text-sm"
+              ></textarea>
+            </div>
+          </div>
+
+          {/* Reminder + Submit row */}
+          <div className="flex items-center justify-between mt-5 pt-4 border-t border-gray-100">
+            <div className="flex items-center gap-5">
+              <span className="text-sm font-medium text-gray-600">{t('booking.reminder') || 'Reminder'}:</span>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={true}
+                  disabled
+                  className="w-4 h-4 accent-[#d4af37] opacity-70"
+                />
+                <span className="text-sm text-gray-600">{t('booking.reminder_email') || 'Email'}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.reminderSms as boolean}
+                  onChange={(e) => {
+                    setFormData(prev => ({ ...prev, reminderSms: e.target.checked }))
+                    setShowError(false)
+                  }}
+                  className="w-4 h-4 accent-[#d4af37]"
+                />
+                <span className="text-sm text-gray-600">{t('booking.reminder_sms') || 'SMS'}</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-gradient-to-r from-[#8b6914] to-[#d4a017] text-white px-8 py-2.5 rounded-full font-semibold hover:from-[#7a5b10] hover:to-[#c49515] transition-all shadow-md hover:shadow-lg flex items-center gap-2.5 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t('booking.submitting') || 'Submitting...'}</span>
+                </>
+              ) : (
+                <>
+                  <span>{t('booking.submit_form')}</span>
+                  <img src={MasterPrimaryButton} alt="" className="h-5 w-auto" />
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Error Message */}
+          {showError && (
+            <div className="mt-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl flex items-center gap-2.5">
+              <AlertCircle className="w-4.5 h-4.5 shrink-0" />
+              <p className="font-medium text-sm">{t('booking.fill_required')}</p>
+            </div>
+          )}
+        </form>
+      </div>
+    </div>
   );
 };
 
