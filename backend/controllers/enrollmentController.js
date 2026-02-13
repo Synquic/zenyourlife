@@ -383,7 +383,7 @@ exports.createEnrollment = async (req, res) => {
     console.log('║                  ✅ ENROLLMENT SAVED SUCCESSFULLY               ║');
     console.log('╚════════════════════════════════════════════════════════════════╝\n');
 
-    // Send emails based on reminder preference
+    // Send confirmation emails (always send to customer regardless of reminder preference)
     let customerEmailSent = false;
     let adminEmailSent = false;
 
@@ -392,24 +392,21 @@ exports.createEnrollment = async (req, res) => {
           process.env.EMAIL_USER !== 'your-email@outlook.com' &&
           process.env.EMAIL_PASSWORD !== 'your-app-password-here') {
 
-        // Send confirmation email to customer if they selected email reminder
-        if (reminderPreference === 'email') {
-          try {
-            const customerMailOptions = {
-              from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
-              to: enrollment.email,
-              subject: `Booking Confirmed - ${enrollment.serviceTitle} | ZenYourLife`,
-              html: generateCustomerEmailTemplate(enrollment)
-            };
+        // ALWAYS send confirmation email to customer (reminder preference only affects 1-day-before reminder)
+        try {
+          const customerMailOptions = {
+            from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
+            to: enrollment.email,
+            subject: `Booking Confirmed - ${enrollment.serviceTitle} | ZenYourLife`,
+            html: generateCustomerEmailTemplate(enrollment)
+          };
 
-            await transporter.sendMail(customerMailOptions);
-            customerEmailSent = true;
-            console.log('📧 Confirmation email sent to customer:', enrollment.email);
-          } catch (emailError) {
-            console.error('❌ Error sending customer email:', emailError.message);
-          }
-        } else {
-          console.log('📱 Customer selected SMS reminder - email not sent');
+          await transporter.sendMail(customerMailOptions);
+          customerEmailSent = true;
+          console.log('📧 Confirmation email sent to customer:', enrollment.email);
+          console.log(`   (Reminder preference: ${reminderPreference} - will receive ${reminderPreference} reminder 1 day before)`);
+        } catch (emailError) {
+          console.error('❌ Error sending customer email:', emailError.message);
         }
 
         // Always send notification email to admin
@@ -435,13 +432,16 @@ exports.createEnrollment = async (req, res) => {
 
     console.log('\n═══════════════════════════════════════════════════════════════');
     console.log('EMAIL STATUS:');
-    console.log('  Customer Email:', customerEmailSent ? '✅ Sent' : (reminderPreference === 'sms' ? '📱 SMS Selected' : '❌ Not Sent'));
+    console.log('  Customer Email:', customerEmailSent ? '✅ Sent' : '❌ Not Sent');
     console.log('  Admin Email:', adminEmailSent ? '✅ Sent' : '❌ Not Sent');
+    console.log('  Reminder Preference:', reminderPreference === 'sms' ? '📱 SMS' : '📧 Email');
     console.log('═══════════════════════════════════════════════════════════════\n');
 
     res.status(201).json({
       success: true,
-      message: customerEmailSent ? 'Booking confirmed! Check your email for confirmation.' : 'Booking confirmed successfully!',
+      message: customerEmailSent
+        ? `Booking confirmed! Check your email for confirmation. You'll receive a ${reminderPreference === 'sms' ? 'SMS' : 'email'} reminder 1 day before your appointment.`
+        : 'Booking confirmed successfully!',
       emailSent: customerEmailSent,
       data: enrollment
     });
