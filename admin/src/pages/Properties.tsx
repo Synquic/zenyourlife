@@ -645,36 +645,47 @@ const Properties = () => {
     }
   }, [])
 
-  // Handle gallery image upload
+  // Handle gallery image upload (supports multiple files)
   const handleGalleryImageUpload = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return
 
-    const file = files[0]
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file')
+    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (imageFiles.length === 0) {
+      alert('Please upload image files')
       return
     }
 
     setUploadingImage(true)
-    const formDataUpload = new FormData()
-    formDataUpload.append('image', file)
+    const uploadedUrls: string[] = []
 
-    try {
-      const data = await apiUpload('/upload/image', formDataUpload)
-      if (data.success && data.data?.url) {
-        setFormData(prev => ({
-          ...prev,
-          galleryImages: [...prev.galleryImages, data.data.url]
-        }))
-      } else {
-        alert('Failed to upload image: ' + (data.message || 'Unknown error'))
+    for (const file of imageFiles) {
+      const formDataUpload = new FormData()
+      formDataUpload.append('image', file)
+
+      try {
+        const data = await apiUpload('/upload/image', formDataUpload)
+        if (data.success && data.data?.url) {
+          uploadedUrls.push(data.data.url)
+        } else {
+          console.error('Failed to upload:', file.name, data.message)
+        }
+      } catch (error) {
+        console.error('Error uploading gallery image:', file.name, error)
       }
-    } catch (error) {
-      console.error('Error uploading gallery image:', error)
-      alert('Failed to upload image: ' + (error instanceof Error ? error.message : 'Unknown error'))
-    } finally {
-      setUploadingImage(false)
     }
+
+    if (uploadedUrls.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        galleryImages: [...prev.galleryImages, ...uploadedUrls]
+      }))
+    }
+
+    if (uploadedUrls.length < imageFiles.length) {
+      alert(`${uploadedUrls.length} of ${imageFiles.length} images uploaded. Some failed.`)
+    }
+
+    setUploadingImage(false)
   }, [])
 
   // Remove gallery image
@@ -1536,14 +1547,16 @@ const Properties = () => {
                     ref={galleryFileInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleGalleryImageUpload(e.target.files)}
+                    multiple
+                    onChange={(e) => { handleGalleryImageUpload(e.target.files); e.target.value = '' }}
                     className="hidden"
                   />
                   <div className="flex flex-col items-center gap-2">
                     <div className="w-8 h-8 rounded-lg bg-[#FFEEC3]/30 flex items-center justify-center">
                       <Plus className="w-4 h-4 text-[#DFB13B]" />
                     </div>
-                    <p className="text-xs font-medium text-slate-600">Add Gallery Image</p>
+                    <p className="text-xs font-medium text-slate-600">Add Gallery Images</p>
+                    <p className="text-[10px] text-slate-400">Select multiple images at once</p>
                   </div>
                 </div>
               </div>
