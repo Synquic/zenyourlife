@@ -6,7 +6,8 @@ const SUPPORTED_LANGUAGES = {
   en: 'English',
   de: 'German',
   nl: 'Dutch',
-  fr: 'French'
+  fr: 'French',
+  es: 'Spanish'
 };
 
 /**
@@ -194,6 +195,48 @@ async function translateProperty(property, targetLang) {
 
   if (storedTranslation && storedTranslation.description) {
     // Use stored translations from DB (cost-efficient approach)
+
+    // Build translated overview if available
+    let translatedOverview = propertyObj.overview;
+    if (storedTranslation.overview && propertyObj.overview) {
+      let translatedFeatures = propertyObj.overview.features || [];
+      if (storedTranslation.overview.features?.length > 0 && propertyObj.overview.features?.length > 0) {
+        translatedFeatures = propertyObj.overview.features.map((feature, idx) => ({
+          ...feature,
+          title: storedTranslation.overview.features[idx]?.title || feature.title,
+          description: storedTranslation.overview.features[idx]?.description || feature.description
+        }));
+      }
+      translatedOverview = {
+        ...propertyObj.overview,
+        title: storedTranslation.overview.title || propertyObj.overview.title,
+        description1: storedTranslation.overview.description1 || propertyObj.overview.description1,
+        description2: storedTranslation.overview.description2 || propertyObj.overview.description2,
+        highlights: storedTranslation.overview.highlights?.length > 0
+          ? storedTranslation.overview.highlights
+          : (propertyObj.overview.highlights || []),
+        features: translatedFeatures
+      };
+    }
+
+    // Build translated location if available
+    let translatedLocation = propertyObj.location;
+    if (storedTranslation.location && propertyObj.location) {
+      let translatedPlaces = propertyObj.location.places || [];
+      if (storedTranslation.location.places?.length > 0 && propertyObj.location.places?.length > 0) {
+        translatedPlaces = propertyObj.location.places.map((place, idx) => ({
+          ...place,
+          title: storedTranslation.location.places[idx]?.title || place.title
+        }));
+      }
+      translatedLocation = {
+        ...propertyObj.location,
+        title: storedTranslation.location.title || propertyObj.location.title,
+        description: storedTranslation.location.description || propertyObj.location.description,
+        places: translatedPlaces
+      };
+    }
+
     return {
       ...propertyObj,
       name: storedTranslation.name || propertyObj.name,
@@ -201,7 +244,9 @@ async function translateProperty(property, targetLang) {
       priceUnit: storedTranslation.priceUnit || propertyObj.priceUnit,
       parking: storedTranslation.parking || propertyObj.parking,
       cleanliness: storedTranslation.cleanliness || propertyObj.cleanliness,
-      amenities: storedTranslation.amenities?.length > 0 ? storedTranslation.amenities : propertyObj.amenities
+      amenities: storedTranslation.amenities?.length > 0 ? storedTranslation.amenities : propertyObj.amenities,
+      overview: translatedOverview,
+      location: translatedLocation
     };
   }
 

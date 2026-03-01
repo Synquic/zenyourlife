@@ -224,7 +224,13 @@
     "slots_booked": "{{count}} horario ya reservado para esta fecha",
     "slots_booked_plural": "{{count}} horarios ya reservados para esta fecha",
     "slots_unavailable": "{{count}} horario no disponible",
-    "slots_unavailable_plural": "{{count}} horarios no disponibles"
+    "slots_unavailable_plural": "{{count}} horarios no disponibles",
+    "select_date_first": "Por favor, selecciona una fecha primero para ver los horarios disponibles",
+    "date_unavailable": "Fecha no disponible",
+    "no_slots_available": "No hay horarios disponibles para este día",
+    "select_another_date": "Por favor, selecciona otra fecha",
+    "time_blocked": "Horario bloqueado",
+    "blocked_dates_legend": "Las fechas tachadas no están disponibles"
   },
   "footer": {
     "description": "Experimenta el arte de la relajación y el rejuvenecimiento en Zen Your Life.",
@@ -322,6 +328,8 @@
       "description_2": "Ya sea que quieras vistas al océano, aislamiento total o una base moderna cerca de los lugares culturales de Lanzarote, encontrarás un lugar aquí que se siente cómodamente tuyo.",
       "villas_title": "Villas Privadas",
       "villas_desc": "Espaciosas, privadas y perfectas para familias o estancias largas.",
+      "casa_title": "Casa",
+      "casa_desc": "Los huéspedes disfrutan de una terraza privada con jacuzzi y una enorme terraza en la azotea con espectaculares vistas a la montaña y al mar.",
       "countryside_title": "Vida Costera",
       "countryside_desc": "Vida lenta rodeada de paisajes volcánicos.",
       "luxury_title": "Colección Premium",
