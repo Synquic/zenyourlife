@@ -224,7 +224,13 @@
     "slots_booked": "{{count}} tijdslot al geboekt voor deze datum",
     "slots_booked_plural": "{{count}} tijdsloten al geboekt voor deze datum",
     "slots_unavailable": "{{count}} tijdslot niet beschikbaar",
-    "slots_unavailable_plural": "{{count}} tijdsloten niet beschikbaar"
+    "slots_unavailable_plural": "{{count}} tijdsloten niet beschikbaar",
+    "select_date_first": "Selecteer eerst een datum om beschikbare tijdsloten te zien",
+    "date_unavailable": "Datum niet beschikbaar",
+    "no_slots_available": "Geen tijdsloten beschikbaar voor deze dag",
+    "select_another_date": "Selecteer een andere datum",
+    "time_blocked": "Tijdslot geblokkeerd",
+    "blocked_dates_legend": "Doorgestreepte datums zijn niet beschikbaar"
   },
   "footer": {
     "description": "Ervaar de kunst van ontspanning en verjonging bij Zen Your Life.",
@@ -333,6 +339,8 @@
       "description_2": "Of je nu zeezicht wilt, totale afzondering of een moderne uitvalsbasis dicht bij de culturele plekken van Lanzarote, je vindt hier een plek die comfortabel de jouwe voelt.",
       "villas_title": "Onze accommodaties",
       "villas_desc": "Ruim, privé en perfect voor gezinnen of lange verblijven.",
+      "casa_title": "Casa",
+      "casa_desc": "Gasten genieten van een privéterras met hottub en een enorm dakterras met spectaculair uitzicht op bergen en zee.",
       "countryside_title": "Kustleven",
       "countryside_desc": "Langzaam leven omringd door vulkanische landschappen.",
       "luxury_title": "Premium Collectie",
@@ -450,9 +458,9 @@
       "label": "Locatie",
       "title": "Locatie",
       "description": "Gelegen aan de rustige oostkust van Lanzarote, geeft de villa u direct toegang tot stranden, vulkaanpaden en lokale plekken zonder toeristendrukte.",
-      "place1": "Vibrant Shopping Street",
-      "place2": "Stunning Beach Views",
-      "place3": "Coastal Town Life",
+      "place1": "Levendige winkelstraat",
+      "place2": "Prachtig strandzicht",
+      "place3": "Kustdorpsfeer",
       "view_on_map": "Bekijk op kaart",
       "open_in_maps": "Openen in Google Maps"
     },

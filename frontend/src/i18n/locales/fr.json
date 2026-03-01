@@ -224,7 +224,13 @@
     "slots_booked": "{{count}} créneau déjà réservé pour cette date",
     "slots_booked_plural": "{{count}} créneaux déjà réservés pour cette date",
     "slots_unavailable": "{{count}} créneau indisponible",
-    "slots_unavailable_plural": "{{count}} créneaux indisponibles"
+    "slots_unavailable_plural": "{{count}} créneaux indisponibles",
+    "select_date_first": "Veuillez d'abord sélectionner une date pour voir les créneaux disponibles",
+    "date_unavailable": "Date indisponible",
+    "no_slots_available": "Aucun créneau disponible pour ce jour",
+    "select_another_date": "Veuillez sélectionner une autre date",
+    "time_blocked": "Créneau bloqué",
+    "blocked_dates_legend": "Les dates barrées ne sont pas disponibles"
   },
   "footer": {
     "description": "Découvrez l'art de la relaxation et du ressourcement chez Zen Your Life.",
@@ -327,6 +333,8 @@
       "description_2": "Vue sur l'océan, isolement total ou base moderne proche des sites culturels : trouvez ici un endroit qui vous ressemble.",
       "villas_title": "Nos hébergements",
       "villas_desc": "Spacieux, intimes et parfaits pour les familles ou les séjours prolongés.",
+      "casa_title": "Casa",
+      "casa_desc": "Les clients profitent d'une terrasse privée avec jacuzzi et d'une immense terrasse sur le toit avec vue spectaculaire sur la montagne et la mer.",
       "countryside_title": "Vie côtière",
       "countryside_desc": "Une vie douce, au rythme des paysages volcaniques.",
       "luxury_title": "Collection premium",
