@@ -33,10 +33,10 @@ exports.getAllServices = async (req, res) => {
 
         if (translation && translation.description) {
           translatedCount++;
-          // Use stored translation from DB (keep title in English, only translate descriptions)
+          // Use stored translation from DB (keep title in English)
           return {
             ...serviceObj,
-            title: serviceObj.title, // Keep title in English
+            title: serviceObj.title,
             description: translation.description || serviceObj.description,
             benefits: translation.benefits?.length > 0 ? translation.benefits : serviceObj.benefits,
             targetAudience: translation.targetAudience?.length > 0 ? translation.targetAudience : serviceObj.targetAudience,
@@ -126,10 +126,10 @@ exports.getServiceById = async (req, res) => {
       const translation = serviceObj.translations?.[lang];
 
       if (translation) {
-        // Use stored translation from DB (keep title in English, only translate descriptions)
+        // Use stored translation from DB (keep title in English)
         const translatedService = {
           ...serviceObj,
-          title: serviceObj.title, // Keep title in English
+          title: serviceObj.title,
           description: translation.description || serviceObj.description,
           benefits: translation.benefits?.length > 0 ? translation.benefits : serviceObj.benefits,
           targetAudience: translation.targetAudience?.length > 0 ? translation.targetAudience : serviceObj.targetAudience,
