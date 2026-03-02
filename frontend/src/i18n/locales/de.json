@@ -26,8 +26,7 @@
   "hero": {
     "welcome": "Willkommen bei",
     "title": "Zen Your Life",
-    "subtitle": "Erleben Sie die Kunst der Entspannung und Verjüngung"
-,
+    "subtitle": "Erleben Sie die Kunst der Entspannung und Verjüngung",
     "description": "Entdecken Sie unsere Premium-Wellness-Dienste, die darauf ausgelegt sind, das Gleichgewicht in Körper, Geist und Seele wiederherzustellen.",
     "cta_book": "Termin Buchen",
     "cta_services": "Unsere Dienste"
@@ -225,7 +224,13 @@
     "slots_booked": "{{count}} Zeitslot bereits für diesen Termin gebucht",
     "slots_booked_plural": "{{count}} Zeitslots bereits für diesen Termin gebucht",
     "slots_unavailable": "{{count}} Zeitslot nicht verfügbar",
-    "slots_unavailable_plural": "{{count}} Zeitslots nicht verfügbar"
+    "slots_unavailable_plural": "{{count}} Zeitslots nicht verfügbar",
+    "select_date_first": "Bitte wählen Sie zuerst ein Datum, um verfügbare Zeitslots zu sehen",
+    "date_unavailable": "Datum nicht verfügbar",
+    "no_slots_available": "Keine Zeitslots für diesen Tag verfügbar",
+    "select_another_date": "Bitte wählen Sie ein anderes Datum",
+    "time_blocked": "Zeitslot gesperrt",
+    "blocked_dates_legend": "Durchgestrichene Daten sind nicht verfügbar"
   },
   "footer": {
     "description": "Erleben Sie die Kunst der Entspannung und Verjüngung bei Zen Your Life.",
@@ -323,6 +328,8 @@
       "description_2": "Ob Sie Meerblick, totale Abgeschiedenheit oder eine moderne Basis in der Nähe der kulturellen Orte von Lanzarote wünschen, Sie finden hier einen Ort, der sich angenehm wie Ihr eigener anfühlt.",
       "villas_title": "Private Villen",
       "villas_desc": "Geräumig, privat und perfekt für Familien oder längere Aufenthalte.",
+      "casa_title": "Casa",
+      "casa_desc": "Gäste genießen eine private Terrasse mit Whirlpool und eine große Dachterrasse mit spektakulärem Berg- und Meerblick.",
       "countryside_title": "Küstenleben",
       "countryside_desc": "Langsames Leben umgeben von vulkanischen Landschaften.",
       "luxury_title": "Premium Kollektion",
@@ -440,9 +447,9 @@
       "label": "Lage",
       "title": "Lage",
       "description": "An der ruhigen Ostküste Lanzarotes gelegen, bietet die Villa direkten Zugang zu Stränden, Vulkanwegen und lokalen Orten ohne Touristenmassen.",
-      "place1": "Vibrant Shopping Street",
-      "place2": "Stunning Beach Views",
-      "place3": "Coastal Town Life",
+      "place1": "Lebhafte Einkaufsstraße",
+      "place2": "Atemberaubender Strandblick",
+      "place3": "Küstenstadtleben",
       "view_on_map": "Auf Karte anzeigen",
       "open_in_maps": "In Google Maps öffnen"
     },
