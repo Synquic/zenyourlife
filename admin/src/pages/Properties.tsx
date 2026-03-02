@@ -649,43 +649,58 @@ const Properties = () => {
   const handleGalleryImageUpload = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return
 
-    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'))
+    // Filter for valid image files
+    const imageFiles = Array.from(files).filter(file => file.type.startsWith('image/'))
     if (imageFiles.length === 0) {
       alert('Please upload image files')
       return
     }
 
+    if (imageFiles.length < files.length) {
+      alert(`${files.length - imageFiles.length} non-image file(s) were skipped`)
+    }
+
     setUploadingImage(true)
     const uploadedUrls: string[] = []
+    const failedUploads: string[] = []
 
-    for (const file of imageFiles) {
-      const formDataUpload = new FormData()
-      formDataUpload.append('image', file)
+    try {
+      // Upload all images
+      for (const file of imageFiles) {
+        const formDataUpload = new FormData()
+        formDataUpload.append('image', file)
 
-      try {
-        const data = await apiUpload('/upload/image', formDataUpload)
-        if (data.success && data.data?.url) {
-          uploadedUrls.push(data.data.url)
-        } else {
-          console.error('Failed to upload:', file.name, data.message)
+        try {
+          const data = await apiUpload('/upload/image', formDataUpload)
+          if (data.success && data.data?.url) {
+            uploadedUrls.push(data.data.url)
+          } else {
+            failedUploads.push(file.name)
+          }
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error)
+          failedUploads.push(file.name)
         }
-      } catch (error) {
-        console.error('Error uploading gallery image:', file.name, error)
       }
-    }
 
-    if (uploadedUrls.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        galleryImages: [...prev.galleryImages, ...uploadedUrls]
-      }))
-    }
+      // Add all successfully uploaded images to gallery
+      if (uploadedUrls.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          galleryImages: [...prev.galleryImages, ...uploadedUrls]
+        }))
+      }
 
-    if (uploadedUrls.length < imageFiles.length) {
-      alert(`${uploadedUrls.length} of ${imageFiles.length} images uploaded. Some failed.`)
+      // Show summary if there were failures
+      if (failedUploads.length > 0) {
+        alert(`Failed to upload ${failedUploads.length} image(s): ${failedUploads.join(', ')}`)
+      }
+    } catch (error) {
+      console.error('Error uploading gallery images:', error)
+      alert('Failed to upload images: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    } finally {
+      setUploadingImage(false)
     }
-
-    setUploadingImage(false)
   }, [])
 
   // Remove gallery image

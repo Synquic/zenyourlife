@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const Enrollment = require('../models/Enrollment');
 const { sendCustomerSmsReminder, sendAdminSmsReminder, initializeTwilio } = require('./twilioSmsService');
-const { BELGIUM_TIMEZONE, getBelgiumNow, toBelgiumTime } = require('../utils/timezone');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getEndOfDayBelgium, getBelgiumDateStr } = require('../utils/timezone');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -229,70 +229,63 @@ const sendAdminReminder = async (enrollment) => {
 // Check and send customer reminders (appointments tomorrow in Belgium timezone)
 const checkCustomerReminders = async () => {
   try {
-    const belgiumNow = getBelgiumNow();
-    console.log(`[Reminder] Belgium time now: ${belgiumNow.toISOString()}`);
+    // Use actual UTC time for all calculations
+    const nowUTC = new Date();
+    const todayDateStr = getBelgiumDateStr(nowUTC);
 
-    const tomorrow = new Date(belgiumNow);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    console.log(`[Reminder] Running at ${nowUTC.toISOString()} (Belgium: ${nowUTC.toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE })})`);
 
-    // Set to start of tomorrow in Belgium timezone
-    const tomorrowStart = new Date(tomorrow);
-    tomorrowStart.setHours(0, 0, 0, 0);
+    // Calculate tomorrow by adding 24 hours to today's start in Belgium
+    const todayStart = getStartOfDayBelgium(todayDateStr);
+    const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const tomorrowDateStr = getBelgiumDateStr(tomorrowStart);
+    const tomorrowEnd = getEndOfDayBelgium(tomorrowDateStr);
 
-    // Set to end of tomorrow in Belgium timezone
-    const tomorrowEnd = new Date(tomorrow);
-    tomorrowEnd.setHours(23, 59, 59, 999);
-
-    console.log(`[Reminder] Looking for appointments between ${tomorrowStart.toISOString()} and ${tomorrowEnd.toISOString()} (Belgium tomorrow)`);
+    console.log(`[Reminder] Looking for appointments between ${tomorrowStart.toISOString()} and ${tomorrowEnd.toISOString()} (Belgium tomorrow: ${tomorrowDateStr})`);
 
     // Find appointments for tomorrow that haven't received customer reminder (EMAIL)
+    // Email is MANDATORY for all customers regardless of their reminder preference
     const emailEnrollments = await Enrollment.find({
       appointmentDate: {
         $gte: tomorrowStart,
         $lte: tomorrowEnd
       },
-      reminderPreference: 'email',
       reminderSentToCustomer: false,
       status: { $in: ['pending', 'confirmed'] }
     });
 
-    console.log(`[Reminder] Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders`);
+    console.log(`[Reminder] Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders (email is mandatory for all)`);
 
+    // Process each enrollment: email is mandatory, SMS is additional for 'sms' or 'both' preference
     for (const enrollment of emailEnrollments) {
-      const sent = await sendCustomerReminder(enrollment);
-      if (sent) {
-        await Enrollment.findByIdAndUpdate(enrollment._id, {
-          reminderSentToCustomer: true
-        });
+      let emailSent = false;
+      let smsSent = false;
+
+      // Step 1: Send email (MANDATORY for all customers)
+      emailSent = await sendCustomerReminder(enrollment);
+      if (emailSent) {
         console.log(`[Reminder] ✅ Customer email reminder sent for enrollment #${enrollment.enrollmentId}`);
       } else {
         console.log(`[Reminder] ❌ Failed to send customer email reminder for enrollment #${enrollment.enrollmentId}`);
       }
-    }
 
-    // Find appointments for tomorrow that haven't received customer reminder (SMS)
-    const smsEnrollments = await Enrollment.find({
-      appointmentDate: {
-        $gte: tomorrowStart,
-        $lte: tomorrowEnd
-      },
-      reminderPreference: 'sms',
-      reminderSentToCustomer: false,
-      status: { $in: ['pending', 'confirmed'] }
-    });
+      // Step 2: Send SMS if customer preference includes SMS ('sms' or 'both')
+      if (enrollment.reminderPreference === 'sms' || enrollment.reminderPreference === 'both') {
+        console.log(`[Reminder] Attempting SMS to ${enrollment.phoneNumber} (country: ${enrollment.country}) for enrollment #${enrollment.enrollmentId}`);
+        smsSent = await sendCustomerSmsReminder(enrollment);
+        if (smsSent) {
+          console.log(`[Reminder] ✅ Customer SMS reminder sent for enrollment #${enrollment.enrollmentId}`);
+        } else {
+          console.log(`[Reminder] ❌ Failed to send customer SMS reminder for enrollment #${enrollment.enrollmentId} - Check Twilio account (trial accounts only send to verified numbers)`);
+        }
+      }
 
-    console.log(`[Reminder] Found ${smsEnrollments.length} appointments for tomorrow needing SMS reminders`);
-
-    for (const enrollment of smsEnrollments) {
-      console.log(`[Reminder] Attempting SMS to ${enrollment.phoneNumber} (country: ${enrollment.country}) for enrollment #${enrollment.enrollmentId}`);
-      const sent = await sendCustomerSmsReminder(enrollment);
-      if (sent) {
+      // Mark as sent if email was successful (email is mandatory)
+      if (emailSent) {
         await Enrollment.findByIdAndUpdate(enrollment._id, {
           reminderSentToCustomer: true
         });
-        console.log(`[Reminder] ✅ Customer SMS reminder sent for enrollment #${enrollment.enrollmentId}`);
-      } else {
-        console.log(`[Reminder] ❌ Failed to send customer SMS reminder for enrollment #${enrollment.enrollmentId} - Check Twilio account (trial accounts only send to verified numbers)`);
+        console.log(`[Reminder] ✅ Enrollment #${enrollment.enrollmentId} marked as reminder sent (email: ${emailSent}, sms: ${smsSent})`);
       }
     }
   } catch (error) {
@@ -303,21 +296,21 @@ const checkCustomerReminders = async () => {
 // Check and send admin reminders (appointments in 15 minutes, Belgium timezone)
 const checkAdminReminders = async () => {
   try {
-    const belgiumNow = getBelgiumNow();
+    // Use actual UTC time for comparisons
+    const nowUTC = new Date();
+    const todayDateStr = getBelgiumDateStr(nowUTC);
 
-    // Get today's date at midnight in Belgium timezone
-    const todayBelgium = new Date(belgiumNow);
-    todayBelgium.setHours(0, 0, 0, 0);
+    // Get today's boundaries in Belgium timezone (as UTC timestamps)
+    const todayStart = getStartOfDayBelgium(todayDateStr);
+    const todayEnd = getEndOfDayBelgium(todayDateStr);
 
-    // Get tomorrow's date at midnight in Belgium timezone
-    const tomorrowBelgium = new Date(todayBelgium);
-    tomorrowBelgium.setDate(tomorrowBelgium.getDate() + 1);
+    console.log(`[Admin Reminder] Checking at ${nowUTC.toISOString()} (Belgium: ${nowUTC.toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE })})`);
 
     // Find today's appointments that haven't received admin reminder
     const enrollments = await Enrollment.find({
       appointmentDate: {
-        $gte: todayBelgium,
-        $lt: tomorrowBelgium
+        $gte: todayStart,
+        $lte: todayEnd
       },
       reminderSentToAdmin: false,
       status: { $in: ['pending', 'confirmed'] }
@@ -327,20 +320,20 @@ const checkAdminReminders = async () => {
       // Parse appointment time (stored as Belgium local time like "14:30")
       const [hours, minutes] = enrollment.appointmentTime.split(':').map(Number);
 
-      // Create appointment datetime in Belgium timezone
-      const appointmentDateBelgium = new Date(todayBelgium);
-      appointmentDateBelgium.setHours(hours, minutes, 0, 0);
+      // Calculate appointment time in UTC
+      // Start with midnight Belgium time (as UTC), then add hours and minutes
+      const appointmentUTC = new Date(todayStart.getTime() + (hours * 60 + minutes) * 60 * 1000);
 
-      // Calculate 15 minutes before appointment
-      const reminderTime = new Date(appointmentDateBelgium);
-      reminderTime.setMinutes(reminderTime.getMinutes() - 15);
+      // Calculate 15 minutes before appointment (in UTC)
+      const reminderTimeUTC = new Date(appointmentUTC.getTime() - 15 * 60 * 1000);
 
-      // Check if it's time to send (within 5 minute window) using Belgium time
-      const timeDiff = belgiumNow.getTime() - reminderTime.getTime();
+      // Check if it's time to send (within 5 minute window)
+      const timeDiff = nowUTC.getTime() - reminderTimeUTC.getTime();
 
       // Send if we're within 5 minutes after the reminder time (to account for cron interval)
       if (timeDiff >= 0 && timeDiff <= 5 * 60 * 1000) {
-        console.log(`[Reminder] Admin reminder triggered for enrollment #${enrollment.enrollmentId} at ${enrollment.appointmentTime}`);
+        console.log(`[Admin Reminder] Triggered for enrollment #${enrollment.enrollmentId} at ${enrollment.appointmentTime} Belgium time`);
+        console.log(`[Admin Reminder] Appointment UTC: ${appointmentUTC.toISOString()}, Reminder should fire at: ${reminderTimeUTC.toISOString()}`);
 
         // Send email reminder to admin
         const emailSent = await sendAdminReminder(enrollment);
@@ -352,14 +345,14 @@ const checkAdminReminders = async () => {
           await Enrollment.findByIdAndUpdate(enrollment._id, {
             reminderSentToAdmin: true
           });
-          console.log(`[Reminder] ✅ Admin reminder sent (email: ${emailSent}, sms: ${smsSent}) for enrollment #${enrollment.enrollmentId}`);
+          console.log(`[Admin Reminder] ✅ Sent (email: ${emailSent}, sms: ${smsSent}) for enrollment #${enrollment.enrollmentId}`);
         } else {
-          console.log(`[Reminder] ❌ Failed to send admin reminder for enrollment #${enrollment.enrollmentId}`);
+          console.log(`[Admin Reminder] ❌ Failed to send for enrollment #${enrollment.enrollmentId}`);
         }
       }
     }
   } catch (error) {
-    console.error('[Reminder] Error checking admin reminders:', error.message);
+    console.error('[Admin Reminder] Error checking admin reminders:', error.message);
   }
 };
 
