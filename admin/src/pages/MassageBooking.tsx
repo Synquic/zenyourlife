@@ -35,7 +35,7 @@ interface BookingData {
 import { API_BASE_URL } from '../config/api'
 const API_URL = API_BASE_URL
 
-type FilterPeriod = 'all' | 'day' | 'week' | 'month' | 'year'
+type FilterPeriod = 'all' | 'today' | 'day' | 'week' | 'month' | 'year'
 
 const countryNames: { [key: string]: string } = {
   'BE': 'Belgium',
@@ -96,6 +96,7 @@ const MassageBooking = () => {
 
   const filterOptions: { value: FilterPeriod; label: string }[] = [
     { value: 'all', label: 'All Time' },
+    { value: 'today', label: 'Today' },
     { value: 'day', label: 'Last 24 Hours' },
     { value: 'week', label: 'Last 7 Days' },
     { value: 'month', label: 'Last 30 Days' },
@@ -108,6 +109,13 @@ const MassageBooking = () => {
     let startDate: Date
 
     switch (filterPeriod) {
+      case 'today': {
+        const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(now)
+        return data.filter(booking => {
+          const belgiumDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date(booking.appointmentDate))
+          return belgiumDate === todayStr
+        })
+      }
       case 'day':
         startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000)
         break
@@ -419,8 +427,8 @@ const MassageBooking = () => {
   }).sort((a, b) => {
     const dateA = new Date(a.appointmentDate).getTime()
     const dateB = new Date(b.appointmentDate).getTime()
-    if (dateA !== dateB) return dateA - dateB
-    return (a.appointmentTime || '').localeCompare(b.appointmentTime || '')
+    if (dateA !== dateB) return dateB - dateA
+    return (b.appointmentTime || '').localeCompare(a.appointmentTime || '')
   })
 
   // Stats based on period filtered bookings
@@ -472,7 +480,7 @@ const MassageBooking = () => {
     <div className="min-h-screen bg-[#f8fafc]">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="lg:ml-60 flex flex-col min-h-screen">
+      <div className="lg:ml-60 flex flex-col h-screen overflow-hidden">
         {/* Header - Modern Design */}
         <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 relative z-50">
           {/* Top row */}
@@ -487,10 +495,23 @@ const MassageBooking = () => {
               </button>
               <div>
                 <h1 className="text-lg sm:text-xl font-bold text-slate-800">Massage Appointments</h1>
-                <p className="text-slate-500 text-xs mt-0.5 hidden sm:block">Manage massage and wellness bookings</p>
+                <p className="text-slate-500 text-xs mt-0.5 hidden sm:block">Manage massage bookings</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {/* Today Quick Button */}
+              <button
+                onClick={() => setFilterPeriod(filterPeriod === 'today' ? 'all' : 'today')}
+                className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg transition-all text-xs sm:text-sm font-medium ${
+                  filterPeriod === 'today'
+                    ? 'bg-[#DFB13B] text-white shadow-md shadow-[#DFB13B]/30'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>Today</span>
+              </button>
+
               {/* Filter Dropdown */}
               <div className="relative" ref={filterDropdownRef}>
                 <button
@@ -615,12 +636,12 @@ const MassageBooking = () => {
         </header>
 
         {/* Main Content */}
-        <div className="flex flex-col md:flex-row relative min-h-[600px]" ref={containerRef}>
+        <div className="flex flex-col md:flex-row relative flex-1 overflow-hidden" ref={containerRef}>
           {/* Left Panel - Full screen on mobile (hidden when booking selected), resizable on desktop */}
           <div
-            className={`md:border-r border-slate-200 bg-white transition-none flex-shrink-0 ${
-              activePanel === 'right' ? 'hidden md:block md:w-0 md:overflow-hidden' : activePanel === 'left' ? 'w-full' : ''
-            } ${selectedBooking ? 'hidden md:block' : 'block'}`}
+            className={`md:border-r border-slate-200 bg-white transition-none flex-shrink-0 flex flex-col overflow-hidden ${
+              activePanel === 'right' ? 'hidden md:flex md:w-0 md:overflow-hidden' : activePanel === 'left' ? 'w-full' : ''
+            } ${selectedBooking ? 'hidden md:flex' : ''}`}
             style={{
               width: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : `${leftPanelWidth}px`,
               minWidth: activePanel === 'right' ? 0 : activePanel === 'left' ? '100%' : '350px'
@@ -691,7 +712,7 @@ const MassageBooking = () => {
             </div>
 
             {/* Booking List - Grouped by Month */}
-            <div className="p-3">
+            <div className="p-3 flex-1 overflow-y-auto">
               {filteredBookings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-slate-500">
                   <div className="w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 rounded-3xl flex items-center justify-center mb-4 shadow-inner">
@@ -720,9 +741,9 @@ const MassageBooking = () => {
                   monthGroups[key].bookings.push(booking)
                 })
 
-                const sortedKeys = Object.keys(monthGroups).sort()
+                const sortedKeys = Object.keys(monthGroups).sort().reverse()
                 const currentAndFutureKeys = sortedKeys.filter(k => k >= recentCutoff)
-                const archivedKeys = sortedKeys.filter(k => k < recentCutoff).reverse()
+                const archivedKeys = sortedKeys.filter(k => k < recentCutoff)
 
                 const renderBookingCard = (booking: typeof filteredBookings[0]) => {
                   const statusConfig = getStatusConfig(booking.status)
@@ -841,9 +862,9 @@ const MassageBooking = () => {
 
           {/* Right Panel - Details (Full height within content area on mobile) */}
           <div
-            className={`flex-1 bg-slate-50 transition-none ${
-              activePanel === 'left' ? 'hidden md:block md:w-0 md:overflow-hidden' : ''
-            } ${selectedBooking ? 'block' : 'hidden md:block'}`}
+            className={`flex-1 bg-slate-50 transition-none flex flex-col overflow-hidden ${
+              activePanel === 'left' ? 'hidden md:flex md:w-0 md:overflow-hidden' : ''
+            } ${selectedBooking ? '' : 'hidden md:flex'}`}
           >
             {/* Right panel header with toggle and back button - Modern */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-slate-200 bg-gradient-to-r from-white to-slate-50 sticky top-0 z-10">
@@ -870,7 +891,7 @@ const MassageBooking = () => {
               </button>
             </div>
 
-            <div className="p-4 sm:p-6">
+            <div className="p-4 sm:p-6 flex-1 overflow-y-auto">
             {selectedBooking ? (
               <div className="space-y-6">
                 {/* Booking Header Card */}
@@ -1060,7 +1081,7 @@ const MassageBooking = () => {
                     <div className="p-5">
                       <div className="p-4 bg-gradient-to-r from-[#DFB13B]/10 to-[#C9A032]/5 rounded-xl border border-[#DFB13B]/20">
                         <p className="font-bold text-slate-800 text-lg">{selectedBooking.serviceTitle}</p>
-                        <p className="text-xs text-slate-500 mt-1">Wellness Treatment</p>
+                        <p className="text-xs text-slate-500 mt-1">Treatment</p>
                       </div>
                     </div>
                   </div>

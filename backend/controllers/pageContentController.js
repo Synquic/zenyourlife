@@ -192,7 +192,7 @@ async function createDefaultPageContent(pageId) {
       { value: '100+', label: 'Treatments Offered', isHighlighted: false },
       { value: '50+', label: 'Certified Therapists', isHighlighted: true },
       { value: '2k+', label: 'Satisfied Clients', isHighlighted: false },
-      { value: '300+', label: 'Unique Wellness', isHighlighted: false }
+      { value: '300+', label: 'Unique', isHighlighted: false }
     ],
     sectionHeaders: {
       services: {
@@ -210,7 +210,7 @@ function getDefaultHeroTitle(pageId) {
   const titles = {
     services: 'Find Your Balance, One Massage at a Time',
     home: 'Welcome to ZenYourLife',
-    about: 'Our Story of Wellness'
+    about: 'Our Story'
   };
   return titles[pageId] || 'Welcome';
 }
@@ -219,7 +219,7 @@ function getDefaultHeroSubtitle(pageId) {
   const subtitles = {
     services: 'Each body carries its own story of movement, tension, and rest. Choose the treatment that speaks to what you need most today.',
     home: 'Discover the art of relaxation and rejuvenation',
-    about: 'Learn about our journey in wellness'
+    about: 'Learn about our journey'
   };
   return subtitles[pageId] || '';
 }

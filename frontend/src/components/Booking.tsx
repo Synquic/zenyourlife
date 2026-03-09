@@ -74,7 +74,7 @@ const Booking = ({ onClose }: BookingProps) => {
           {
             _id: '4',
             title: "Healing reflexology",
-            description: "Pressure applied to specific points on the feet to support overall wellness.",
+            description: "Pressure applied to specific points on the feet to support overall health.",
             category: 'therapy',
             duration: 45,
             price: 55

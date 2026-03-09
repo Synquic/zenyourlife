@@ -1,4 +1,5 @@
 const twilio = require('twilio');
+const { getBelgiumDateStr } = require('../utils/timezone');
 
 // Initialize Twilio client
 let twilioClient = null;
@@ -59,12 +60,14 @@ const formatPhoneNumber = (phoneNumber, countryCode = 'BE') => {
 
 // Generate customer reminder SMS message
 const generateCustomerSmsReminder = (enrollment) => {
-  const appointmentDate = new Date(enrollment.appointmentDate);
-  const formattedDate = appointmentDate.toLocaleDateString('en-GB', {
-    timeZone: 'Europe/Brussels',
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-GB', {
+    timeZone: 'UTC',
     weekday: 'long',
     day: 'numeric',
-    month: 'long'
+    month: 'long',
+    year: 'numeric'
   });
 
   return `Dear ${enrollment.firstName},
@@ -73,7 +76,7 @@ This is a friendly reminder for your upcoming appointment at Zen Your Life.
 
 Service: ${enrollment.serviceTitle}
 Date: ${formattedDate}
-Time: ${enrollment.appointmentTime}
+Time: ${enrollment.appointmentTime} (Belgian time)
 Location: Schapenbaan 45, 1731 Relegem
 
 Please arrive 5 minutes early. To reschedule or cancel, kindly contact us in advance.
@@ -84,11 +87,22 @@ We look forward to seeing you!
 
 // Generate admin reminder SMS message
 const generateAdminSmsReminder = (enrollment) => {
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-GB', {
+    timeZone: 'UTC',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
   let message = `UPCOMING APPOINTMENT (15 min)
 
 Client: ${enrollment.fullName}
 Service: ${enrollment.serviceTitle}
-Time: ${enrollment.appointmentTime}
+Date: ${formattedDate}
+Time: ${enrollment.appointmentTime} (Belgian time)
 Phone: ${enrollment.phoneNumber}`;
 
   if (enrollment.specialRequests) {

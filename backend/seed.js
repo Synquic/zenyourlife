@@ -53,7 +53,7 @@ const services = [
   },
   {
     title: "Hopstempel",
-    description: "A unique Belgian wellness tradition using warm hop stamp compresses. The aromatic herbs release their soothing properties as they're pressed gently against your body, promoting deep relaxation.",
+    description: "A unique Belgian tradition using warm hop stamp compresses. The aromatic herbs release their soothing properties as they're pressed gently against your body, promoting deep relaxation.",
     category: "massage",
     duration: 75,
     price: 85,
@@ -67,7 +67,7 @@ const services = [
       { description: "Improved skin texture from natural herbs" }
     ],
     targetAudience: [
-      { description: "Lovers of traditional wellness therapies" },
+      { description: "Lovers of traditional therapies" },
       { description: "Those seeking natural healing methods" },
       { description: "People interested in herbal treatments" },
       { description: "Anyone wanting a unique spa experience" }

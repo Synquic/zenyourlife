@@ -15,9 +15,10 @@ const transporter = nodemailer.createTransport({
 
 // Generate customer reminder email template (sent 1 day before)
 const generateCustomerReminderTemplate = (enrollment) => {
-  const appointmentDate = new Date(enrollment.appointmentDate);
-  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
-    timeZone: BELGIUM_TIMEZONE,
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -59,7 +60,7 @@ const generateCustomerReminderTemplate = (enrollment) => {
           <div class="highlight-box">
             <h3 style="margin-top: 0; color: #C9A032;">Your Appointment is Tomorrow!</h3>
             <p style="font-size: 24px; font-weight: bold; color: #333; margin: 15px 0;">${formattedDate}</p>
-            <p style="font-size: 20px; color: #666;">at ${enrollment.appointmentTime}</p>
+            <p style="font-size: 20px; color: #666;">at ${enrollment.appointmentTime} <span style="font-size: 14px; color: #999;">(Belgian time)</span></p>
           </div>
 
           <div class="section-title">Service Details</div>
@@ -91,9 +92,10 @@ const generateCustomerReminderTemplate = (enrollment) => {
 
 // Generate admin reminder email template (sent 15 min before appointment)
 const generateAdminReminderTemplate = (enrollment) => {
-  const appointmentDate = new Date(enrollment.appointmentDate);
-  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
-    timeZone: BELGIUM_TIMEZONE,
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -132,7 +134,7 @@ const generateAdminReminderTemplate = (enrollment) => {
 
           <div class="time-highlight">
             <p style="font-size: 14px; color: #666; margin: 0;">Appointment Time</p>
-            <p style="font-size: 28px; font-weight: bold; color: #D32F2F; margin: 10px 0;">${enrollment.appointmentTime}</p>
+            <p style="font-size: 28px; font-weight: bold; color: #D32F2F; margin: 10px 0;">${enrollment.appointmentTime} <span style="font-size: 16px; color: #888; font-weight: normal;">(Belgian time)</span></p>
             <p style="font-size: 14px; color: #666; margin: 0;">${formattedDate}</p>
           </div>
 
@@ -186,7 +188,7 @@ const sendCustomerReminder = async (enrollment) => {
 
   try {
     const mailOptions = {
-      from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
+      from: `"ZenYourLife" <${process.env.EMAIL_USER}>`,
       to: enrollment.email,
       subject: `Reminder: Your Massage Appointment Tomorrow - ${enrollment.serviceTitle}`,
       html: generateCustomerReminderTemplate(enrollment)

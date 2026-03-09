@@ -31,11 +31,11 @@ const testimonialTranslations = {
       role: "@sebasbedoya"
     },
     de: {
-      text: "Sobald Sie anfangen @ZenYourLife zu benutzen, gibt es kein Zurück mehr. Es hat meine Wellness-Reise komplett verändert. Massagen und Behandlungen zu buchen war noch nie einfacher! 🔥🔥",
+      text: "Sobald Sie anfangen @ZenYourLife zu benutzen, gibt es kein Zurück mehr. Es hat meine Reise komplett verändert. Massagen und Behandlungen zu buchen war noch nie einfacher! 🔥🔥",
       role: "@sebasbedoya"
     },
     nl: {
-      text: "Zodra je begint met @ZenYourLife, is er geen weg terug. Het heeft mijn wellness-reis volledig getransformeerd. Massages en behandelingen boeken was nog nooit zo makkelijk! 🔥🔥",
+      text: "Zodra je begint met @ZenYourLife, is er geen weg terug. Het heeft mijn reis volledig getransformeerd. Massages en behandelingen boeken was nog nooit zo makkelijk! 🔥🔥",
       role: "@sebasbedoya"
     }
   },
@@ -45,11 +45,11 @@ const testimonialTranslations = {
       role: "@dylanbusiness"
     },
     de: {
-      text: "ZenYourLife - Der Tesla der Wellness-Dienstleistungen. Eine kurze Sitzung mit ihrem Experten hat meine Entspannung fast verdoppelt. Stellen Sie sich vor, was ihre Plattform für Sie tun kann! Die Zukunft ist rosig. ☀",
+      text: "ZenYourLife - Der Tesla der Massagedienstleistungen. Eine kurze Sitzung mit ihrem Experten hat meine Entspannung fast verdoppelt. Stellen Sie sich vor, was ihre Plattform für Sie tun kann! Die Zukunft ist rosig. ☀",
       role: "@dylanbusiness"
     },
     nl: {
-      text: "ZenYourLife - De Tesla van wellness diensten. Een korte sessie met hun expert heeft mijn ontspanning bijna verdubbeld. Stel je voor wat hun platform voor jou kan doen! De toekomst is rooskleurig. ☀",
+      text: "ZenYourLife - De Tesla van massagediensten. Een korte sessie met hun expert heeft mijn ontspanning bijna verdubbeld. Stel je voor wat hun platform voor jou kan doen! De toekomst is rooskleurig. ☀",
       role: "@dylanbusiness"
     }
   },
@@ -73,11 +73,11 @@ const testimonialTranslations = {
       role: "@GeorgeBlue94"
     },
     de: {
-      text: "ZenYourLife ist der Höhepunkt von Wellness-Expertise und Beiträgen vieler Fachleute. Selbstpflege ist gekommen um zu bleiben. ZenYourLife ist die Zukunft des Wohlbefindens! 💎",
+      text: "ZenYourLife ist der Höhepunkt von Expertise und Beiträgen vieler Fachleute. Selbstpflege ist gekommen um zu bleiben. ZenYourLife ist die Zukunft des Wohlbefindens! 💎",
       role: "@GeorgeBlue94"
     },
     nl: {
-      text: "ZenYourLife is het hoogtepunt van wellness-expertise en bijdragen van vele professionals. Zelfzorg is here to stay. ZenYourLife is de toekomst van welzijn! 💎",
+      text: "ZenYourLife is het hoogtepunt van expertise en bijdragen van vele professionals. Zelfzorg is here to stay. ZenYourLife is de toekomst van welzijn! 💎",
       role: "@GeorgeBlue94"
     }
   },
@@ -87,11 +87,11 @@ const testimonialTranslations = {
       role: "@jrdn.w"
     },
     de: {
-      text: "Ich war Teil des Beta-Launches... absolut umwerfend. Die Verwaltung meiner Wellness-Termine war noch nie so einfach. @ZenYourLife ist bei weitem meine bevorzugte Plattform",
+      text: "Ich war Teil des Beta-Launches... absolut umwerfend. Die Verwaltung meiner Termine war noch nie so einfach. @ZenYourLife ist bei weitem meine bevorzugte Plattform",
       role: "@jrdn.w"
     },
     nl: {
-      text: "Ik was onderdeel van de bèta-lancering... absoluut verbluffend. Het beheren van mijn wellness-afspraken was nog nooit zo makkelijk. @ZenYourLife is verreweg mijn favoriete platform",
+      text: "Ik was onderdeel van de bèta-lancering... absoluut verbluffend. Het beheren van mijn afspraken was nog nooit zo makkelijk. @ZenYourLife is verreweg mijn favoriete platform",
       role: "@jrdn.w"
     }
   },
@@ -101,11 +101,11 @@ const testimonialTranslations = {
       role: "@Faiz"
     },
     de: {
-      text: "Unglaublich! @ZenYourLife hebt Ihr Wellness-Spiel auf ein neues Level. Mein Stresslevel ist in kürzester Zeit deutlich gesunken! 😱",
+      text: "Unglaublich! @ZenYourLife hebt Ihr Spiel auf ein neues Level. Mein Stresslevel ist in kürzester Zeit deutlich gesunken! 😱",
       role: "@Faiz"
     },
     nl: {
-      text: "Ongelooflijk! @ZenYourLife tilt je wellness naar een hoger niveau. Mijn stressniveau is in korte tijd aanzienlijk gedaald! 😱",
+      text: "Ongelooflijk! @ZenYourLife tilt je naar een hoger niveau. Mijn stressniveau is in korte tijd aanzienlijk gedaald! 😱",
       role: "@Faiz"
     }
   },

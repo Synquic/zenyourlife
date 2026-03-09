@@ -2,7 +2,7 @@ const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
 const nodemailer = require('nodemailer');
-const { BELGIUM_TIMEZONE, getStartOfDayBelgium } = require('../utils/timezone');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getBelgiumDateStr } = require('../utils/timezone');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -15,9 +15,10 @@ const transporter = nodemailer.createTransport({
 
 // Generate customer confirmation email template
 const generateCustomerEmailTemplate = (enrollment) => {
-  const appointmentDate = new Date(enrollment.appointmentDate);
-  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
-    timeZone: BELGIUM_TIMEZONE,
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -71,7 +72,7 @@ const generateCustomerEmailTemplate = (enrollment) => {
           </div>
           <div class="info-row">
             <span class="label">Time:</span>
-            <span class="value">${enrollment.appointmentTime}</span>
+            <span class="value">${enrollment.appointmentTime} <span style="color:#888;font-size:12px;">(Belgian time)</span></span>
           </div>
           <div class="info-row">
             <span class="label">Day:</span>
@@ -101,9 +102,10 @@ const generateCustomerEmailTemplate = (enrollment) => {
 
 // Generate admin notification email template
 const generateAdminEmailTemplate = (enrollment) => {
-  const appointmentDate = new Date(enrollment.appointmentDate);
-  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
-    timeZone: BELGIUM_TIMEZONE,
+  const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -395,7 +397,7 @@ exports.createEnrollment = async (req, res) => {
         // ALWAYS send confirmation email to customer (reminder preference only affects 1-day-before reminder)
         try {
           const customerMailOptions = {
-            from: `"ZenYourLife Wellness" <${process.env.EMAIL_USER}>`,
+            from: `"ZenYourLife" <${process.env.EMAIL_USER}>`,
             to: enrollment.email,
             subject: `Booking Confirmed - ${enrollment.serviceTitle} | ZenYourLife`,
             html: generateCustomerEmailTemplate(enrollment)

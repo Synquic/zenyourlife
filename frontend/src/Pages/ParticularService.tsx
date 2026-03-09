@@ -59,7 +59,7 @@ const getBannerImageByServiceName = (title: string, category: string): string =>
   }
 
   // Relaxation/Swedish/Classic massage
-  if (lowerTitle.includes('relax') || lowerTitle.includes('swedish') || lowerTitle.includes('classic') || lowerTitle.includes('wellness')) {
+  if (lowerTitle.includes('relax') || lowerTitle.includes('swedish') || lowerTitle.includes('classic')) {
     return zenurlifemassage;
   }
 

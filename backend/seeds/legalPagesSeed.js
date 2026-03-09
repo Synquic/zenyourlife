@@ -11,7 +11,7 @@ const privacyPolicyData = {
     language: 'en',
     pageTitle: 'Privacy Policy - Zenyourlife',
     lastUpdated: 'December 2024',
-    introduction: 'Zenyourlife ("we", "our", or "us") operates the website zenyourlife.be and provides wellness services, coaching, massage therapy, and holiday rentals in Lanzarote. We are committed to protecting your privacy and complying with the EU GDPR and Belgian data-protection laws.',
+    introduction: 'Zenyourlife ("we", "our", or "us") operates the website zenyourlife.be and provides massage services, coaching, massage therapy, and holiday rentals in Lanzarote. We are committed to protecting your privacy and complying with the EU GDPR and Belgian data-protection laws.',
     sections: [
       {
         key: 'personalData',
@@ -42,7 +42,7 @@ const privacyPolicyData = {
         content: `We use your data to:
 • Manage and confirm bookings
 • Communicate with you regarding your stay or services
-• Provide personalised wellness services
+• Provide personalised massage services
 • Improve the website and user experience
 • Send newsletters (only with explicit consent)
 • Fulfill legal and accounting obligations`
@@ -241,7 +241,7 @@ Site web : www.zenyourlife.be`
     language: 'de',
     pageTitle: 'Datenschutzrichtlinie - Zenyourlife',
     lastUpdated: 'Dezember 2024',
-    introduction: 'Zenyourlife ("wir", "unser" oder "uns") betreibt die Website zenyourlife.be und bietet Wellness-Dienstleistungen, Coaching, Massagetherapie und Ferienvermietungen auf Lanzarote an. Wir verpflichten uns, Ihre Privatsphäre zu schützen und die EU-DSGVO sowie die belgischen Datenschutzgesetze einzuhalten.',
+    introduction: 'Zenyourlife ("wir", "unser" oder "uns") betreibt die Website zenyourlife.be und bietet Massagedienstleistungen, Coaching, Massagetherapie und Ferienvermietungen auf Lanzarote an. Wir verpflichten uns, Ihre Privatsphäre zu schützen und die EU-DSGVO sowie die belgischen Datenschutzgesetze einzuhalten.',
     sections: [
       {
         key: 'personalData',
@@ -272,7 +272,7 @@ Site web : www.zenyourlife.be`
         content: `Wir verwenden Ihre Daten um:
 • Buchungen zu verwalten und zu bestätigen
 • Mit Ihnen bezüglich Ihres Aufenthalts oder Dienstleistungen zu kommunizieren
-• Personalisierte Wellness-Dienstleistungen anzubieten
+• Personalisierte Massagedienstleistungen anzubieten
 • Die Website und Benutzererfahrung zu verbessern
 • Newsletter zu senden (nur mit ausdrücklicher Zustimmung)
 • Gesetzliche und buchhalterische Pflichten zu erfüllen`
@@ -356,7 +356,7 @@ Website: www.zenyourlife.be`
     language: 'nl',
     pageTitle: 'Privacybeleid - Zenyourlife',
     lastUpdated: 'December 2024',
-    introduction: 'Zenyourlife ("wij", "ons" of "onze") exploiteert de website zenyourlife.be en biedt wellness-diensten, coaching, massagetherapie en vakantieverhuur op Lanzarote. Wij zijn toegewijd aan het beschermen van uw privacy en het naleven van de EU AVG en Belgische gegevensbeschermingswetten.',
+    introduction: 'Zenyourlife ("wij", "ons" of "onze") exploiteert de website zenyourlife.be en biedt massagediensten, coaching, massagetherapie en vakantieverhuur op Lanzarote. Wij zijn toegewijd aan het beschermen van uw privacy en het naleven van de EU AVG en Belgische gegevensbeschermingswetten.',
     sections: [
       {
         key: 'personalData',
@@ -387,7 +387,7 @@ Website: www.zenyourlife.be`
         content: `Wij gebruiken uw gegevens om:
 • Boekingen te beheren en te bevestigen
 • Met u te communiceren over uw verblijf of diensten
-• Gepersonaliseerde wellness-diensten te bieden
+• Gepersonaliseerde massagediensten te bieden
 • De website en gebruikerservaring te verbeteren
 • Nieuwsbrieven te versturen (alleen met expliciete toestemming)
 • Wettelijke en boekhoudkundige verplichtingen na te komen`
@@ -489,9 +489,9 @@ By using the Site or booking a service, you agree to these Terms.`
         key: 'services',
         title: 'Services',
         content: `Zenyourlife provides:
-• Wellness and massage treatments
+• Massage treatments
 • Coaching sessions
-• Retreat and wellness programs
+• Retreat and self-care programs
 • Holiday rental accommodations in Lanzarote
 
 Descriptions may vary slightly depending on availability or provider updates.`
@@ -506,7 +506,7 @@ Descriptions may vary slightly depending on availability or provider updates.`
       {
         key: 'cancellation',
         title: 'Cancellations & Refunds',
-        content: `Wellness Services
+        content: `Massage Services
 • Cancellations 24 hours before: free
 • Less than 24 hours: the full service may be charged
 
@@ -521,7 +521,7 @@ Holiday Rentals
 • Provide accurate information
 • Respect appointment times
 • Use accommodations and facilities responsibly
-• Follow health & safety guidelines during wellness sessions
+• Follow health & safety guidelines during treatment sessions
 
 We reserve the right to refuse service in case of inappropriate behavior.`
       },
@@ -661,9 +661,9 @@ Durch die Nutzung der Website oder die Buchung einer Dienstleistung stimmen Sie 
         key: 'services',
         title: 'Dienstleistungen',
         content: `Zenyourlife bietet:
-• Wellness- und Massagebehandlungen
+• Massagebehandlungen
 • Coaching-Sitzungen
-• Retreat- und Wellness-Programme
+• Retreat- und Selbstfürsorge-Programme
 • Ferienwohnungen auf Lanzarote
 
 Beschreibungen können je nach Verfügbarkeit oder Anbieter-Updates leicht variieren.`
@@ -678,7 +678,7 @@ Beschreibungen können je nach Verfügbarkeit oder Anbieter-Updates leicht varii
       {
         key: 'cancellation',
         title: 'Stornierungen & Rückerstattungen',
-        content: `Wellness-Dienstleistungen
+        content: `Massagedienstleistungen
 • Stornierung 24 Stunden vorher: kostenlos
 • Weniger als 24 Stunden: volle Servicegebühr kann berechnet werden
 
@@ -693,7 +693,7 @@ Ferienwohnungen
 • Genaue Informationen anzugeben
 • Terminzeiten einzuhalten
 • Unterkünfte und Einrichtungen verantwortungsvoll zu nutzen
-• Gesundheits- und Sicherheitsrichtlinien während der Wellness-Sitzungen zu befolgen
+• Gesundheits- und Sicherheitsrichtlinien während der Behandlungssitzungen zu befolgen
 
 Wir behalten uns das Recht vor, bei unangemessenem Verhalten den Service zu verweigern.`
       },
@@ -747,9 +747,9 @@ Door de Site te gebruiken of een dienst te boeken, gaat u akkoord met deze Voorw
         key: 'services',
         title: 'Diensten',
         content: `Zenyourlife biedt:
-• Wellness- en massagebehandelingen
+• Massagebehandelingen
 • Coachingsessies
-• Retreat- en wellnessprogramma's
+• Retreat- en zelfzorgprogramma's
 • Vakantieverhuur op Lanzarote
 
 Beschrijvingen kunnen licht variëren afhankelijk van beschikbaarheid of updates.`
@@ -764,7 +764,7 @@ Beschrijvingen kunnen licht variëren afhankelijk van beschikbaarheid of updates
       {
         key: 'cancellation',
         title: 'Annuleringen & Terugbetalingen',
-        content: `Wellness Diensten
+        content: `Massagediensten
 • Annulering 24 uur van tevoren: gratis
 • Minder dan 24 uur: volledige service kan in rekening worden gebracht
 
@@ -779,7 +779,7 @@ Vakantieverhuur
 • Accurate informatie te verstrekken
 • Afspraaktijden te respecteren
 • Accommodaties en faciliteiten verantwoordelijk te gebruiken
-• Gezondheids- en veiligheidsrichtlijnen te volgen tijdens wellness-sessies
+• Gezondheids- en veiligheidsrichtlijnen te volgen tijdens behandelsessies
 
 Wij behouden ons het recht voor om service te weigeren bij ongepast gedrag.`
       },
@@ -875,7 +875,7 @@ Website: www.zenyourlife.be`
       title: 'Website Disclaimer - Zenyourlife',
       content: `The content of this website is provided for general information purposes only.
 
-Wellness advice, massage information, or coaching insights do not replace professional medical advice.
+Massage information, or coaching insights do not replace professional medical advice.
 
 Zenyourlife is not liable for decisions taken based on website content.`
     }
@@ -991,7 +991,7 @@ Website: www.zenyourlife.be`
       title: 'Website-Haftungsausschluss - Zenyourlife',
       content: `Der Inhalt dieser Website dient nur allgemeinen Informationszwecken.
 
-Wellness-Ratschläge, Massage-Informationen oder Coaching-Einblicke ersetzen keine professionelle medizinische Beratung.
+Massage-Informationen oder Coaching-Einblicke ersetzen keine professionelle medizinische Beratung.
 
 Zenyourlife haftet nicht für Entscheidungen, die auf Grundlage des Website-Inhalts getroffen werden.`
     }
@@ -1049,7 +1049,7 @@ Website: www.zenyourlife.be`
       title: 'Website Disclaimer - Zenyourlife',
       content: `De inhoud van deze website wordt alleen verstrekt voor algemene informatiedoeleinden.
 
-Wellnessadvies, massage-informatie of coaching-inzichten vervangen geen professioneel medisch advies.
+Massage-informatie of coaching-inzichten vervangen geen professioneel medisch advies.
 
 Zenyourlife is niet aansprakelijk voor beslissingen die worden genomen op basis van website-inhoud.`
     }

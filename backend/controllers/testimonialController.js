@@ -273,7 +273,7 @@ exports.seedTestimonials = async (req, res) => {
       // Massage testimonials
       {
         name: "Maria Rodriguez",
-        role: "@maria_wellness",
+        role: "@maria_m",
         text: "The best massage experience I've ever had! The therapist was incredibly skilled and the atmosphere was so relaxing. I left feeling completely rejuvenated!",
         photo: "profile1.png",
         displayOrder: 0,

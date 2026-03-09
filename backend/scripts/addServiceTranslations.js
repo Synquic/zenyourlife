@@ -308,7 +308,7 @@ const serviceTranslations = [
     translations: {
       en: {
         title: "Hopstempel",
-        description: "A unique Belgian wellness tradition using warm hop stamp compresses. The aromatic herbs release their soothing properties as they're pressed gently against your body, promoting deep relaxation.",
+        description: "A unique Belgian tradition using warm hop stamp compresses. The aromatic herbs release their soothing properties as they're pressed gently against your body, promoting deep relaxation.",
         contentSections: [
           {
             title: "Numerous advantages",
@@ -327,7 +327,7 @@ const serviceTranslations = [
           "Improved skin texture from natural herbs"
         ],
         target_audience: [
-          "Lovers of traditional wellness therapies",
+          "Lovers of traditional therapies",
           "Those seeking natural healing methods",
           "People interested in herbal treatments",
           "Anyone wanting a unique spa experience"
@@ -335,7 +335,7 @@ const serviceTranslations = [
       },
       nl: {
         title: "Hopstempel",
-        description: "Een unieke Belgische wellnesstraditie met warme hopstempelcompressen. De aromatische kruiden geven hun kalmerende eigenschappen vrij wanneer ze zachtjes op het lichaam worden gedrukt, wat diepe ontspanning bevordert.",
+        description: "Een unieke Belgische traditie met warme hopstempelcompressen. De aromatische kruiden geven hun kalmerende eigenschappen vrij wanneer ze zachtjes op het lichaam worden gedrukt, wat diepe ontspanning bevordert.",
         contentSections: [
           {
             title: "Tal van voordelen",
@@ -354,7 +354,7 @@ const serviceTranslations = [
           "Verbeterde huidtextuur door natuurlijke kruiden"
         ],
         target_audience: [
-          "Liefhebbers van traditionele wellnessbehandelingen",
+          "Liefhebbers van traditionele behandelingen",
           "Zij die natuurlijke geneesmethoden zoeken",
           "Mensen die geïnteresseerd zijn in kruidentherapie",
           "Iedereen die een unieke spa-ervaring wil"
@@ -389,7 +389,7 @@ const serviceTranslations = [
       },
       de: {
         title: "Hopstempel",
-        description: "Eine einzigartige belgische Wellness-Tradition mit warmen Hopfenstempel-Kompressen. Die aromatischen Kräuter entfalten ihre beruhigenden Eigenschaften, wenn sie sanft auf den Körper gedrückt werden, und fördern eine tiefe Entspannung.",
+        description: "Eine einzigartige belgische Tradition mit warmen Hopfenstempel-Kompressen. Die aromatischen Kräuter entfalten ihre beruhigenden Eigenschaften, wenn sie sanft auf den Körper gedrückt werden, und fördern eine tiefe Entspannung.",
         contentSections: [
           {
             title: "Zahlreiche Vorteile",
@@ -408,7 +408,7 @@ const serviceTranslations = [
           "Verbesserte Hautstruktur durch natürliche Kräuter"
         ],
         target_audience: [
-          "Liebhaber traditioneller Wellness-Therapien",
+          "Liebhaber traditioneller Therapien",
           "Personen, die natürliche Heilmethoden suchen",
           "Menschen, die sich für Kräuterbehandlungen interessieren",
           "Jeder, der ein einzigartiges Spa-Erlebnis wünscht"

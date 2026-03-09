@@ -418,7 +418,7 @@ const homePageTranslations = {
       { value: '100+', label: 'Aangeboden behandelingen' },
       { value: '50+', label: 'Gecertificeerde therapeuten' },
       { value: '2k+', label: 'Tevreden klanten' },
-      { value: '300+', label: 'Unieke wellness' }
+      { value: '300+', label: 'Uniek' }
     ],
     sectionHeaders: {
       services: {
@@ -439,7 +439,7 @@ const homePageTranslations = {
       { value: '100+', label: 'Angebotene Behandlungen' },
       { value: '50+', label: 'Zertifizierte Therapeuten' },
       { value: '2k+', label: 'Zufriedene Kunden' },
-      { value: '300+', label: 'Einzigartiges Wellness' }
+      { value: '300+', label: 'Einzigartig' }
     ],
     sectionHeaders: {
       services: {
@@ -509,7 +509,7 @@ const aboutPageTranslations = {
       { value: '100+', label: 'Aangeboden behandelingen' },
       { value: '50+', label: 'Gecertificeerde therapeuten' },
       { value: '2k+', label: 'Tevreden klanten' },
-      { value: '300+', label: 'Unieke wellness' }
+      { value: '300+', label: 'Uniek' }
     ],
     sectionHeaders: {
       services: {
@@ -522,7 +522,7 @@ const aboutPageTranslations = {
   de: {
     hero: {
       title: 'Unsere Geschichte des Wohlbefindens',
-      subtitle: 'Erfahren Sie mehr über unseren Weg im Bereich Wellness',
+      subtitle: 'Erfahren Sie mehr über unseren Weg',
       badgeText: 'Über uns',
       buttonText: 'Dienstleistungen ansehen'
     },
@@ -530,7 +530,7 @@ const aboutPageTranslations = {
       { value: '100+', label: 'Angebotene Behandlungen' },
       { value: '50+', label: 'Zertifizierte Therapeuten' },
       { value: '2k+', label: 'Zufriedene Kunden' },
-      { value: '300+', label: 'Einzigartiges Wellness' }
+      { value: '300+', label: 'Einzigartig' }
     ],
     sectionHeaders: {
       services: {

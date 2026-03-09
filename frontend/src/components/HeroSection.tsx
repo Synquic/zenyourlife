@@ -13,7 +13,7 @@ const HeroSection = () => {
         {/* Background Image */}
         <img
           src={Frame1}
-          alt="Wellness"
+          alt="Zen Your Life"
           className="absolute inset-0 w-full h-full object-cover object-[70%_center] sm:object-center"
         />
 
