@@ -84,7 +84,7 @@ exports.enrollmentConfirmationEmail = (enrollment) => {
         <div class="content">
           <p>Dear ${enrollment.fullName},</p>
 
-          <p>Your appointment has been successfully confirmed! We're excited to welcome you to our wellness center.</p>
+          <p>Your appointment has been successfully confirmed! We're excited to welcome you.</p>
 
           <div class="info-box">
             <p style="margin: 5px 0;"><span class="info-label">Enrollment ID:</span> <span class="info-value">#${enrollment.enrollmentId}</span></p>

@@ -59,7 +59,7 @@ const RPrivacy = () => {
           <div className="mb-12">
             <h2 className="text-sm font-semibold text-gray-900 mb-3">Introduction</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Welcome to ZenYourLife. This document outlines our Privacy Policy, explaining how we collect, use, and protect your personal information, and the Terms of Service that govern your use of our website and services for both wellness and holiday rentals. By accessing our site, you agree to these terms.
+              Welcome to ZenYourLife. This document outlines our Privacy Policy, explaining how we collect, use, and protect your personal information, and the Terms of Service that govern your use of our website and services for both massage and holiday rentals. By accessing our site, you agree to these terms.
             </p>
           </div>
 
@@ -140,7 +140,7 @@ const RPrivacy = () => {
 
               <h4 className="font-semibold text-gray-900 mb-2">Payment Terms</h4>
               <p className="mb-4">
-                For wellness services, full payment is required at the time of booking. For holiday rentals, a 30% deposit is required to secure your booking, with the remaining balance due 14 days before your arrival date.
+                For massage services, full payment is required at the time of booking. For holiday rentals, a 30% deposit is required to secure your booking, with the remaining balance due 14 days before your arrival date.
               </p>
 
               <h4 className="font-semibold text-gray-900 mb-2">Accepted Payment Methods</h4>
@@ -155,7 +155,7 @@ const RPrivacy = () => {
               isOpen={openSection === 'cancellation'}
               onToggle={() => toggleSection('cancellation')}
             >
-              <h4 className="font-semibold text-gray-900 mb-2">Wellness Services</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">Massage Services</h4>
               <p className="mb-4">
                 Cancellations made more than 24 hours before the appointment will receive a full refund. Cancellations made within 24 hours will be charged 50% of the service fee. No-shows will be charged the full amount.
               </p>
@@ -183,7 +183,7 @@ const RPrivacy = () => {
                 Our total liability to you for any claims arising from your use of our services shall not exceed the amount you paid for the specific service giving rise to the claim.
               </p>
               <p>
-                We are not responsible for any loss or damage to personal belongings during your stay at our rental properties or during wellness treatments. Guests are advised to secure valuables and use any provided safety deposit facilities.
+                We are not responsible for any loss or damage to personal belongings during your stay at our rental properties or during treatments. Guests are advised to secure valuables and use any provided safety deposit facilities.
               </p>
             </AccordionItem>
           </div>

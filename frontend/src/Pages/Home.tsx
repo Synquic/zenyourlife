@@ -94,7 +94,7 @@ const Home = () => {
           {/* Background Image */}
           <img
             src={zenurlifemassage}
-            alt="Wellness"
+            alt="Zen Your Life"
             className="absolute inset-0 w-full h-full object-cover object-[65%_center] sm:object-center"
           />
 
@@ -352,7 +352,7 @@ const Home = () => {
           <div className="relative h-[350px] sm:h-[400px] md:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg">
             <img
               src={frame5}
-              alt="Wellness Room"
+              alt="Treatment Room"
               className="w-full h-full object-cover"
             />
             {/* Schedule Now Button Overlay */}

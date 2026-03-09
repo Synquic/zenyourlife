@@ -16,23 +16,23 @@ const massageTestimonialTranslations = [
     nameMatch: "Maria Rodriguez",
     en: {
       text: "The best massage experience I've ever had! The therapist was incredibly skilled and the atmosphere was so relaxing. I left feeling completely rejuvenated!",
-      role: "@maria_wellness"
+      role: "@maria_m"
     },
     fr: {
       text: "La meilleure expérience de massage que j'ai jamais eue ! Le thérapeute était incroyablement compétent et l'atmosphère était si relaxante. Je suis partie complètement régénérée !",
-      role: "@maria_wellness"
+      role: "@maria_m"
     },
     de: {
       text: "Das beste Massageerlebnis, das ich je hatte! Der Therapeut war unglaublich kompetent und die Atmosphäre war so entspannend. Ich fühlte mich völlig verjüngt!",
-      role: "@maria_wellness"
+      role: "@maria_m"
     },
     nl: {
       text: "De beste massage-ervaring die ik ooit heb gehad! De therapeut was ongelooflijk bekwaam en de sfeer was zo ontspannend. Ik voelde me volledig verjongd!",
-      role: "@maria_wellness"
+      role: "@maria_m"
     },
     es: {
       text: "¡La mejor experiencia de masaje que he tenido! El terapeuta fue increíblemente hábil y el ambiente era muy relajante. ¡Salí sintiéndome completamente rejuvenecida!",
-      role: "@maria_wellness"
+      role: "@maria_m"
     }
   },
   {

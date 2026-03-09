@@ -38,7 +38,7 @@ router.post('/send', async (req, res) => {
               <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
               <p style="color: #999; font-size: 12px; text-align: center;">
                 Schapenbaan 45, 1731 Relegem<br>
-                Contact: info@zenyourlife.be
+                Contact: nadia.delens@zenyourlife.be
               </p>
             </div>
           </div>

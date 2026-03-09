@@ -998,7 +998,7 @@ const Services = () => {
                   Services
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-0.5 hidden sm:block">
-                  Manage your wellness services and pricing
+                  Manage your services and pricing
                 </p>
               </div>
             </div>
@@ -1573,7 +1573,7 @@ const Services = () => {
                   <p className="text-[#FFEEC3] text-xs sm:text-sm mt-0.5 truncate">
                     {editingService
                       ? "Update service details"
-                      : "Create a new wellness service"}
+                      : "Create a new service"}
                   </p>
                 </div>
               </div>

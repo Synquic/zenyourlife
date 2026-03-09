@@ -66,7 +66,7 @@ const Testimonial = () => {
       _id: '2',
       name: "Sebas",
       role: "@sebasbedoya",
-      text: "Once you start using @ZenYourLife, there's no going back. It has completely transformed my wellness journey. Booking massages has never been easier! 🔥🔥",
+      text: "Once you start using @ZenYourLife, there's no going back. It has completely transformed my journey. Booking massages has never been easier! 🔥🔥",
       photo: "profile2.png",
       isActive: true,
       displayOrder: 1
@@ -75,7 +75,7 @@ const Testimonial = () => {
       _id: '3',
       name: "Dylan Pearson",
       role: "@dylanbusiness",
-      text: "ZenYourLife - The Tesla of wellness services. A brief session with their expert nearly doubled my relaxation. The future is bright. ☀",
+      text: "ZenYourLife - The Tesla of massage services. A brief session with their expert nearly doubled my relaxation. The future is bright. ☀",
       photo: "profile1.png",
       isActive: true,
       displayOrder: 2
@@ -93,7 +93,7 @@ const Testimonial = () => {
       _id: '5',
       name: "George Klein",
       role: "@GeorgeBlue94",
-      text: "ZenYourLife is the culmination of wellness expertise. Self-care is here to stay. ZenYourLife is the future of wellness! 💎",
+      text: "ZenYourLife is the culmination of self-care expertise. Self-care is here to stay. ZenYourLife is the future of self-care! 💎",
       photo: "profile4.png",
       isActive: true,
       displayOrder: 4
@@ -102,7 +102,7 @@ const Testimonial = () => {
       _id: '6',
       name: "Jordan Welch",
       role: "@jrdn.w",
-      text: "I was part of the beta launch... absolutely mind-blowing. Managing my wellness appointments has never been easier. @ZenYourLife is by far my go-to platform",
+      text: "I was part of the beta launch... absolutely mind-blowing. Managing my appointments has never been easier. @ZenYourLife is by far my go-to platform",
       photo: "profile2.png",
       isActive: true,
       displayOrder: 5
@@ -111,7 +111,7 @@ const Testimonial = () => {
       _id: '7',
       name: "Faiz W",
       role: "@Faiz",
-      text: "Incredible! @ZenYourLife elevates your wellness game. My stress levels dropped significantly in no time! 😱",
+      text: "Incredible! @ZenYourLife elevates your self-care game. My stress levels dropped significantly in no time! 😱",
       photo: "profile3.png",
       isActive: true,
       displayOrder: 6

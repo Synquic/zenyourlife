@@ -14,9 +14,9 @@ const defaultData = {
   targetAudience: [
     { description: "Individuals experiencing chronic stress, tension, or anxiety seeking relaxation." },
     { description: "People with muscle pain, stiffness, or recovering from physical strain." },
-    { description: "Those looking to improve circulation and overall wellness." },
+    { description: "Those looking to improve circulation and overall health." },
     { description: "Anyone seeking a holistic approach to health and self-care." },
-    { description: "Wellness enthusiasts wanting to maintain optimal physical and mental balance." }
+    { description: "Enthusiasts wanting to maintain optimal physical and mental balance." }
   ],
   benefitsTitle: "Benefits You'll Feel",
   targetAudienceTitle: "Who It's For"
