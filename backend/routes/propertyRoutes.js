@@ -275,26 +275,22 @@ router.get('/section-settings/:type', async (req, res) => {
   }
 });
 
-// PUT - Update section settings - Auto-translates content to FR/DE/NL
+// PUT - Update section settings
 router.put('/section-settings/:type', async (req, res) => {
   try {
     const { title, description, isActive } = req.body;
 
-    // Auto-translate content to all languages
-    console.log('[Section Settings Update] Auto-translating content...');
-    const translations = await autoTranslateSectionSettings({ title, description, sectionType: req.params.type });
-
     const settings = await SectionSettings.findOneAndUpdate(
       { sectionType: req.params.type },
-      { title, description, isActive, translations },
+      { title, description, isActive },
       { upsert: true, new: true, runValidators: true }
     );
 
-    console.log('✅ Section settings updated with translations:', req.params.type);
+    console.log('✅ Section settings updated:', req.params.type);
 
     res.status(200).json({
       success: true,
-      message: 'Section settings updated with translations',
+      message: 'Section settings updated successfully',
       data: settings
     });
   } catch (error) {
@@ -304,6 +300,36 @@ router.put('/section-settings/:type', async (req, res) => {
       message: 'Failed to update section settings',
       error: error.message
     });
+  }
+});
+
+// POST - Trigger translation for section settings
+router.post('/section-settings/:type/translate', async (req, res) => {
+  try {
+    const settings = await SectionSettings.findOne({ sectionType: req.params.type });
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Section settings not found' });
+    }
+
+    const translations = await autoTranslateSectionSettings({
+      title: settings.title,
+      description: settings.description,
+      sectionType: req.params.type
+    });
+
+    const updated = await SectionSettings.findOneAndUpdate(
+      { sectionType: req.params.type },
+      { translations },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Section settings translated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to translate section settings', error: error.message });
   }
 });
 
@@ -388,7 +414,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST - Create new property - Auto-translates content to FR/DE/NL
+// POST - Create new property
 router.post('/', async (req, res) => {
   try {
     const {
@@ -396,10 +422,6 @@ router.post('/', async (req, res) => {
       guests, bedrooms, parking, image, imageUrl, galleryImages,
       cleanliness, amenities, hostName, overview, location, mapUrl, displayOrder
     } = req.body;
-
-    // Auto-translate content to all languages and store in DB
-    console.log('[Property Create] Auto-translating content...');
-    const translations = await autoTranslateProperty(req.body);
 
     const property = await Property.create({
       name,
@@ -419,15 +441,14 @@ router.post('/', async (req, res) => {
       hostName,
       overview,
       location,
-      displayOrder,
-      translations
+      displayOrder
     });
 
-    console.log('✅ New property created with translations:', property.name);
+    console.log('✅ New property created:', property.name);
 
     res.status(201).json({
       success: true,
-      message: 'Property created successfully with translations',
+      message: 'Property created successfully',
       data: property
     });
   } catch (error) {
@@ -440,24 +461,39 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT - Update property - Auto-translates content to FR/DE/NL
+// POST - Trigger translation for a property
+router.post('/:id/translate', async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ success: false, message: 'Property not found' });
+    }
+
+    const translations = await autoTranslateProperty(property.toObject());
+
+    const updated = await Property.findByIdAndUpdate(
+      req.params.id,
+      { translations },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Property translated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to translate property', error: error.message });
+  }
+});
+
+// PUT - Update property
 router.put('/:id', async (req, res) => {
   try {
     // Log received data for debugging
     console.log('[Property Update] Received galleryImages:', req.body.galleryImages);
 
-    // Check if translatable fields are being updated
-    const translatableFields = ['name', 'description', 'priceUnit', 'parking', 'cleanliness', 'amenities'];
-    const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
-
-    let updateData = { ...req.body };
-
-    // Auto-translate if translatable content is being updated
-    if (hasTranslatableChanges) {
-      console.log('[Property Update] Auto-translating content...');
-      const translations = await autoTranslateProperty(req.body);
-      updateData.translations = translations;
-    }
+    const updateData = { ...req.body };
 
     console.log('[Property Update] updateData being saved:', JSON.stringify(updateData, null, 2));
 
@@ -479,7 +515,7 @@ router.put('/:id', async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: hasTranslatableChanges ? 'Property updated with translations' : 'Property updated successfully',
+      message: 'Property updated successfully',
       data: property
     });
   } catch (error) {

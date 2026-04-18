@@ -50,6 +50,16 @@ interface LocationPlace {
   imageUrl: string
 }
 
+interface PropertyLangTranslation {
+  description?: string
+  priceUnit?: string
+  parking?: string
+  cleanliness?: {
+    title?: string
+    description?: string
+  }
+}
+
 interface PropertyData {
   _id: string
   name: string
@@ -85,6 +95,12 @@ interface PropertyData {
   }
   displayOrder: number
   isActive: boolean
+  translations?: {
+    fr?: PropertyLangTranslation
+    de?: PropertyLangTranslation
+    nl?: PropertyLangTranslation
+    es?: PropertyLangTranslation
+  }
 }
 
 interface SectionSettings {
@@ -156,6 +172,15 @@ const Properties = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
+
+  // Translation state
+  const [propertyTranslations, setPropertyTranslations] = useState<{
+    fr: PropertyLangTranslation
+    de: PropertyLangTranslation
+    nl: PropertyLangTranslation
+    es: PropertyLangTranslation
+  }>({ fr: {}, de: {}, nl: {}, es: {} })
+  const [selectedLang, setSelectedLang] = useState<'en' | 'fr' | 'de' | 'nl' | 'es'>('en')
   const [amenityInput, setAmenityInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -269,7 +294,7 @@ const Properties = () => {
       const response = await fetch(url, {
         method: editingProperty ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, translations: propertyTranslations })
       })
 
       const data = await response.json()
@@ -451,9 +476,36 @@ const Properties = () => {
     }
   }
 
+  // Translation helpers
+  const updateTranslation = (lang: 'fr' | 'de' | 'nl' | 'es', field: string, value: string) => {
+    setPropertyTranslations(prev => {
+      const current = prev[lang]
+      if (field.startsWith('cleanliness.')) {
+        const subField = field.replace('cleanliness.', '')
+        return {
+          ...prev,
+          [lang]: {
+            ...current,
+            cleanliness: { ...(current.cleanliness || {}), [subField]: value }
+          }
+        }
+      }
+      return { ...prev, [lang]: { ...current, [field]: value } }
+    })
+  }
+
   // Open modal for editing
   const openEditModal = (property: PropertyData) => {
     setEditingProperty(property)
+    // Load existing translations
+    const t = property.translations || {}
+    setPropertyTranslations({
+      fr: t.fr || {},
+      de: t.de || {},
+      nl: t.nl || {},
+      es: t.es || {}
+    })
+    setSelectedLang('en')
     setFormData({
       name: property.name,
       description: property.description,
@@ -491,6 +543,8 @@ const Properties = () => {
   // Open modal for new property
   const openNewModal = () => {
     setEditingProperty(null)
+    setPropertyTranslations({ fr: {}, de: {}, nl: {}, es: {} })
+    setSelectedLang('en')
     setFormData({
       name: '',
       description: '',
@@ -1216,25 +1270,45 @@ const Properties = () => {
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
           <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
             {/* Modal Header */}
-            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#DFB13B] to-[#C9A032] flex items-center justify-center">
-                  {editingProperty ? <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+            <div className="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+              <div className="px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-gradient-to-br from-[#DFB13B] to-[#C9A032] flex items-center justify-center">
+                    {editingProperty ? <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-white" /> : <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />}
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-semibold text-slate-800">
+                      {editingProperty ? 'Edit Property' : 'Add New Property'}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-500">Fill in the property details below</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-base sm:text-lg font-semibold text-slate-800">
-                    {editingProperty ? 'Edit Property' : 'Add New Property'}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-500">Fill in the property details below</p>
-                </div>
+                <button onClick={closeModal} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg sm:rounded-xl transition-all">
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
+                </button>
               </div>
-              <button onClick={closeModal} className="p-1.5 sm:p-2 hover:bg-slate-100 rounded-lg sm:rounded-xl transition-all">
-                <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-500" />
-              </button>
+              {/* Language selector */}
+              <div className="flex items-center gap-1.5 px-4 sm:px-6 pb-3 flex-wrap">
+                <span className="text-xs text-slate-400 mr-1">Language:</span>
+                {(['en', 'fr', 'de', 'nl', 'es'] as const).map(lang => (
+                  <button key={lang} type="button" onClick={() => setSelectedLang(lang)}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition ${selectedLang === lang ? 'bg-[#DFB13B] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Modal Body */}
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
+              {/* Translation mode banner */}
+              {selectedLang !== 'en' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-200 rounded-xl text-xs text-violet-700">
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span>Editing <strong>{selectedLang.toUpperCase()}</strong> translation — English values shown as placeholders.</span>
+                </div>
+              )}
+
               {/* Basic Info Section */}
               <div className="space-y-3 sm:space-y-4 bg-slate-50/50 rounded-xl p-3 sm:p-4">
                 <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700">
@@ -1255,13 +1329,17 @@ const Properties = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">Description *</label>
+                  <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">
+                    Description {selectedLang === 'en' ? '*' : `(${selectedLang.toUpperCase()})`}
+                  </label>
                   <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all h-20 sm:h-24 resize-none text-xs sm:text-sm"
-                    placeholder="Describe the property, its features and surroundings..."
-                    required
+                    value={selectedLang === 'en' ? formData.description : (propertyTranslations[selectedLang as 'fr'|'de'|'nl'|'es']?.description || '')}
+                    onChange={(e) => selectedLang === 'en'
+                      ? setFormData({ ...formData, description: e.target.value })
+                      : updateTranslation(selectedLang as 'fr'|'de'|'nl'|'es', 'description', e.target.value)}
+                    placeholder={selectedLang === 'en' ? 'Describe the property, its features and surroundings...' : formData.description || 'Description translation...'}
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border rounded-lg sm:rounded-xl focus:outline-none transition-all h-20 sm:h-24 resize-none text-xs sm:text-sm ${selectedLang !== 'en' ? 'border-violet-200 focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400' : 'border-slate-200 focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]'}`}
+                    required={selectedLang === 'en'}
                   />
                 </div>
               </div>
@@ -1348,13 +1426,17 @@ const Properties = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">Parking</label>
+                    <label className="block text-[10px] sm:text-sm font-medium text-slate-600 mb-1">
+                      Parking {selectedLang !== 'en' && `(${selectedLang.toUpperCase()})`}
+                    </label>
                     <input
                       type="text"
-                      value={formData.parking}
-                      onChange={(e) => setFormData({ ...formData, parking: e.target.value })}
-                      className="w-full px-2 sm:px-4 py-2 sm:py-3 bg-white border border-slate-200 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all text-xs sm:text-sm placeholder:text-[10px] sm:placeholder:text-sm"
-                      placeholder="e.g., 2 cars"
+                      value={selectedLang === 'en' ? formData.parking : (propertyTranslations[selectedLang as 'fr'|'de'|'nl'|'es']?.parking || '')}
+                      onChange={(e) => selectedLang === 'en'
+                        ? setFormData({ ...formData, parking: e.target.value })
+                        : updateTranslation(selectedLang as 'fr'|'de'|'nl'|'es', 'parking', e.target.value)}
+                      className={`w-full px-2 sm:px-4 py-2 sm:py-3 bg-white border rounded-lg sm:rounded-xl focus:outline-none transition-all text-xs sm:text-sm placeholder:text-[10px] sm:placeholder:text-sm ${selectedLang !== 'en' ? 'border-violet-200 focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400' : 'border-slate-200 focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]'}`}
+                      placeholder={selectedLang === 'en' ? 'e.g., 2 cars' : formData.parking || 'Parking translation...'}
                     />
                   </div>
                 </div>
@@ -2120,6 +2202,30 @@ const Properties = () => {
                   placeholder="e.g., Maria"
                 />
               </div>
+
+              {/* Cleanliness — translatable */}
+              {selectedLang !== 'en' && (
+                <div className="space-y-2 bg-slate-50/50 rounded-xl p-3 sm:p-4">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-700 mb-2">
+                    <Sparkles className="w-3.5 h-3.5 text-violet-500" />
+                    Cleanliness ({selectedLang.toUpperCase()})
+                  </div>
+                  <input
+                    type="text"
+                    value={propertyTranslations[selectedLang as 'fr'|'de'|'nl'|'es']?.cleanliness?.title || ''}
+                    onChange={e => updateTranslation(selectedLang as 'fr'|'de'|'nl'|'es', 'cleanliness.title', e.target.value)}
+                    placeholder={formData.cleanliness.title || `Cleanliness title in ${selectedLang.toUpperCase()}...`}
+                    className="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400"
+                  />
+                  <textarea
+                    value={propertyTranslations[selectedLang as 'fr'|'de'|'nl'|'es']?.cleanliness?.description || ''}
+                    onChange={e => updateTranslation(selectedLang as 'fr'|'de'|'nl'|'es', 'cleanliness.description', e.target.value)}
+                    rows={2}
+                    placeholder={formData.cleanliness.description || `Cleanliness description in ${selectedLang.toUpperCase()}...`}
+                    className="w-full px-3 py-2 bg-white border border-violet-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 resize-none"
+                  />
+                </div>
+              )}
             </form>
 
             {/* Modal Footer */}

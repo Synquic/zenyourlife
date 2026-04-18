@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
 const { bookingLimiter, strictLimiter } = require('../middleware/rateLimiter');
+const validateBooking = require('../middleware/validateBooking');
 const {
   createAppointment,
   getAllAppointments,
@@ -13,8 +14,8 @@ const {
   clearAllAppointments
 } = require('../controllers/appointmentController');
 
-// Public routes
-router.post('/', bookingLimiter, createAppointment); // Rate limited for bookings
+// Public routes (with server-side availability validation)
+router.post('/', bookingLimiter, validateBooking, createAppointment);
 router.get('/booked-slots', getBookedSlots); // Public - must be before /:id route
 
 // Admin routes (authentication required) - MUST be before /:id routes

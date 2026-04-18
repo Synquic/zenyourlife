@@ -46,14 +46,19 @@ async function translateWithDeepL(text, targetLang, retryCount = 0) {
   try {
     console.log(`🌐 [DeepL API CALL] Translating to ${targetLang}: "${text.substring(0, 50)}..."`);
 
-    const response = await axios.post(DEEPL_API_URL, null, {
-      params: {
-        auth_key: DEEPL_API_KEY,
-        text: text,
+    const response = await axios.post(DEEPL_API_URL,
+      {
+        text: [text],
         source_lang: 'EN',
         target_lang: DEEPL_LANGUAGE_MAP[targetLang] || targetLang.toUpperCase()
+      },
+      {
+        headers: {
+          'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     // Add delay after successful call to avoid rate limiting
     await sleep(RATE_LIMIT_DELAY_MS);

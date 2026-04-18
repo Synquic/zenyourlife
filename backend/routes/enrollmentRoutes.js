@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const enrollmentController = require('../controllers/enrollmentController');
+const validateBooking = require('../middleware/validateBooking');
 
-// Create new enrollment
-router.post('/', enrollmentController.createEnrollment);
+// Create new enrollment (with server-side availability validation)
+router.post('/', validateBooking, enrollmentController.createEnrollment);
 
 // Get all enrollments
 router.get('/', enrollmentController.getAllEnrollments);
