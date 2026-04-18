@@ -8,7 +8,8 @@ const {
   updateFAQ,
   deleteFAQ,
   updateFAQOrder,
-  seedFAQs
+  seedFAQs,
+  translateFAQ
 } = require('../controllers/faqController');
 
 // Public routes
@@ -19,6 +20,7 @@ router.get('/admin', getAllFAQsAdmin);          // GET /api/faqs/admin?category=
 router.post('/', createFAQ);                    // POST /api/faqs
 router.post('/seed', seedFAQs);                 // POST /api/faqs/seed
 router.get('/:id', getFAQById);                 // GET /api/faqs/:id
+router.post('/:id/translate', translateFAQ);    // POST /api/faqs/:id/translate
 router.put('/:id', updateFAQ);                  // PUT /api/faqs/:id
 router.put('/order/bulk', updateFAQOrder);      // PUT /api/faqs/order/bulk
 router.delete('/:id', deleteFAQ);               // DELETE /api/faqs/:id

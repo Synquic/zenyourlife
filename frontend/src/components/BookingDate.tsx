@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { X, AlertCircle, Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import BookingForm from "./BookingForm";
 import { API_BASE_URL } from "../config/api";
-import { getBelgiumNow, generateBelgiumDates } from "../utils/timezone";
+import { getBelgiumNow, generateBelgiumDates, getBelgiumDateStr } from "../utils/timezone";
 
 interface Service {
   _id: string;
@@ -16,6 +16,7 @@ interface Service {
 
 interface BlockedDateInfo {
   date: string;
+  dateStr: string; // Belgium calendar day YYYY-MM-DD — authoritative comparison key
   isFullDayBlocked: boolean;
   blockedTimeSlots: string[];
 }
@@ -99,6 +100,8 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
         }
       } catch (error) {
         console.error('Error fetching blocked dates:', error);
+      } finally {
+        setBlockedDatesLoaded(true);
       }
     };
 
@@ -164,40 +167,26 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   };
 
   // Check if a date is fully blocked (whole day blocked OR non-working day OR too soon)
-  const isDateFullyBlocked = (dateToCheck: Date) => {
-    // First check if it's too soon based on advance booking setting
+  // Compares using Belgium calendar dateStr (YYYY-MM-DD) — timezone-safe for users worldwide.
+  const isDateFullyBlocked = (dateToCheck: Date, dateStr?: string) => {
     if (isDateTooSoon(dateToCheck)) {
       return true;
     }
-
-    // Check if it's a non-working day
     if (!isWorkingDay(dateToCheck)) {
       return true;
     }
 
-    // Then check if it's explicitly blocked
-    const checkDate = new Date(dateToCheck);
-    checkDate.setHours(0, 0, 0, 0);
-
-    const blockedInfo = blockedDatesInfo.find(info => {
-      const bd = new Date(info.date);
-      bd.setHours(0, 0, 0, 0);
-      return bd.getTime() === checkDate.getTime();
-    });
+    // String-based comparison on Belgium calendar date — no timezone drift
+    const targetStr = dateStr || getBelgiumDateStr(dateToCheck);
+    const blockedInfo = blockedDatesInfo.find(info => info.dateStr === targetStr);
 
     return blockedInfo?.isFullDayBlocked === true;
   };
 
   // Get blocked time slots for a specific date (partial day block)
-  const getBlockedTimeSlotsForDate = (dateToCheck: Date): string[] => {
-    const checkDate = new Date(dateToCheck);
-    checkDate.setHours(0, 0, 0, 0);
-
-    const blockedInfo = blockedDatesInfo.find(info => {
-      const bd = new Date(info.date);
-      bd.setHours(0, 0, 0, 0);
-      return bd.getTime() === checkDate.getTime();
-    });
+  const getBlockedTimeSlotsForDate = (dateToCheck: Date, dateStr?: string): string[] => {
+    const targetStr = dateStr || getBelgiumDateStr(dateToCheck);
+    const blockedInfo = blockedDatesInfo.find(info => info.dateStr === targetStr);
 
     if (blockedInfo && !blockedInfo.isFullDayBlocked) {
       return blockedInfo.blockedTimeSlots || [];
@@ -205,27 +194,46 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
     return [];
   };
 
-  // Find first available (non-fully-blocked) date and auto-select it
+  // Find first available (non-fully-blocked) date and auto-select it — wait until BOTH
+  // settings and blocked-dates have loaded to avoid picking a blocked day during the race.
+  const [blockedDatesLoaded, setBlockedDatesLoaded] = useState(false);
   useEffect(() => {
-    if (bookingSettings && selectedDate === null) {
-      const firstAvailableIndex = dates.findIndex(d => !isDateFullyBlocked(d.fullDate));
+    if (bookingSettings && blockedDatesLoaded && selectedDate === null) {
+      const firstAvailableIndex = dates.findIndex(d => !isDateFullyBlocked(d.fullDate, d.dateStr));
       if (firstAvailableIndex !== -1) {
         setSelectedDate(firstAvailableIndex);
         centerDateLine(firstAvailableIndex);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingSettings, blockedDatesInfo]);
+  }, [bookingSettings, blockedDatesInfo, blockedDatesLoaded]);
+
+  // If the currently selected date becomes fully blocked after blocked-dates refresh, re-select.
+  useEffect(() => {
+    if (selectedDate !== null && blockedDatesLoaded) {
+      const current = dates[selectedDate];
+      if (current && isDateFullyBlocked(current.fullDate, current.dateStr)) {
+        const firstAvailableIndex = dates.findIndex(d => !isDateFullyBlocked(d.fullDate, d.dateStr));
+        setSelectedDate(firstAvailableIndex !== -1 ? firstAvailableIndex : null);
+        setSelectedTime(null);
+        setAvailableTimeSlots([]);
+        setBlockedTimeSlotsForDate([]);
+        if (firstAvailableIndex !== -1) centerDateLine(firstAvailableIndex);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockedDatesInfo, blockedDatesLoaded]);
 
   // Update available time slots and blocked time slots when date changes
   useEffect(() => {
     if (selectedDate !== null) {
-      const selectedFullDate = dates[selectedDate].fullDate;
+      const selectedItem = dates[selectedDate];
+      const selectedFullDate = selectedItem.fullDate;
       // Get time slots for the day of week
       const daySlots = getTimeSlotsForDay(selectedFullDate);
       setAvailableTimeSlots(daySlots);
-      // Get any blocked slots for this specific date
-      const blockedSlots = getBlockedTimeSlotsForDate(selectedFullDate);
+      // Get any blocked slots for this specific date (using dateStr — timezone-safe)
+      const blockedSlots = getBlockedTimeSlotsForDate(selectedFullDate, selectedItem.dateStr);
       setBlockedTimeSlotsForDate(blockedSlots);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -287,7 +295,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
   // Handle date selection
   const handleDateSelect = (index: number) => {
     const dateItem = dates[index];
-    if (isDateFullyBlocked(dateItem.fullDate)) {
+    if (isDateFullyBlocked(dateItem.fullDate, dateItem.dateStr)) {
       // Don't allow selection of fully blocked dates
       return;
     }
@@ -356,7 +364,7 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                 <div className="flex-1 grid grid-cols-7 gap-1.5">
                   {dates.slice(dateLineStart, dateLineStart + VISIBLE_DATES).map((item, i) => {
                     const actualIndex = dateLineStart + i;
-                    const isBlocked = isDateFullyBlocked(item.fullDate);
+                    const isBlocked = isDateFullyBlocked(item.fullDate, item.dateStr);
                     const isSelected = selectedDate === actualIndex;
                     return (
                       <button
@@ -702,7 +710,10 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                     }
 
                     const isOutOfRange = cell.dateIndex === null;
-                    const isBlocked = !isOutOfRange && isDateFullyBlocked(cell.fullDate!);
+                    const isBlocked = !isOutOfRange && isDateFullyBlocked(
+                      cell.fullDate!,
+                      cell.dateIndex !== null ? dates[cell.dateIndex].dateStr : undefined
+                    );
                     const isSelected = !isOutOfRange && selectedDate === cell.dateIndex;
                     const isDisabled = isOutOfRange || isBlocked;
 

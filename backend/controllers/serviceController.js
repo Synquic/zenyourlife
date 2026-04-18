@@ -159,24 +159,14 @@ exports.getServiceById = async (req, res) => {
   }
 };
 
-// Create new service (Admin only) - Auto-translates content to FR/DE/NL
+// Create new service (Admin only)
 exports.createService = async (req, res) => {
   try {
-    // Auto-translate content to all languages and store in DB
-    console.log('[Service Create] Auto-translating content...');
-    const translations = await autoTranslateService(req.body);
-
-    // Create service with translations
-    const serviceData = {
-      ...req.body,
-      translations
-    };
-
-    const service = await Service.create(serviceData);
+    const service = await Service.create(req.body);
 
     res.status(201).json({
       success: true,
-      message: 'Service created successfully with translations',
+      message: 'Service created successfully',
       data: service
     });
   } catch (error) {
@@ -188,7 +178,7 @@ exports.createService = async (req, res) => {
   }
 };
 
-// Update service (Admin only) - Auto-translates content to FR/DE/NL
+// Update service (Admin only)
 exports.updateService = async (req, res) => {
   try {
     // Debug: Log what's being received
@@ -203,10 +193,6 @@ exports.updateService = async (req, res) => {
         message: 'Service not found'
       });
     }
-
-    // Check if translatable fields are being updated
-    const translatableFields = ['title', 'description', 'benefits', 'targetAudience', 'contentSections'];
-    const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
 
     let updateData = { ...req.body };
 
@@ -227,11 +213,9 @@ exports.updateService = async (req, res) => {
       updateData.bannerImageUrl = existingService.bannerImageUrl;
     }
 
-    // Auto-translate if translatable content is being updated
-    if (hasTranslatableChanges) {
-      console.log('[Service Update] Auto-translating content...');
-      const translations = await autoTranslateService(req.body);
-      updateData.translations = translations;
+    // Preserve existing translations if not provided in request
+    if (req.body.translations === undefined) {
+      updateData.translations = existingService.translations;
     }
 
     const service = await Service.findByIdAndUpdate(
@@ -242,13 +226,44 @@ exports.updateService = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: hasTranslatableChanges ? 'Service updated with translations' : 'Service updated successfully',
+      message: 'Service updated successfully',
       data: service
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       message: 'Error updating service',
+      error: error.message
+    });
+  }
+};
+
+// Trigger auto-translation for a service (Admin only - explicit action)
+exports.translateService = async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found' });
+    }
+
+    console.log('[Service Translate] Running auto-translation for:', service.title);
+    const translations = await autoTranslateService(service.toObject());
+
+    const updated = await Service.findByIdAndUpdate(
+      req.params.id,
+      { translations },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Service translated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error translating service',
       error: error.message
     });
   }
@@ -613,7 +628,7 @@ exports.updateServiceTranslations = async (req, res) => {
     // Update translations for each language provided
     const updateData = { translations: { ...service.translations } };
 
-    for (const lang of ['fr', 'de', 'nl']) {
+    for (const lang of ['fr', 'de', 'nl', 'es']) {
       if (translations[lang]) {
         updateData.translations[lang] = {
           title: translations[lang].title || '',

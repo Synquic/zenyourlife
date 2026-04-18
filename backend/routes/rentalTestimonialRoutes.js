@@ -150,7 +150,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// POST create new testimonial - Auto-translates content to FR/DE/NL
+// POST create new testimonial
 router.post('/', async (req, res) => {
   try {
     const { name, role, text, photo, photoUrl, rating, isActive } = req.body;
@@ -158,10 +158,6 @@ router.post('/', async (req, res) => {
     // Get highest display order
     const lastTestimonial = await RentalTestimonial.findOne().sort({ displayOrder: -1 });
     const displayOrder = lastTestimonial ? lastTestimonial.displayOrder + 1 : 0;
-
-    // Auto-translate content to all languages and store in DB
-    console.log('[Rental Testimonial Create] Auto-translating content...');
-    const translations = await autoTranslateTestimonial({ text, role });
 
     const testimonial = new RentalTestimonial({
       name,
@@ -171,12 +167,11 @@ router.post('/', async (req, res) => {
       photoUrl,
       rating: rating || 5,
       isActive: isActive !== undefined ? isActive : true,
-      displayOrder,
-      translations
+      displayOrder
     });
 
     await testimonial.save();
-    res.status(201).json({ success: true, data: testimonial, message: 'Testimonial created successfully with translations' });
+    res.status(201).json({ success: true, data: testimonial, message: 'Testimonial created successfully' });
   } catch (error) {
     console.error('Error creating rental testimonial:', error);
     res.status(500).json({ success: false, message: 'Failed to create testimonial' });
@@ -199,23 +194,11 @@ router.post('/seed', async (req, res) => {
   }
 });
 
-// PUT update testimonial - Auto-translates content to FR/DE/NL
+// PUT update testimonial
 router.put('/:id', async (req, res) => {
   try {
     const { name, role, text, photo, photoUrl, rating, isActive, displayOrder } = req.body;
-
-    // Check if translatable fields are being updated
-    const translatableFields = ['text', 'role'];
-    const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
-
-    let updateData = { name, role, text, photo, photoUrl, rating, isActive, displayOrder };
-
-    // Auto-translate if translatable content is being updated
-    if (hasTranslatableChanges) {
-      console.log('[Rental Testimonial Update] Auto-translating content...');
-      const translations = await autoTranslateTestimonial({ text, role });
-      updateData.translations = translations;
-    }
+    const updateData = { name, role, text, photo, photoUrl, rating, isActive, displayOrder };
 
     const testimonial = await RentalTestimonial.findByIdAndUpdate(
       req.params.id,
@@ -227,10 +210,31 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ success: false, message: 'Testimonial not found' });
     }
 
-    res.json({ success: true, data: testimonial, message: hasTranslatableChanges ? 'Testimonial updated with translations' : 'Testimonial updated successfully' });
+    res.json({ success: true, data: testimonial, message: 'Testimonial updated successfully' });
   } catch (error) {
     console.error('Error updating rental testimonial:', error);
     res.status(500).json({ success: false, message: 'Failed to update testimonial' });
+  }
+});
+
+// POST - Trigger translation for a rental testimonial
+router.post('/:id/translate', async (req, res) => {
+  try {
+    const testimonial = await RentalTestimonial.findById(req.params.id);
+    if (!testimonial) {
+      return res.status(404).json({ success: false, message: 'Testimonial not found' });
+    }
+
+    const translations = await autoTranslateTestimonial({ text: testimonial.text, role: testimonial.role });
+    const updated = await RentalTestimonial.findByIdAndUpdate(
+      req.params.id,
+      { translations },
+      { new: true }
+    );
+
+    res.json({ success: true, data: updated, message: 'Testimonial translated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to translate testimonial', error: error.message });
   }
 });
 

@@ -131,7 +131,7 @@ exports.getTestimonialById = async (req, res) => {
   }
 };
 
-// Create new testimonial - Auto-translates content to FR/DE/NL
+// Create new testimonial
 exports.createTestimonial = async (req, res) => {
   try {
     // Sanitize propertyId - convert empty string to null (Mongoose can't cast '' to ObjectId)
@@ -139,28 +139,11 @@ exports.createTestimonial = async (req, res) => {
       req.body.propertyId = null;
     }
 
-    // Auto-translate content to all languages and store in DB
-    console.log('[Testimonial Create] Auto-translating content...');
-    let translations = { fr: {}, de: {}, nl: {} };
-
-    try {
-      translations = await autoTranslateTestimonial(req.body);
-    } catch (translationError) {
-      // Log translation error but continue with create without translations
-      console.error('[Testimonial Create] Translation failed, continuing without translations:', translationError.message);
-    }
-
-    // Create testimonial with translations
-    const testimonialData = {
-      ...req.body,
-      translations
-    };
-
-    const testimonial = await Testimonial.create(testimonialData);
+    const testimonial = await Testimonial.create(req.body);
 
     res.status(201).json({
       success: true,
-      message: 'Testimonial created successfully with translations',
+      message: 'Testimonial created successfully',
       data: testimonial
     });
   } catch (error) {
@@ -172,7 +155,7 @@ exports.createTestimonial = async (req, res) => {
   }
 };
 
-// Update testimonial - Auto-translates content to FR/DE/NL
+// Update testimonial
 exports.updateTestimonial = async (req, res) => {
   try {
     // Sanitize propertyId - convert empty string to null (Mongoose can't cast '' to ObjectId)
@@ -186,27 +169,9 @@ exports.updateTestimonial = async (req, res) => {
     delete req.body.createdAt;
     delete req.body.updatedAt;
 
-    // Check if translatable fields are being updated
-    const translatableFields = ['text', 'role'];
-    const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
-
-    let updateData = { ...req.body };
-
-    // Auto-translate if translatable content is being updated
-    if (hasTranslatableChanges) {
-      console.log('[Testimonial Update] Auto-translating content...');
-      try {
-        const translations = await autoTranslateTestimonial(req.body);
-        updateData.translations = translations;
-      } catch (translationError) {
-        // Log translation error but continue with update without translations
-        console.error('[Testimonial Update] Translation failed, continuing without translations:', translationError.message);
-      }
-    }
-
     const testimonial = await Testimonial.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      req.body,
       { new: true, runValidators: true }
     );
 
@@ -219,7 +184,7 @@ exports.updateTestimonial = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: hasTranslatableChanges ? 'Testimonial updated with translations' : 'Testimonial updated successfully',
+      message: 'Testimonial updated successfully',
       data: testimonial
     });
   } catch (error) {
@@ -227,6 +192,36 @@ exports.updateTestimonial = async (req, res) => {
     res.status(400).json({
       success: false,
       message: 'Error updating testimonial',
+      error: error.message
+    });
+  }
+};
+
+// Trigger auto-translation for a testimonial (Admin only - explicit action)
+exports.translateTestimonial = async (req, res) => {
+  try {
+    const testimonial = await Testimonial.findById(req.params.id);
+    if (!testimonial) {
+      return res.status(404).json({ success: false, message: 'Testimonial not found' });
+    }
+
+    const translations = await autoTranslateTestimonial(testimonial.toObject());
+
+    const updated = await Testimonial.findByIdAndUpdate(
+      req.params.id,
+      { translations },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'Testimonial translated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error translating testimonial',
       error: error.message
     });
   }

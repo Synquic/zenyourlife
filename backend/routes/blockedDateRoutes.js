@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const BlockedDate = require('../models/BlockedDate');
 const BookingSettings = require('../models/BookingSettings');
+const Appointment = require('../models/Appointment');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getEndOfDayBelgium, getBelgiumDateStr } = require('../utils/timezone');
 
 // ==================== BOOKING SETTINGS ROUTES ====================
 
@@ -128,8 +130,11 @@ router.get('/available-slots/:date', async (req, res) => {
     const checkDate = new Date(req.params.date);
     checkDate.setUTCHours(0, 0, 0, 0);
 
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const dayOfWeek = dayNames[checkDate.getDay()];
+    // Use Belgium timezone for day-of-week to avoid UTC mismatch
+    const dayOfWeek = new Intl.DateTimeFormat('en-US', {
+      timeZone: BELGIUM_TIMEZONE,
+      weekday: 'long'
+    }).format(getStartOfDayBelgium(req.params.date)).toLowerCase();
 
     // Get settings
     let settings = await BookingSettings.findOne({ settingsType: 'booking' });
@@ -225,9 +230,11 @@ router.get('/active', async (req, res) => {
   try {
     const blockedDates = await BlockedDate.find({ isActive: true });
 
-    // Return structured data with date, isFullDayBlocked, and blockedTimeSlots
+    // Return structured data with date, dateStr (Belgium calendar YYYY-MM-DD), isFullDayBlocked, and blockedTimeSlots
+    // dateStr is the authoritative comparison key — immune to browser timezone
     const data = blockedDates.map(bd => ({
       date: bd.date.toISOString(),
+      dateStr: getBelgiumDateStr(bd.date),
       isFullDayBlocked: bd.isFullDayBlocked,
       blockedTimeSlots: bd.blockedTimeSlots || []
     }));
@@ -263,6 +270,39 @@ router.post('/', async (req, res) => {
     const blockedDate = new Date(date);
     blockedDate.setUTCHours(0, 0, 0, 0);
 
+    // Check for existing confirmed/pending bookings on this date
+    const startOfDay = getStartOfDayBelgium(date);
+    const endOfDay = getEndOfDayBelgium(date);
+
+    const isFullDay = !blockedTimeSlots || blockedTimeSlots.length === 0;
+
+    if (isFullDay) {
+      // Full day block — reject if ANY booking exists on this day
+      const existingBooking = await Appointment.findOne({
+        appointmentDate: { $gte: startOfDay, $lte: endOfDay },
+        status: { $in: ['confirmed', 'pending'] }
+      });
+      if (existingBooking) {
+        return res.status(409).json({
+          success: false,
+          message: `Cannot block this date — there is already a confirmed booking at ${existingBooking.appointmentTime}. Cancel or reschedule the booking first.`
+        });
+      }
+    } else {
+      // Partial block — reject only if a booking exists on one of the requested slots
+      const conflictingBooking = await Appointment.findOne({
+        appointmentDate: { $gte: startOfDay, $lte: endOfDay },
+        appointmentTime: { $in: blockedTimeSlots },
+        status: { $in: ['confirmed', 'pending'] }
+      });
+      if (conflictingBooking) {
+        return res.status(409).json({
+          success: false,
+          message: `Cannot block time slot "${conflictingBooking.appointmentTime}" — there is already a confirmed booking. Cancel or reschedule the booking first.`
+        });
+      }
+    }
+
     // Check if this exact date already exists
     const existingBlock = await BlockedDate.findOne({ date: blockedDate });
 
@@ -291,7 +331,6 @@ router.post('/', async (req, res) => {
     }
 
     // Create new blocked date
-    const isFullDay = !blockedTimeSlots || blockedTimeSlots.length === 0;
     const newBlockedDate = await BlockedDate.create({
       date: blockedDate,
       reason: reason || '',
@@ -330,7 +369,8 @@ router.post('/bulk', async (req, res) => {
 
     const results = {
       blocked: [],
-      skipped: []
+      skipped: [],
+      conflicting: []
     };
 
     const isFullDay = !blockedTimeSlots || blockedTimeSlots.length === 0;
@@ -338,6 +378,34 @@ router.post('/bulk', async (req, res) => {
     for (const dateStr of dates) {
       const blockedDate = new Date(dateStr);
       blockedDate.setUTCHours(0, 0, 0, 0);
+
+      // Check for existing confirmed/pending bookings on this date
+      const startOfDay = getStartOfDayBelgium(dateStr);
+      const endOfDay = getEndOfDayBelgium(dateStr);
+
+      let hasConflict = false;
+      if (isFullDay) {
+        const existingBooking = await Appointment.findOne({
+          appointmentDate: { $gte: startOfDay, $lte: endOfDay },
+          status: { $in: ['confirmed', 'pending'] }
+        });
+        if (existingBooking) {
+          results.conflicting.push({ date: blockedDate.toISOString(), slot: existingBooking.appointmentTime });
+          hasConflict = true;
+        }
+      } else {
+        const conflictingBooking = await Appointment.findOne({
+          appointmentDate: { $gte: startOfDay, $lte: endOfDay },
+          appointmentTime: { $in: blockedTimeSlots },
+          status: { $in: ['confirmed', 'pending'] }
+        });
+        if (conflictingBooking) {
+          results.conflicting.push({ date: blockedDate.toISOString(), slot: conflictingBooking.appointmentTime });
+          hasConflict = true;
+        }
+      }
+
+      if (hasConflict) continue;
 
       const existingBlock = await BlockedDate.findOne({ date: blockedDate });
 
@@ -361,11 +429,15 @@ router.post('/bulk', async (req, res) => {
       }
     }
 
-    console.log('✅ Bulk dates blocked:', results.blocked.length);
+    console.log('✅ Bulk dates blocked:', results.blocked.length, '| Conflicting:', results.conflicting.length);
+
+    const conflictMsg = results.conflicting.length > 0
+      ? `, ${results.conflicting.length} skipped due to existing bookings`
+      : '';
 
     res.status(201).json({
       success: true,
-      message: `Blocked ${results.blocked.length} dates, skipped ${results.skipped.length} (already blocked)`,
+      message: `Blocked ${results.blocked.length} dates, skipped ${results.skipped.length} (already blocked)${conflictMsg}`,
       data: results
     });
   } catch (error) {
@@ -521,7 +593,8 @@ router.delete('/:id/slot/:slot', async (req, res) => {
 // Check if a specific date is blocked (with time slot info)
 router.get('/check/:date', async (req, res) => {
   try {
-    const checkDate = new Date(req.params.date);
+    // Normalize using Belgium timezone to avoid day-boundary mismatch
+    const checkDate = new Date(getStartOfDayBelgium(req.params.date));
     checkDate.setUTCHours(0, 0, 0, 0);
 
     const blockedDate = await BlockedDate.findOne({

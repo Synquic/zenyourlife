@@ -12,9 +12,10 @@ interface FAQ {
   isActive: boolean
   displayOrder: number
   translations?: {
-    fr: { question: string; answer: string }
-    de: { question: string; answer: string }
-    nl: { question: string; answer: string }
+    fr?: { question?: string; answer?: string }
+    de?: { question?: string; answer?: string }
+    nl?: { question?: string; answer?: string }
+    es?: { question?: string; answer?: string }
   }
   createdAt?: string
 }
@@ -47,6 +48,11 @@ const FAQs = () => {
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'inactive'>('all')
   const [showFilterDropdown, setShowFilterDropdown] = useState(false)
 
+  // Translation state
+  const emptyTranslations = { fr: {}, de: {}, nl: {}, es: {} }
+  const [faqTranslations, setFaqTranslations] = useState<Record<string, { question?: string; answer?: string }>>(emptyTranslations)
+  const [selectedLang, setSelectedLang] = useState<'en' | 'fr' | 'de' | 'nl' | 'es'>('en')
+
   // Fetch FAQs
   useEffect(() => {
     fetchFAQs()
@@ -76,6 +82,8 @@ const FAQs = () => {
   const handleAddNew = () => {
     setEditingFAQ(null)
     setFormData(initialFormData)
+    setFaqTranslations(emptyTranslations)
+    setSelectedLang('en')
     setShowModal(true)
   }
 
@@ -87,7 +95,18 @@ const FAQs = () => {
       answer: faq.answer,
       isActive: faq.isActive
     })
+    setFaqTranslations({
+      fr: faq.translations?.fr || {},
+      de: faq.translations?.de || {},
+      nl: faq.translations?.nl || {},
+      es: faq.translations?.es || {},
+    })
+    setSelectedLang('en')
     setShowModal(true)
+  }
+
+  const updateTranslation = (lang: string, field: string, value: string) => {
+    setFaqTranslations(prev => ({ ...prev, [lang]: { ...prev[lang], [field]: value } }))
   }
 
   // Save FAQ (create or update)
@@ -106,8 +125,8 @@ const FAQs = () => {
       const method = editingFAQ ? 'PUT' : 'POST'
 
       const payload = editingFAQ
-        ? formData
-        : { ...formData, category: activeTab }
+        ? { ...formData, translations: faqTranslations }
+        : { ...formData, category: activeTab, translations: faqTranslations }
 
       const response = await fetch(url, {
         method,
@@ -123,6 +142,7 @@ const FAQs = () => {
         setShowModal(false)
         fetchFAQs()
         setFormData(initialFormData)
+        setFaqTranslations(emptyTranslations)
         setEditingFAQ(null)
       } else {
         alert(data.message || 'Failed to save FAQ')
@@ -476,46 +496,74 @@ const FAQs = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center shadow-md">
-                  {editingFAQ ? <Edit2 className="w-5 h-5 text-white" /> : <Plus className="w-5 h-5 text-white" />}
+            <div className="border-b border-slate-100">
+              <div className="flex items-center justify-between px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-[#DFB13B] to-[#C9A032] rounded-xl flex items-center justify-center shadow-md">
+                    {editingFAQ ? <Edit2 className="w-5 h-5 text-white" /> : <Plus className="w-5 h-5 text-white" />}
+                  </div>
+                  <div>
+                    <h2 className="font-bold text-slate-800">
+                      {editingFAQ ? 'Edit FAQ' : 'Add FAQ'}
+                    </h2>
+                    <p className="text-xs text-slate-500">{activeTab === 'massage' ? 'Massage' : 'Rental'}</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="font-bold text-slate-800">
-                    {editingFAQ ? 'Edit FAQ' : 'Add FAQ'}
-                  </h2>
-                  <p className="text-xs text-slate-500">{activeTab === 'massage' ? 'Massage' : 'Rental'}</p>
-                </div>
+                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-100 rounded-lg transition">
+                  <X className="w-5 h-5 text-slate-400" />
+                </button>
               </div>
-              <button onClick={() => setShowModal(false)} className="p-2 hover:bg-slate-100 rounded-lg transition">
-                <X className="w-5 h-5 text-slate-400" />
-              </button>
+              {/* Language selector */}
+              <div className="flex items-center gap-1.5 px-5 pb-3 flex-wrap">
+                <span className="text-xs text-slate-400 mr-1">Language:</span>
+                {(['en', 'fr', 'de', 'nl', 'es'] as const).map(lang => (
+                  <button key={lang} type="button" onClick={() => setSelectedLang(lang)}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition ${selectedLang === lang ? 'bg-[#DFB13B] text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Modal Body */}
             <div className="p-5 space-y-4 overflow-y-auto max-h-[calc(90vh-140px)]">
+              {/* Translation mode banner */}
+              {selectedLang !== 'en' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-200 rounded-xl text-xs text-violet-700">
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span>Editing <strong>{selectedLang.toUpperCase()}</strong> translation — English values shown as placeholders.</span>
+                </div>
+              )}
+
               {/* Question */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Question *</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Question {selectedLang === 'en' ? '*' : `(${selectedLang.toUpperCase()})`}
+                </label>
                 <input
                   type="text"
-                  value={formData.question}
-                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                  placeholder="What is..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] outline-none transition"
+                  value={selectedLang === 'en' ? formData.question : (faqTranslations[selectedLang]?.question || '')}
+                  onChange={(e) => selectedLang === 'en'
+                    ? setFormData({ ...formData, question: e.target.value })
+                    : updateTranslation(selectedLang, 'question', e.target.value)}
+                  placeholder={selectedLang === 'en' ? 'What is...' : formData.question || 'Question translation...'}
+                  className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm outline-none transition ${selectedLang !== 'en' ? 'border-violet-200 focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400' : 'border-slate-200 focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]'}`}
                 />
               </div>
 
               {/* Answer */}
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Answer *</label>
+                <label className="block text-xs font-medium text-slate-700 mb-1">
+                  Answer {selectedLang === 'en' ? '*' : `(${selectedLang.toUpperCase()})`}
+                </label>
                 <textarea
-                  value={formData.answer}
-                  onChange={(e) => setFormData({ ...formData, answer: e.target.value })}
-                  placeholder="The answer is..."
+                  value={selectedLang === 'en' ? formData.answer : (faqTranslations[selectedLang]?.answer || '')}
+                  onChange={(e) => selectedLang === 'en'
+                    ? setFormData({ ...formData, answer: e.target.value })
+                    : updateTranslation(selectedLang, 'answer', e.target.value)}
+                  placeholder={selectedLang === 'en' ? 'The answer is...' : formData.answer || 'Answer translation...'}
                   rows={5}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] outline-none resize-none transition"
+                  className={`w-full px-3 py-2 bg-slate-50 border rounded-xl text-sm outline-none resize-none transition ${selectedLang !== 'en' ? 'border-violet-200 focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400' : 'border-slate-200 focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]'}`}
                 />
               </div>
 

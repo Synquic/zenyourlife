@@ -14,7 +14,8 @@ const {
   addMassageGalleryImages,
   addFacialGalleryImages,
   updateServiceTranslations,
-  bulkUpdateTranslations
+  bulkUpdateTranslations,
+  translateService
 } = require('../controllers/serviceController');
 
 // Public routes (no authentication required)
@@ -40,5 +41,6 @@ router.post('/add-facial-gallery-images', authMiddleware, strictLimiter, addFaci
 // Translation management routes (authentication required)
 router.patch('/:id/translations', authMiddleware, strictLimiter, updateServiceTranslations);
 router.post('/bulk-translations', authMiddleware, strictLimiter, bulkUpdateTranslations);
+router.post('/:id/translate', authMiddleware, strictLimiter, translateService);
 
 module.exports = router;

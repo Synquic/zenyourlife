@@ -97,7 +97,7 @@ const generateAdminSmsReminder = (enrollment) => {
     year: 'numeric'
   });
 
-  let message = `UPCOMING APPOINTMENT (15 min)
+  let message = `APPOINTMENT TOMORROW
 
 Client: ${enrollment.fullName}
 Service: ${enrollment.serviceTitle}

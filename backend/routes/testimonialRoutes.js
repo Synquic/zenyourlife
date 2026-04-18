@@ -7,7 +7,8 @@ const {
   createTestimonial,
   updateTestimonial,
   deleteTestimonial,
-  seedTestimonials
+  seedTestimonials,
+  translateTestimonial
 } = require('../controllers/testimonialController');
 
 // Public routes
@@ -18,6 +19,7 @@ router.get('/:id', getTestimonialById);
 // Admin routes
 router.post('/', createTestimonial);
 router.post('/seed', seedTestimonials);
+router.post('/:id/translate', translateTestimonial);
 router.put('/:id', updateTestimonial);
 router.delete('/:id', deleteTestimonial);
 

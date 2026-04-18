@@ -172,6 +172,12 @@ interface ServiceImage {
   caption: string;
 }
 
+interface ServiceLangTranslation {
+  description?: string;
+  benefits?: { description: string }[];
+  targetAudience?: { description: string }[];
+}
+
 interface Service {
   _id: string;
   title: string;
@@ -188,6 +194,7 @@ interface Service {
   benefits?: ServiceBenefit[];
   targetAudience?: ServiceTargetAudience[];
   serviceImages?: ServiceImage[];
+  translations?: { fr?: ServiceLangTranslation; de?: ServiceLangTranslation; nl?: ServiceLangTranslation; es?: ServiceLangTranslation };
 }
 
 interface ServiceFormData {
@@ -253,6 +260,11 @@ const Services = () => {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+
+  // Translation state
+  const emptyTranslations = { fr: {}, de: {}, nl: {}, es: {} };
+  const [serviceTranslations, setServiceTranslations] = useState<Record<string, ServiceLangTranslation>>(emptyTranslations);
+  const [selectedLang, setSelectedLang] = useState<'en' | 'fr' | 'de' | 'nl' | 'es'>('en');
 
   // Service Page Content state (Benefits & Target Audience)
   const [servicePageContent, setServicePageContent] =
@@ -785,6 +797,8 @@ const Services = () => {
   const handleAddNew = () => {
     setEditingService(null);
     setFormData(initialFormData);
+    setServiceTranslations(emptyTranslations);
+    setSelectedLang('en');
     setNewServiceBenefit("");
     setNewServiceTarget("");
     setNewContentSectionTitle("");
@@ -814,6 +828,13 @@ const Services = () => {
       targetAudience: service.targetAudience || [],
       serviceImages: service.serviceImages || [],
     });
+    setServiceTranslations({
+      fr: service.translations?.fr || {},
+      de: service.translations?.de || {},
+      nl: service.translations?.nl || {},
+      es: service.translations?.es || {},
+    });
+    setSelectedLang('en');
     setNewServiceBenefit("");
     setNewServiceTarget("");
     setNewContentSectionTitle("");
@@ -826,6 +847,23 @@ const Services = () => {
     setEditContentSectionTitle("");
     setEditContentSectionDesc("");
     setShowModal(true);
+  };
+
+  // Update a translation field for a specific language
+  const updateTranslation = (lang: string, field: string, value: string) => {
+    setServiceTranslations(prev => ({
+      ...prev,
+      [lang]: { ...prev[lang], [field]: value }
+    }));
+  };
+
+  // Update a translation array item (benefits/targetAudience)
+  const updateTranslationArrayItem = (lang: string, field: string, index: number, value: string) => {
+    setServiceTranslations(prev => {
+      const arr = [...((prev[lang] as Record<string, {description: string}[]>)?.[field] || [])];
+      arr[index] = { description: value };
+      return { ...prev, [lang]: { ...prev[lang], [field]: arr } };
+    });
   };
 
   // Save service (create or update)
@@ -850,7 +888,7 @@ const Services = () => {
       const response = await fetch(url, {
         method,
         headers: getAuthHeaders(),
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, translations: serviceTranslations }),
       });
 
       const data = await response.json();
@@ -1551,37 +1589,55 @@ const Services = () => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
             {/* Modal Header */}
-            <div className="relative bg-gradient-to-r from-[#DFB13B] to-[#C9A032] px-4 sm:px-8 py-4 sm:py-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="absolute top-3 sm:top-4 right-3 sm:right-4 p-1.5 sm:p-2 hover:bg-white/20 rounded-xl transition"
-              >
-                <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </button>
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0">
-                  {editingService ? (
-                    <Edit2 className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-                  ) : (
-                    <Plus className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
-                  )}
+            <div className="bg-gradient-to-r from-[#DFB13B] to-[#C9A032]">
+              <div className="relative px-4 sm:px-8 py-4 sm:py-6">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="absolute top-3 sm:top-4 right-3 sm:right-4 p-1.5 sm:p-2 hover:bg-white/20 rounded-xl transition"
+                >
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                </button>
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                    {editingService ? (
+                      <Edit2 className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                    ) : (
+                      <Plus className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="text-base sm:text-xl font-bold text-white">
+                      {editingService ? "Edit Service" : "Add New Service"}
+                    </h2>
+                    <p className="text-[#FFEEC3] text-xs sm:text-sm mt-0.5 truncate">
+                      {editingService ? "Update service details" : "Create a new service"}
+                    </p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <h2 className="text-base sm:text-xl font-bold text-white">
-                    {editingService ? "Edit Service" : "Add New Service"}
-                  </h2>
-                  <p className="text-[#FFEEC3] text-xs sm:text-sm mt-0.5 truncate">
-                    {editingService
-                      ? "Update service details"
-                      : "Create a new service"}
-                  </p>
-                </div>
+              </div>
+              {/* Language selector */}
+              <div className="flex items-center gap-1.5 px-4 sm:px-8 pb-3 flex-wrap">
+                <span className="text-xs text-white/70 mr-1">Language:</span>
+                {(['en', 'fr', 'de', 'nl', 'es'] as const).map(lang => (
+                  <button key={lang} type="button" onClick={() => setSelectedLang(lang)}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition ${selectedLang === lang ? 'bg-white text-[#C9A032] shadow-sm' : 'bg-white/20 text-white hover:bg-white/30'}`}>
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Modal Body */}
             <div className="p-4 sm:p-8 space-y-4 sm:space-y-6 overflow-y-auto max-h-[calc(90vh-180px)] sm:max-h-[calc(90vh-200px)]">
-              {/* Title */}
+              {/* Translation mode banner */}
+              {selectedLang !== 'en' && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-violet-50 border border-violet-200 rounded-xl text-xs text-violet-700">
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
+                  <span>Editing <strong>{selectedLang.toUpperCase()}</strong> translation — English values shown as placeholders.</span>
+                </div>
+              )}
+
+              {/* Title — not translatable */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
                   Service Title *
@@ -1589,27 +1645,26 @@ const Services = () => {
                 <input
                   type="text"
                   value={formData.title}
-                  onChange={(e) =>
-                    setFormData({ ...formData, title: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="e.g., Swedish Massage"
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base"
+                  disabled={selectedLang !== 'en'}
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">
-                  Description *
+                  Description {selectedLang === 'en' ? '*' : `(${selectedLang.toUpperCase()})`}
                 </label>
                 <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Describe the service..."
+                  value={selectedLang === 'en' ? formData.description : ((serviceTranslations[selectedLang] as ServiceLangTranslation)?.description || '')}
+                  onChange={(e) => selectedLang === 'en'
+                    ? setFormData({ ...formData, description: e.target.value })
+                    : updateTranslation(selectedLang, 'description', e.target.value)}
+                  placeholder={selectedLang === 'en' ? 'Describe the service...' : formData.description || 'Description translation...'}
                   rows={3}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] focus:bg-white transition-all outline-none resize-none text-sm sm:text-base"
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-slate-50 border rounded-xl focus:bg-white transition-all outline-none resize-none text-sm sm:text-base ${selectedLang !== 'en' ? 'border-violet-200 focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400' : 'border-slate-200 focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B]'}`}
                 />
               </div>
 
@@ -1979,106 +2034,107 @@ const Services = () => {
                   <label className="text-sm font-semibold text-slate-700">
                     Service Benefits{" "}
                     <span className="font-normal text-slate-400">
-                      (Unique to this service)
+                      {selectedLang !== 'en' ? `(${selectedLang.toUpperCase()} translations)` : '(Unique to this service)'}
                     </span>
                   </label>
                 </div>
 
-                {/* Add new benefit */}
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={newServiceBenefit}
-                    onChange={(e) => setNewServiceBenefit(e.target.value)}
-                    placeholder="Add a benefit for this service..."
-                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 focus:bg-white transition-all outline-none text-sm"
-                    onKeyPress={(e) =>
-                      e.key === "Enter" &&
-                      (e.preventDefault(), handleAddServiceBenefit())
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddServiceBenefit}
-                    className="px-4 py-2.5 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
+                {/* Add new benefit — only in EN mode */}
+                {selectedLang === 'en' && (
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={newServiceBenefit}
+                      onChange={(e) => setNewServiceBenefit(e.target.value)}
+                      placeholder="Add a benefit for this service..."
+                      className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 focus:bg-white transition-all outline-none text-sm"
+                      onKeyPress={(e) =>
+                        e.key === "Enter" &&
+                        (e.preventDefault(), handleAddServiceBenefit())
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddServiceBenefit}
+                      className="px-4 py-2.5 bg-rose-500 text-white rounded-xl hover:bg-rose-600 transition"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
 
                 {/* Benefits list */}
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {formData.benefits.map((benefit, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-2 p-3 bg-rose-50 rounded-lg group"
-                    >
-                      <div className="w-1.5 h-1.5 bg-rose-500 rounded-full mt-2 shrink-0"></div>
-                      {editingServiceBenefitIndex === index ? (
-                        <div className="flex-1 flex flex-col gap-2">
-                          <textarea
-                            value={editServiceBenefitText}
-                            onChange={(e) =>
-                              setEditServiceBenefitText(e.target.value)
-                            }
-                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-500/20 resize-none"
-                            rows={3}
-                            autoFocus
+                  {selectedLang !== 'en' ? (
+                    // Translation mode: show EN text + translation input
+                    formData.benefits.length === 0 ? (
+                      <p className="text-xs text-slate-400 text-center py-3">No benefits to translate.</p>
+                    ) : formData.benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-violet-50 rounded-lg border border-violet-100">
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-400 mb-0.5">EN: {benefit.description}</p>
+                          <input
+                            type="text"
+                            value={(serviceTranslations[selectedLang] as ServiceLangTranslation)?.benefits?.[index]?.description || ''}
+                            onChange={e => updateTranslationArrayItem(selectedLang, 'benefits', index, e.target.value)}
+                            placeholder={`Benefit ${index + 1} in ${selectedLang.toUpperCase()}...`}
+                            className="w-full px-2 py-1.5 border border-violet-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 bg-white"
                           />
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleSaveEditServiceBenefit(index)
-                              }
-                              className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1"
-                            >
-                              <Save className="w-3 h-3" />
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingServiceBenefitIndex(null);
-                                setEditServiceBenefitText("");
-                              }}
-                              className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition"
-                            >
-                              Cancel
-                            </button>
-                          </div>
                         </div>
-                      ) : (
-                        <>
-                          <p className="flex-1 text-sm text-slate-600 whitespace-pre-wrap">
-                            {benefit.description}
-                          </p>
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleStartEditServiceBenefit(index)
-                              }
-                              className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveServiceBenefit(index)}
-                              className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
+                      </div>
+                    ))
+                  ) : (
+                    // EN mode: full edit UI
+                    <>
+                    {formData.benefits.map((benefit, index) => (
+                      <div
+                        key={index}
+                        className="flex items-start gap-2 p-3 bg-rose-50 rounded-lg group"
+                      >
+                        <div className="w-1.5 h-1.5 bg-rose-500 rounded-full mt-2 shrink-0"></div>
+                        {editingServiceBenefitIndex === index ? (
+                          <div className="flex-1 flex flex-col gap-2">
+                            <textarea
+                              value={editServiceBenefitText}
+                              onChange={(e) => setEditServiceBenefitText(e.target.value)}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-rose-500/20 resize-none"
+                              rows={3}
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <button type="button" onClick={() => handleSaveEditServiceBenefit(index)}
+                                className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1">
+                                <Save className="w-3 h-3" /> Save
+                              </button>
+                              <button type="button" onClick={() => { setEditingServiceBenefitIndex(null); setEditServiceBenefitText(""); }}
+                                className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition">
+                                Cancel
+                              </button>
+                            </div>
                           </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  {formData.benefits.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center py-3">
-                      No benefits added. Add benefits specific to this service.
-                    </p>
+                        ) : (
+                          <>
+                            <p className="flex-1 text-sm text-slate-600 whitespace-pre-wrap">{benefit.description}</p>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                              <button type="button" onClick={() => handleStartEditServiceBenefit(index)}
+                                className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition">
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button type="button" onClick={() => handleRemoveServiceBenefit(index)}
+                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                    {formData.benefits.length === 0 && (
+                      <p className="text-xs text-slate-400 text-center py-3">
+                        No benefits added. Add benefits specific to this service.
+                      </p>
+                    )}
+                    </>
                   )}
                 </div>
               </div>
@@ -2090,12 +2146,13 @@ const Services = () => {
                   <label className="text-sm font-semibold text-slate-700">
                     Who It's For{" "}
                     <span className="font-normal text-slate-400">
-                      (Target audience for this service)
+                      {selectedLang !== 'en' ? `(${selectedLang.toUpperCase()} translations)` : '(Target audience for this service)'}
                     </span>
                   </label>
                 </div>
 
-                {/* Add new target */}
+                {/* Add new target — only in EN mode */}
+                {selectedLang === 'en' && (
                 <div className="flex gap-2 mb-3">
                   <input
                     type="text"
@@ -2116,78 +2173,72 @@ const Services = () => {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                )}
 
                 {/* Target audience list */}
                 <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                  {formData.targetAudience.map((target, index) => (
-                    <div
-                      key={index}
-                      className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg group"
-                    >
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0"></div>
-                      {editingServiceTargetIndex === index ? (
-                        <div className="flex-1 flex flex-col gap-2">
-                          <textarea
-                            value={editServiceTargetText}
-                            onChange={(e) =>
-                              setEditServiceTargetText(e.target.value)
-                            }
-                            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
-                            rows={2}
-                            autoFocus
+                  {selectedLang !== 'en' ? (
+                    formData.targetAudience.length === 0 ? (
+                      <p className="text-xs text-slate-400 text-center py-3">No target audience to translate.</p>
+                    ) : formData.targetAudience.map((target, index) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-violet-50 rounded-lg border border-violet-100">
+                        <div className="flex-1">
+                          <p className="text-[10px] text-slate-400 mb-0.5">EN: {target.description}</p>
+                          <input
+                            type="text"
+                            value={(serviceTranslations[selectedLang] as ServiceLangTranslation)?.targetAudience?.[index]?.description || ''}
+                            onChange={e => updateTranslationArrayItem(selectedLang, 'targetAudience', index, e.target.value)}
+                            placeholder={`Audience ${index + 1} in ${selectedLang.toUpperCase()}...`}
+                            className="w-full px-2 py-1.5 border border-violet-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-violet-400/20 focus:border-violet-400 bg-white"
                           />
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleSaveEditServiceTarget(index)}
-                              className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1"
-                            >
-                              <Save className="w-3 h-3" />
-                              Save
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditingServiceTargetIndex(null);
-                                setEditServiceTargetText("");
-                              }}
-                              className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition"
-                            >
-                              Cancel
-                            </button>
-                          </div>
                         </div>
-                      ) : (
-                        <>
-                          <p className="flex-1 text-sm text-slate-600">
-                            {target.description}
-                          </p>
-                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleStartEditServiceTarget(index)
-                              }
-                              className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveServiceTarget(index)}
-                              className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                    {formData.targetAudience.map((target, index) => (
+                      <div key={index} className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg group">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0"></div>
+                        {editingServiceTargetIndex === index ? (
+                          <div className="flex-1 flex flex-col gap-2">
+                            <textarea value={editServiceTargetText}
+                              onChange={(e) => setEditServiceTargetText(e.target.value)}
+                              className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500/20 resize-none"
+                              rows={2} autoFocus />
+                            <div className="flex gap-2">
+                              <button type="button" onClick={() => handleSaveEditServiceTarget(index)}
+                                className="px-3 py-1.5 text-xs bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition flex items-center gap-1">
+                                <Save className="w-3 h-3" /> Save
+                              </button>
+                              <button type="button" onClick={() => { setEditingServiceTargetIndex(null); setEditServiceTargetText(""); }}
+                                className="px-3 py-1.5 text-xs bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300 transition">
+                                Cancel
+                              </button>
+                            </div>
                           </div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                  {formData.targetAudience.length === 0 && (
-                    <p className="text-xs text-slate-400 text-center py-3">
-                      No target audience added. Specify who this service is for.
-                    </p>
+                        ) : (
+                          <>
+                            <p className="flex-1 text-sm text-slate-600">{target.description}</p>
+                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition shrink-0">
+                              <button type="button" onClick={() => handleStartEditServiceTarget(index)}
+                                className="p-1.5 text-slate-400 hover:text-[#B8922D] hover:bg-[#FFEEC3]/30 rounded transition">
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button type="button" onClick={() => handleRemoveServiceTarget(index)}
+                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                    {formData.targetAudience.length === 0 && (
+                      <p className="text-xs text-slate-400 text-center py-3">
+                        No target audience added. Specify who this service is for.
+                      </p>
+                    )}
+                    </>
                   )}
                 </div>
               </div>

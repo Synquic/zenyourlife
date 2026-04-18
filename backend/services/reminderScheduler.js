@@ -90,7 +90,7 @@ const generateCustomerReminderTemplate = (enrollment) => {
   `;
 };
 
-// Generate admin reminder email template (sent 15 min before appointment)
+// Generate admin reminder email template (sent 1 day before appointment)
 const generateAdminReminderTemplate = (enrollment) => {
   const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
   const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
@@ -112,7 +112,7 @@ const generateAdminReminderTemplate = (enrollment) => {
         .header { background: linear-gradient(135deg, #FF5722 0%, #E64A19 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
         .header h1 { margin: 0 0 10px 0; font-size: 24px; }
         .content { background: #f9f9f9; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
-        .urgent-box { background: #FFF3E0; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF9800; text-align: center; }
+        .upcoming-box { background: #FFF3E0; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FF9800; text-align: center; }
         .section-title { font-size: 16px; font-weight: bold; color: #555; margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 1px solid #ddd; }
         .info-row { margin: 8px 0; padding: 10px; background: white; border-radius: 5px; }
         .label { font-weight: 600; color: #555; display: inline-block; width: 120px; }
@@ -124,12 +124,12 @@ const generateAdminReminderTemplate = (enrollment) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>Upcoming Appointment in 15 Minutes!</h1>
+          <h1>Appointment Tomorrow!</h1>
           <p>Booking ID: #${enrollment.enrollmentId}</p>
         </div>
         <div class="content">
-          <div class="urgent-box">
-            <strong>Get Ready!</strong> You have an appointment starting in 15 minutes.
+          <div class="upcoming-box">
+            <strong>Heads Up!</strong> You have an appointment scheduled for tomorrow.
           </div>
 
           <div class="time-highlight">
@@ -295,62 +295,48 @@ const checkCustomerReminders = async () => {
   }
 };
 
-// Check and send admin reminders (appointments in 15 minutes, Belgium timezone)
+// Check and send admin reminders (appointments tomorrow in Belgium timezone)
 const checkAdminReminders = async () => {
   try {
-    // Use actual UTC time for comparisons
     const nowUTC = new Date();
     const todayDateStr = getBelgiumDateStr(nowUTC);
 
-    // Get today's boundaries in Belgium timezone (as UTC timestamps)
+    console.log(`[Admin Reminder] Running at ${nowUTC.toISOString()} (Belgium: ${nowUTC.toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE })})`);
+
+    // Calculate tomorrow's date range in Belgium timezone
     const todayStart = getStartOfDayBelgium(todayDateStr);
-    const todayEnd = getEndOfDayBelgium(todayDateStr);
+    const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const tomorrowDateStr = getBelgiumDateStr(tomorrowStart);
+    const tomorrowEnd = getEndOfDayBelgium(tomorrowDateStr);
 
-    console.log(`[Admin Reminder] Checking at ${nowUTC.toISOString()} (Belgium: ${nowUTC.toLocaleString('en-US', { timeZone: BELGIUM_TIMEZONE })})`);
+    console.log(`[Admin Reminder] Looking for appointments between ${tomorrowStart.toISOString()} and ${tomorrowEnd.toISOString()} (Belgium tomorrow: ${tomorrowDateStr})`);
 
-    // Find today's appointments that haven't received admin reminder
+    // Find tomorrow's appointments that haven't received admin reminder
     const enrollments = await Enrollment.find({
       appointmentDate: {
-        $gte: todayStart,
-        $lte: todayEnd
+        $gte: tomorrowStart,
+        $lte: tomorrowEnd
       },
       reminderSentToAdmin: false,
       status: { $in: ['pending', 'confirmed'] }
     });
 
+    console.log(`[Admin Reminder] Found ${enrollments.length} appointments for tomorrow needing admin reminders`);
+
     for (const enrollment of enrollments) {
-      // Parse appointment time (stored as Belgium local time like "14:30")
-      const [hours, minutes] = enrollment.appointmentTime.split(':').map(Number);
+      // Send email reminder to admin
+      const emailSent = await sendAdminReminder(enrollment);
 
-      // Calculate appointment time in UTC
-      // Start with midnight Belgium time (as UTC), then add hours and minutes
-      const appointmentUTC = new Date(todayStart.getTime() + (hours * 60 + minutes) * 60 * 1000);
+      // Also send SMS reminder to admin if configured
+      const smsSent = await sendAdminSmsReminder(enrollment);
 
-      // Calculate 15 minutes before appointment (in UTC)
-      const reminderTimeUTC = new Date(appointmentUTC.getTime() - 15 * 60 * 1000);
-
-      // Check if it's time to send (within 5 minute window)
-      const timeDiff = nowUTC.getTime() - reminderTimeUTC.getTime();
-
-      // Send if we're within 5 minutes after the reminder time (to account for cron interval)
-      if (timeDiff >= 0 && timeDiff <= 5 * 60 * 1000) {
-        console.log(`[Admin Reminder] Triggered for enrollment #${enrollment.enrollmentId} at ${enrollment.appointmentTime} Belgium time`);
-        console.log(`[Admin Reminder] Appointment UTC: ${appointmentUTC.toISOString()}, Reminder should fire at: ${reminderTimeUTC.toISOString()}`);
-
-        // Send email reminder to admin
-        const emailSent = await sendAdminReminder(enrollment);
-
-        // Also send SMS reminder to admin if configured
-        const smsSent = await sendAdminSmsReminder(enrollment);
-
-        if (emailSent || smsSent) {
-          await Enrollment.findByIdAndUpdate(enrollment._id, {
-            reminderSentToAdmin: true
-          });
-          console.log(`[Admin Reminder] ✅ Sent (email: ${emailSent}, sms: ${smsSent}) for enrollment #${enrollment.enrollmentId}`);
-        } else {
-          console.log(`[Admin Reminder] ❌ Failed to send for enrollment #${enrollment.enrollmentId}`);
-        }
+      if (emailSent || smsSent) {
+        await Enrollment.findByIdAndUpdate(enrollment._id, {
+          reminderSentToAdmin: true
+        });
+        console.log(`[Admin Reminder] ✅ Sent (email: ${emailSent}, sms: ${smsSent}) for enrollment #${enrollment.enrollmentId}`);
+      } else {
+        console.log(`[Admin Reminder] ❌ Failed to send for enrollment #${enrollment.enrollmentId}`);
       }
     }
   } catch (error) {
@@ -370,16 +356,11 @@ const startReminderScheduler = () => {
   // Initialize Twilio for SMS reminders
   initializeTwilio();
 
-  // Check customer reminders every day at 9:00 AM Belgium time (for tomorrow's appointments)
+  // Check customer and admin reminders every day at 9:00 AM Belgium time (for tomorrow's appointments)
   cron.schedule('0 9 * * *', () => {
     console.log('[Reminder] Running customer reminder check at 9:00 AM Belgium time');
     checkCustomerReminders();
-  }, {
-    timezone: BELGIUM_TIMEZONE
-  });
-
-  // Check admin reminders every 5 minutes (for 15-min-before notifications)
-  cron.schedule('*/5 * * * *', () => {
+    console.log('[Admin Reminder] Running admin reminder check at 9:00 AM Belgium time');
     checkAdminReminders();
   }, {
     timezone: BELGIUM_TIMEZONE
@@ -387,7 +368,7 @@ const startReminderScheduler = () => {
 
   console.log('Reminder scheduler started successfully (Belgium timezone)');
   console.log('- Customer reminders: Daily at 9:00 AM Belgium time (for next day appointments)');
-  console.log('- Admin reminders: Every 5 minutes (15 min before appointment, Belgium time)');
+  console.log('- Admin reminders: Daily at 9:00 AM Belgium time (for next day appointments)');
   console.log('- SMS reminders: Enabled if Twilio credentials are configured');
 };
 

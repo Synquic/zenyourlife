@@ -124,24 +124,14 @@ exports.getFAQById = async (req, res) => {
   }
 };
 
-// Create new FAQ - Auto-translates content to FR/DE/NL
+// Create new FAQ
 exports.createFAQ = async (req, res) => {
   try {
-    // Auto-translate content to all languages and store in DB
-    console.log('[FAQ Create] Auto-translating content...');
-    const translations = await autoTranslateFAQ(req.body);
-
-    // Create FAQ with translations
-    const faqData = {
-      ...req.body,
-      translations
-    };
-
-    const faq = await FAQ.create(faqData);
+    const faq = await FAQ.create(req.body);
 
     res.status(201).json({
       success: true,
-      message: 'FAQ created successfully with translations',
+      message: 'FAQ created successfully',
       data: faq
     });
   } catch (error) {
@@ -153,25 +143,12 @@ exports.createFAQ = async (req, res) => {
   }
 };
 
-// Update FAQ - Auto-translates content to FR/DE/NL
+// Update FAQ
 exports.updateFAQ = async (req, res) => {
   try {
-    // Check if translatable fields are being updated
-    const translatableFields = ['question', 'answer'];
-    const hasTranslatableChanges = translatableFields.some(field => req.body[field] !== undefined);
-
-    let updateData = { ...req.body };
-
-    // Auto-translate if translatable content is being updated
-    if (hasTranslatableChanges) {
-      console.log('[FAQ Update] Auto-translating content...');
-      const translations = await autoTranslateFAQ(req.body);
-      updateData.translations = translations;
-    }
-
     const faq = await FAQ.findByIdAndUpdate(
       req.params.id,
-      updateData,
+      req.body,
       { new: true, runValidators: true }
     );
 
@@ -184,13 +161,43 @@ exports.updateFAQ = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: hasTranslatableChanges ? 'FAQ updated with translations' : 'FAQ updated successfully',
+      message: 'FAQ updated successfully',
       data: faq
     });
   } catch (error) {
     res.status(400).json({
       success: false,
       message: 'Error updating FAQ',
+      error: error.message
+    });
+  }
+};
+
+// Trigger auto-translation for a FAQ (Admin only - explicit action)
+exports.translateFAQ = async (req, res) => {
+  try {
+    const faq = await FAQ.findById(req.params.id);
+    if (!faq) {
+      return res.status(404).json({ success: false, message: 'FAQ not found' });
+    }
+
+    const translations = await autoTranslateFAQ(faq.toObject());
+
+    const updated = await FAQ.findByIdAndUpdate(
+      req.params.id,
+      { translations },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'FAQ translated successfully',
+      data: updated
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error translating FAQ',
       error: error.message
     });
   }
