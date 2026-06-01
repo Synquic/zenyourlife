@@ -1,8 +1,15 @@
+const crypto = require('crypto');
 const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const Appointment = require('../models/Appointment');
 const nodemailer = require('nodemailer');
-const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getBelgiumDateStr } = require('../utils/timezone');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getBelgiumDateStr, getTimeSlot, formatAppointmentDate } = require('../utils/timezone');
+const { sendSms, formatPhoneNumber } = require('../services/twilioSmsService');
+
+const FRONTEND_URL = (
+  process.env.FRONTEND_URL
+  || (process.env.NODE_ENV === 'production' ? 'https://zenyourlife.be' : 'http://localhost:5173')
+).replace(/\/$/, '');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -14,7 +21,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Generate customer confirmation email template
-const generateCustomerEmailTemplate = (enrollment) => {
+const generateCustomerEmailTemplate = (enrollment, cancelUrl) => {
   const belgiumDateStr = getBelgiumDateStr(enrollment.appointmentDate);
   const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
   const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
@@ -24,6 +31,8 @@ const generateCustomerEmailTemplate = (enrollment) => {
     month: 'long',
     day: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   return `
     <!DOCTYPE html>
@@ -72,7 +81,7 @@ const generateCustomerEmailTemplate = (enrollment) => {
           </div>
           <div class="info-row">
             <span class="label">Time:</span>
-            <span class="value">${enrollment.appointmentTime} <span style="color:#888;font-size:12px;">(Belgian time)</span></span>
+            <span class="value">${timeSlot} <span style="color:#888;font-size:12px;">(Belgian time, ${durationMinutes} min)</span></span>
           </div>
           <div class="info-row">
             <span class="label">Day:</span>
@@ -88,8 +97,16 @@ const generateCustomerEmailTemplate = (enrollment) => {
             <p style="margin: 0; color: #1976D2; font-weight: 500;">Please arrive 5 minutes before your appointment time.</p>
           </div>
 
+          ${cancelUrl ? `
+          <div style="text-align: center; margin-top: 30px;">
+            <p style="margin: 0 0 12px 0; color: #555;">Need to cancel? You can do it in one click:</p>
+            <a href="${cancelUrl}" style="display: inline-block; background: #B71C1C; color: white; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600;">Cancel Appointment</a>
+            <p style="margin: 12px 0 0 0; color: #888; font-size: 12px;">Please cancel at least 24 hours in advance when possible.</p>
+          </div>
+          ` : ''}
+
           <div class="footer">
-            <p>If you need to reschedule or cancel, please contact us at least 24 hours in advance.</p>
+            <p>If you need to reschedule, please contact us at least 24 hours in advance.</p>
             <p>Best regards,<br><strong>The ZenYourLife Team</strong></p>
             <p style="font-size: 12px; color: #999; margin-top: 20px;">© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
           </div>
@@ -111,6 +128,8 @@ const generateAdminEmailTemplate = (enrollment) => {
     month: 'long',
     day: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   return `
     <!DOCTYPE html>
@@ -196,7 +215,7 @@ const generateAdminEmailTemplate = (enrollment) => {
             </div>
             <div class="info-row">
               <span class="label">Time:</span>
-              <span class="value">${enrollment.appointmentTime}</span>
+              <span class="value">${timeSlot} (Belgian time, ${durationMinutes} min)</span>
             </div>
           </div>
 
@@ -234,6 +253,183 @@ const generateAdminEmailTemplate = (enrollment) => {
     </body>
     </html>
   `;
+};
+
+// Shared formatter for cancellation emails — accepts either an Enrollment or Appointment doc
+const formatBookingForCancellation = (booking) => {
+  const belgiumDateStr = getBelgiumDateStr(booking.appointmentDate);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  const formattedDate = new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const durationMinutes = booking.service?.duration || 60;
+  const timeSlot = getTimeSlot(booking.appointmentTime, durationMinutes);
+  const fullName = booking.fullName || `${booking.firstName || ''} ${booking.lastName || ''}`.trim();
+  return { formattedDate, durationMinutes, timeSlot, fullName };
+};
+
+// Customer cancellation confirmation email
+const generateCustomerCancellationEmail = (booking) => {
+  const { formattedDate, durationMinutes, timeSlot } = formatBookingForCancellation(booking);
+  const reference = booking.enrollmentId ? `#${booking.enrollmentId}` : '';
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #B71C1C 0%, #8b1414 100%); color: white; padding: 40px 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .header h1 { margin: 0 0 10px 0; font-size: 26px; }
+        .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
+        .notice-box { background: #FFEBEE; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #B71C1C; }
+        .info-row { margin: 10px 0; padding: 12px 15px; background: white; border-radius: 5px; }
+        .label { font-weight: 600; color: #555; }
+        .value { color: #333; }
+        .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Appointment Cancelled</h1>
+          ${reference ? `<p>Booking Reference: ${reference}</p>` : ''}
+        </div>
+        <div class="content">
+          <div class="notice-box">
+            <p style="margin: 0;">Hi ${booking.firstName}, your appointment has been cancelled. The following booking is no longer active:</p>
+          </div>
+
+          <div class="info-row">
+            <span class="label">Service:</span>
+            <span class="value">${booking.serviceTitle}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Date:</span>
+            <span class="value">${formattedDate}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Time:</span>
+            <span class="value">${timeSlot} <span style="color:#888;font-size:12px;">(Belgian time, ${durationMinutes} min)</span></span>
+          </div>
+
+          <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 25px; text-align: center;">
+            <p style="margin: 0; color: #1976D2;">You can book a new appointment anytime at <a href="${FRONTEND_URL}" style="color: #1976D2; font-weight: 600;">zenyourlife.be</a>.</p>
+          </div>
+
+          <div class="footer">
+            <p>If you did not request this cancellation, please contact us immediately.</p>
+            <p>Best regards,<br><strong>The ZenYourLife Team</strong></p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">© ${new Date().getFullYear()} ZenYourLife. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+// Admin cancellation notification email
+const generateAdminCancellationEmail = (booking) => {
+  const { formattedDate, durationMinutes, timeSlot, fullName } = formatBookingForCancellation(booking);
+  const reference = booking.enrollmentId ? `#${booking.enrollmentId}` : '';
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #B71C1C 0%, #8b1414 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .alert-box { background: #FFEBEE; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #B71C1C; }
+        .content { background: #f9f9f9; padding: 30px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 10px 10px; }
+        .info-row { margin: 8px 0; padding: 10px; background: white; border-radius: 5px; }
+        .label { font-weight: 600; color: #555; display: inline-block; width: 140px; }
+        .value { color: #333; }
+        .footer { text-align: center; padding: 15px; color: #888; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>❌ Booking Cancelled</h1>
+          ${reference ? `<p>Booking ID: ${reference}</p>` : ''}
+        </div>
+        <div class="content">
+          <div class="alert-box">
+            <strong>A customer has cancelled their appointment.</strong> The time slot is now available again.
+          </div>
+
+          <div class="info-row"><span class="label">Customer:</span><span class="value">${fullName}</span></div>
+          <div class="info-row"><span class="label">Email:</span><span class="value"><a href="mailto:${booking.email}">${booking.email}</a></span></div>
+          <div class="info-row"><span class="label">Phone:</span><span class="value">${booking.phoneNumber || '—'}</span></div>
+          <div class="info-row"><span class="label">Service:</span><span class="value">${booking.serviceTitle}</span></div>
+          <div class="info-row"><span class="label">Date:</span><span class="value">${formattedDate}</span></div>
+          <div class="info-row"><span class="label">Time:</span><span class="value">${timeSlot} (Belgian time, ${durationMinutes} min)</span></div>
+
+          <div class="info-row" style="margin-top: 20px; background: #FFF3E0; text-align: center;">
+            <span class="value">Cancelled on: ${new Date().toLocaleString('en-US', {
+              timeZone: BELGIUM_TIMEZONE,
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })} (Brussels time)</span>
+          </div>
+
+          <div class="footer">
+            <p>This is an automated notification from ZenYourLife Booking System</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+// Send cancellation notifications to both customer and admin. Errors are logged, never thrown.
+exports.sendCancellationEmails = async (booking) => {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD ||
+      process.env.EMAIL_USER === 'your-email@outlook.com' ||
+      process.env.EMAIL_PASSWORD === 'your-app-password-here') {
+    console.log('⏭️  Skipping cancellation emails (EMAIL_USER/EMAIL_PASSWORD not configured)');
+    return;
+  }
+
+  const reference = booking.enrollmentId ? `#${booking.enrollmentId}` : '';
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+
+  try {
+    await transporter.sendMail({
+      from: `"ZenYourLife" <${process.env.EMAIL_USER}>`,
+      to: booking.email,
+      subject: `Appointment Cancelled - ${booking.serviceTitle} | ZenYourLife`,
+      html: generateCustomerCancellationEmail(booking)
+    });
+    console.log('📧 Cancellation email sent to customer:', booking.email);
+  } catch (err) {
+    console.error('❌ Error sending cancellation email to customer:', err.message);
+  }
+
+  try {
+    await transporter.sendMail({
+      from: `"ZenYourLife Booking System" <${process.env.EMAIL_USER}>`,
+      to: adminEmail,
+      subject: `Cancellation ${reference} - ${booking.serviceTitle}`,
+      html: generateAdminCancellationEmail(booking)
+    });
+    console.log('📧 Cancellation email sent to admin:', adminEmail);
+  } catch (err) {
+    console.error('❌ Error sending cancellation email to admin:', err.message);
+  }
 };
 
 // Create new enrollment
@@ -303,8 +499,11 @@ exports.createEnrollment = async (req, res) => {
 
     await enrollment.save();
 
+    // Token that authorizes the customer to cancel via the email link
+    const cancellationToken = crypto.randomBytes(24).toString('hex');
+
     // Also create an appointment record to maintain booked slots functionality
-    await Appointment.create({
+    const appointment = await Appointment.create({
       service: serviceId,
       serviceTitle: serviceTitle || service.title,
       appointmentDate: appointmentDateUTC,
@@ -317,8 +516,11 @@ exports.createEnrollment = async (req, res) => {
       gender,
       specialRequests: specialRequests || '',
       message: message || '',
-      status: 'confirmed'
+      status: 'confirmed',
+      cancellationToken
     });
+
+    const cancelUrl = `${FRONTEND_URL}/cancel/${appointment._id}?token=${cancellationToken}`;
 
     // Populate service details
     await enrollment.populate('service');
@@ -330,6 +532,7 @@ exports.createEnrollment = async (req, res) => {
 
     console.log('🆔 ENROLLMENT ID:', enrollment.enrollmentId);
     console.log('📅 DATABASE ID:', enrollment._id);
+    console.log('🔗 CANCEL URL:', cancelUrl);
     console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('💆 SERVICE INFORMATION:');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
@@ -388,6 +591,7 @@ exports.createEnrollment = async (req, res) => {
     // Send confirmation emails (always send to customer regardless of reminder preference)
     let customerEmailSent = false;
     let adminEmailSent = false;
+    let customerSmsSent = false;
 
     try {
       if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD &&
@@ -400,7 +604,7 @@ exports.createEnrollment = async (req, res) => {
             from: `"ZenYourLife" <${process.env.EMAIL_USER}>`,
             to: enrollment.email,
             subject: `Booking Confirmed - ${enrollment.serviceTitle} | ZenYourLife`,
-            html: generateCustomerEmailTemplate(enrollment)
+            html: generateCustomerEmailTemplate(enrollment, cancelUrl)
           };
 
           await transporter.sendMail(customerMailOptions);
@@ -432,11 +636,48 @@ exports.createEnrollment = async (req, res) => {
       console.error('❌ Error with email setup:', emailError.message);
     }
 
+    // Send immediate SMS confirmation if customer preference includes SMS
+    if (reminderPreference === 'sms' || reminderPreference === 'both') {
+      try {
+        const formattedDate = formatAppointmentDate(enrollment.appointmentDate);
+        const durationMinutes = enrollment.service?.duration || 60;
+        const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
+
+        const smsMessage = `Dear ${enrollment.firstName},
+
+Your booking at Zen Your Life is confirmed!
+
+Booking #${enrollment.enrollmentId}
+Service: ${enrollment.serviceTitle}
+Date: ${formattedDate}
+Time: ${timeSlot} (Belgian time, ${durationMinutes} min)
+Location: Schapenbaan 45, 1731 Relegem
+
+Please arrive 5 minutes early.
+
+Kind Regards,
+Zen Your Life Team`;
+
+        const formattedPhone = formatPhoneNumber(enrollment.phoneNumber, enrollment.country);
+        customerSmsSent = await sendSms(formattedPhone, smsMessage);
+        if (customerSmsSent) {
+          console.log('📱 Confirmation SMS sent to customer:', formattedPhone);
+        } else {
+          console.log('❌ Failed to send confirmation SMS to customer:', formattedPhone);
+        }
+      } catch (smsError) {
+        console.error('❌ Error sending confirmation SMS:', smsError.message);
+      }
+    }
+
     console.log('\n═══════════════════════════════════════════════════════════════');
-    console.log('EMAIL STATUS:');
+    console.log('CONFIRMATION STATUS:');
     console.log('  Customer Email:', customerEmailSent ? '✅ Sent' : '❌ Not Sent');
     console.log('  Admin Email:', adminEmailSent ? '✅ Sent' : '❌ Not Sent');
-    console.log('  Reminder Preference:', reminderPreference === 'sms' ? '📱 SMS' : '📧 Email');
+    console.log('  Customer SMS:', (reminderPreference === 'sms' || reminderPreference === 'both')
+      ? (customerSmsSent ? '✅ Sent' : '❌ Not Sent')
+      : '⏭️  Skipped (email-only preference)');
+    console.log('  Reminder Preference:', reminderPreference === 'sms' ? '📱 SMS' : reminderPreference === 'both' ? '📧📱 Email + SMS' : '📧 Email');
     console.log('═══════════════════════════════════════════════════════════════\n');
 
     res.status(201).json({

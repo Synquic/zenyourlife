@@ -7,6 +7,7 @@ import Booking from "./components/Booking";
 import BookingDate from "./components/BookingDate";
 import BookingForm from "./components/BookingForm";
 import Approved from "./components/Approved";
+import CancelAppointment from "./components/CancelAppointment";
 import RBooking from "./components/Rental/RBooking";
 import Servicepage from "./Pages/Servicepage";
 import ParticularService from "./Pages/ParticularService";
@@ -37,6 +38,7 @@ const App = () => {
         <Route path="/bookingdate" element={<BookingDate />} />
         <Route path="/bookingForm" element={<BookingForm />} />
         <Route path="/approved" element={<Approved />} />
+        <Route path="/cancel/:id" element={<CancelAppointment />} />
         <Route path="/privacy-policy" element={<Privacypolicy />} />
         <Route path="/dpa" element={<DPAPage />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />

@@ -112,11 +112,12 @@ const Users = () => {
   })
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Brussels',
       year: 'numeric',
       month: 'short',
       day: 'numeric'
-    })
+    }).format(new Date(dateString))
   }
 
   const getStatusColor = (status: string) => {

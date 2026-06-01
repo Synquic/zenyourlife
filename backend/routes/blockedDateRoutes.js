@@ -156,9 +156,12 @@ router.get('/available-slots/:date', async (req, res) => {
       });
     }
 
-    // Check for blocked date
+    // Check for blocked date using Belgium-day range to avoid UTC boundary mismatch
     const blockedDate = await BlockedDate.findOne({
-      date: checkDate,
+      date: {
+        $gte: getStartOfDayBelgium(req.params.date),
+        $lte: getEndOfDayBelgium(req.params.date)
+      },
       isActive: true
     });
 
@@ -598,7 +601,10 @@ router.get('/check/:date', async (req, res) => {
     checkDate.setUTCHours(0, 0, 0, 0);
 
     const blockedDate = await BlockedDate.findOne({
-      date: checkDate,
+      date: {
+        $gte: getStartOfDayBelgium(req.params.date),
+        $lte: getEndOfDayBelgium(req.params.date)
+      },
       isActive: true
     });
 

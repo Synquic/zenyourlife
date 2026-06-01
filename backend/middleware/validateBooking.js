@@ -70,12 +70,13 @@ const validateBooking = async (req, res, next) => {
       });
     }
 
-    // 6. Check blocked dates — normalize to UTC midnight for DB query
-    const checkDate = new Date(appointmentDateUTC);
-    checkDate.setUTCHours(0, 0, 0, 0);
-
+    // 6. Check blocked dates — `BlockedDate.date` is stored at UTC midnight of the Belgium
+    // calendar day, so we query by an exact-day range rather than strict equality to be safe.
     const blockedDate = await BlockedDate.findOne({
-      date: checkDate,
+      date: {
+        $gte: getStartOfDayBelgium(selectedDate),
+        $lte: getEndOfDayBelgium(selectedDate)
+      },
       isActive: true
     });
 

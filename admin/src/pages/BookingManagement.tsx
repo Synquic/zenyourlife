@@ -3,6 +3,7 @@ import { Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, AlertCircle
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
+import { formatBelgiumDate, getBelgiumDayOfWeek, getBelgiumTodayStr, getBelgiumDateStr } from '../utils/timezone'
 
 interface DaySchedule {
   isWorking: boolean
@@ -195,13 +196,12 @@ const BookingManagement = () => {
     setActiveRange(null) // custom pick clears the range tab
   }
 
-  // Quick range selection
+  // Quick range selection — Belgium dates
   const handleQuickRange = (days: number, label: string) => {
-    const now = new Date()
-    const fromStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-    const end = new Date(now)
-    end.setDate(end.getDate() + days)
-    const toStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`
+    const fromStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())
+    const end = new Date(fromStr + 'T12:00:00Z')
+    end.setUTCDate(end.getUTCDate() + days)
+    const toStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(end)
     setFilterFrom(fromStr)
     setFilterTo(toStr)
     setActiveRange(label)
@@ -235,12 +235,13 @@ const BookingManagement = () => {
   }
 
   const handlePastQuickRange = (days: number, label: string) => {
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    const toStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`
-    const start = new Date()
-    start.setDate(start.getDate() - days)
-    const fromStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
+    const todayBelgium = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())
+    const yesterday = new Date(todayBelgium + 'T12:00:00Z')
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1)
+    const toStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(yesterday)
+    const start = new Date(todayBelgium + 'T12:00:00Z')
+    start.setUTCDate(start.getUTCDate() - days)
+    const fromStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(start)
     setPastFilterFrom(fromStr)
     setPastFilterTo(toStr)
     setPastActiveRange(label)
@@ -254,11 +255,10 @@ const BookingManagement = () => {
     setPastOpenPicker(null)
   }
 
-  // Format YYYY-MM-DD to readable string
+  // Format YYYY-MM-DD to readable string — always Belgium calendar
   const formatFilterDate = (dateStr: string) => {
     if (!dateStr) return ''
-    const d = new Date(dateStr + 'T00:00:00')
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    return new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(dateStr + 'T12:00:00Z'))
   }
 
   // Handle editing a day's schedule
@@ -464,18 +464,19 @@ const BookingManagement = () => {
     }
   }
 
-  // Get time slots for selected date based on day of week
+  // Get time slots for selected date based on day of week (Belgium timezone)
   const getTimeSlotsForSelectedDate = () => {
     if (!selectedDate || !settings) return []
-    const date = new Date(selectedDate + 'T00:00:00')
-    const dayIndex = date.getDay()
+    // selectedDate is a YYYY-MM-DD string — day-of-week is a property of the calendar day itself
+    const date = new Date(selectedDate + 'T12:00:00Z') // noon UTC anchors avoid DST edges
+    const dayIndex = getBelgiumDayOfWeek(date)
     const dayNames: DayName[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
     const dayName = dayNames[dayIndex]
     return settings.weeklySchedule[dayName].timeSlots
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBelgiumDate(dateString, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -484,46 +485,36 @@ const BookingManagement = () => {
   }
 
   const formatShortDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBelgiumDate(dateString, {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
     })
   }
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  // Belgium "today" as YYYY-MM-DD — string comparison is timezone-safe
+  const todayStr = getBelgiumTodayStr()
 
-  // Split blocked dates into future and past
+  // Split blocked dates into future and past using Belgium calendar days
   const { futureBlockedDates, pastBlockedDates } = useMemo(() => {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
     const future: typeof blockedDates = []
     const past: typeof blockedDates = []
     blockedDates.forEach(bd => {
-      const d = new Date(bd.date)
-      d.setHours(0, 0, 0, 0)
-      if (d < now) past.push(bd)
+      const dStr = getBelgiumDateStr(bd.date)
+      if (dStr < todayStr) past.push(bd)
       else future.push(bd)
     })
     return { futureBlockedDates: future, pastBlockedDates: past }
-  }, [blockedDates])
+  }, [blockedDates, todayStr])
 
   // Filter blocked dates by date range (only future dates)
   const filteredBlockedDates = useMemo(() => {
     if (!filterFrom && !filterTo) return futureBlockedDates
 
     return futureBlockedDates.filter(bd => {
-      const d = new Date(bd.date)
-      d.setHours(0, 0, 0, 0)
-      if (filterFrom) {
-        const from = new Date(filterFrom + 'T00:00:00')
-        if (d < from) return false
-      }
-      if (filterTo) {
-        const to = new Date(filterTo + 'T00:00:00')
-        if (d > to) return false
-      }
+      const dStr = getBelgiumDateStr(bd.date)
+      if (filterFrom && dStr < filterFrom) return false
+      if (filterTo && dStr > filterTo) return false
       return true
     })
   }, [futureBlockedDates, filterFrom, filterTo])
@@ -533,16 +524,9 @@ const BookingManagement = () => {
     if (!pastFilterFrom && !pastFilterTo) return pastBlockedDates
 
     return pastBlockedDates.filter(bd => {
-      const d = new Date(bd.date)
-      d.setHours(0, 0, 0, 0)
-      if (pastFilterFrom) {
-        const from = new Date(pastFilterFrom + 'T00:00:00')
-        if (d < from) return false
-      }
-      if (pastFilterTo) {
-        const to = new Date(pastFilterTo + 'T00:00:00')
-        if (d > to) return false
-      }
+      const dStr = getBelgiumDateStr(bd.date)
+      if (pastFilterFrom && dStr < pastFilterFrom) return false
+      if (pastFilterTo && dStr > pastFilterTo) return false
       return true
     })
   }, [pastBlockedDates, pastFilterFrom, pastFilterTo])
@@ -1155,10 +1139,10 @@ const BookingManagement = () => {
                                     : 'bg-gradient-to-br from-purple-500 to-purple-600'
                                 }`}>
                                   <span className="text-[10px] uppercase tracking-wide opacity-90">
-                                    {new Date(blockedDate.date).toLocaleDateString('en-US', { month: 'short' })}
+                                    {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short' }).format(new Date(blockedDate.date))}
                                   </span>
                                   <span className="text-lg sm:text-xl font-bold -mt-0.5">
-                                    {new Date(blockedDate.date).getDate()}
+                                    {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', day: 'numeric' }).format(new Date(blockedDate.date))}
                                   </span>
                                 </div>
 
@@ -1453,10 +1437,10 @@ const BookingManagement = () => {
                                   <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg flex flex-col items-center justify-center text-white font-semibold bg-slate-400 shrink-0">
                                       <span className="text-[8px] uppercase tracking-wide opacity-90">
-                                        {new Date(blockedDate.date).toLocaleDateString('en-US', { month: 'short' })}
+                                        {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short' }).format(new Date(blockedDate.date))}
                                       </span>
                                       <span className="text-sm font-bold -mt-0.5">
-                                        {new Date(blockedDate.date).getDate()}
+                                        {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', day: 'numeric' }).format(new Date(blockedDate.date))}
                                       </span>
                                     </div>
                                     <div>
@@ -1594,7 +1578,7 @@ const BookingManagement = () => {
                       setSelectedDate(e.target.value)
                       setSelectedBlockSlots([])
                     }}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())}
                     className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
                   />
                 </div>
@@ -1613,7 +1597,7 @@ const BookingManagement = () => {
                           setBlockEndDate('')
                         }
                       }}
-                      min={new Date().toISOString().split('T')[0]}
+                      min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())}
                       className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
                     />
                   </div>
@@ -1625,7 +1609,7 @@ const BookingManagement = () => {
                       type="date"
                       value={blockEndDate}
                       onChange={(e) => setBlockEndDate(e.target.value)}
-                      min={selectedDate || new Date().toISOString().split('T')[0]}
+                      min={selectedDate || new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())}
                       className="w-full px-4 py-3.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-red-500 transition-all text-sm"
                     />
                   </div>
@@ -1729,12 +1713,7 @@ const BookingManagement = () => {
               {blockMode === 'single' && selectedDate && (
                 <div className={`p-4 rounded-xl ${blockType === 'full' ? 'bg-gradient-to-r from-red-50 to-rose-50 border border-red-100' : 'bg-gradient-to-r from-purple-50 to-violet-50 border border-purple-100'}`}>
                   <p className={`text-sm font-semibold ${blockType === 'full' ? 'text-red-700' : 'text-purple-700'}`}>
-                    Blocking: {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    Blocking: {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(selectedDate + 'T12:00:00Z'))}
                   </p>
                   <p className={`text-xs mt-1 ${blockType === 'full' ? 'text-red-600' : 'text-purple-600'}`}>
                     {blockType === 'full'
@@ -1752,7 +1731,7 @@ const BookingManagement = () => {
                     Blocking {Math.round((new Date(blockEndDate + 'T00:00:00').getTime() - new Date(selectedDate + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24)) + 1} days
                   </p>
                   <p className="text-xs mt-1 text-red-600">
-                    From {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} to {new Date(blockEndDate + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} — all appointments will be blocked.
+                    From {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short', day: 'numeric' }).format(new Date(selectedDate + 'T12:00:00Z'))} to {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(blockEndDate + 'T12:00:00Z'))} — all appointments will be blocked.
                   </p>
                 </div>
               )}

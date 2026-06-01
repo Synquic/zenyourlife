@@ -1,6 +1,11 @@
+const crypto = require('crypto');
 const Appointment = require('../models/Appointment');
+const Enrollment = require('../models/Enrollment');
 const Service = require('../models/Service');
 const { getStartOfDayBelgium, getEndOfDayBelgium } = require('../utils/timezone');
+const { sendCancellationEmails } = require('./enrollmentController');
+
+const generateCancellationToken = () => crypto.randomBytes(24).toString('hex');
 
 // Create new appointment
 exports.createAppointment = async (req, res) => {
@@ -51,7 +56,8 @@ exports.createAppointment = async (req, res) => {
       gender,
       specialRequests: specialRequests || '',
       message: message || '',
-      status: 'confirmed'
+      status: 'confirmed',
+      cancellationToken: generateCancellationToken()
     });
 
     // Populate service details
@@ -81,10 +87,11 @@ exports.getAllAppointments = async (req, res) => {
     if (status) query.status = status;
     if (email) query.email = email.toLowerCase();
     if (date) {
-      const startDate = new Date(date);
-      const endDate = new Date(date);
-      endDate.setDate(endDate.getDate() + 1);
-      query.appointmentDate = { $gte: startDate, $lt: endDate };
+      // Range: start of Belgium day → end of Belgium day (avoids server-timezone drift)
+      query.appointmentDate = {
+        $gte: getStartOfDayBelgium(date),
+        $lte: getEndOfDayBelgium(date)
+      };
     }
 
     const appointments = await Appointment.find(query)
@@ -169,14 +176,12 @@ exports.updateAppointmentStatus = async (req, res) => {
   }
 };
 
-// Cancel appointment
+// Cancel appointment (customer self-service via email link)
 exports.cancelAppointment = async (req, res) => {
   try {
-    const appointment = await Appointment.findByIdAndUpdate(
-      req.params.id,
-      { status: 'cancelled' },
-      { new: true }
-    ).populate('service');
+    const { token } = req.body;
+
+    const appointment = await Appointment.findById(req.params.id).select('+cancellationToken');
 
     if (!appointment) {
       return res.status(404).json({
@@ -184,6 +189,56 @@ exports.cancelAppointment = async (req, res) => {
         message: 'Appointment not found'
       });
     }
+
+    if (!appointment.cancellationToken) {
+      return res.status(403).json({
+        success: false,
+        message: 'This booking cannot be cancelled online. Please contact us directly.'
+      });
+    }
+
+    if (!token || token !== appointment.cancellationToken) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid or expired cancellation link.'
+      });
+    }
+
+    if (appointment.status === 'cancelled') {
+      await appointment.populate('service');
+      return res.status(200).json({
+        success: true,
+        message: 'Appointment was already cancelled.',
+        data: appointment
+      });
+    }
+
+    if (appointment.status === 'completed') {
+      return res.status(400).json({
+        success: false,
+        message: 'Completed appointments cannot be cancelled.'
+      });
+    }
+
+    appointment.status = 'cancelled';
+    await appointment.save();
+    await appointment.populate('service');
+
+    // Keep the linked Enrollment record in sync so admin views match
+    const enrollment = await Enrollment.findOneAndUpdate(
+      {
+        email: appointment.email,
+        appointmentDate: appointment.appointmentDate,
+        appointmentTime: appointment.appointmentTime
+      },
+      { status: 'cancelled' },
+      { new: true }
+    ).populate('service');
+
+    // Notify customer and admin. Use the enrollment when available (has enrollmentId).
+    sendCancellationEmails(enrollment || appointment).catch(err =>
+      console.error('❌ Cancellation email dispatch failed:', err.message)
+    );
 
     res.status(200).json({
       success: true,

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Search, Plus, Send, CheckCircle, XCircle, Loader2, Calendar, User, Clock, Mail, Phone, MapPin, X, Save, Sparkles, CalendarCheck, MessageSquare, FileText, Menu, Trash2, Filter, ChevronDown, PanelLeftClose, PanelRightClose, GripVertical, Archive } from 'lucide-react'
 import Sidebar from '../components/Sidebar'
+import { getBelgiumDayOfWeek } from '../utils/timezone'
 
 interface ServiceOption {
   _id: string
@@ -175,7 +176,8 @@ const MassageBooking = () => {
 
     try {
       const selectedService = services.find(s => s._id === newBookingForm.serviceId)
-      const appointmentDate = new Date(newBookingForm.appointmentDate)
+      // Parse appointmentDate as Belgium calendar day — noon UTC anchor avoids DST edges
+      const appointmentDate = new Date(newBookingForm.appointmentDate + 'T12:00:00Z')
       const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
       const response = await fetch(`${API_URL}/enrollments`, {
@@ -185,7 +187,7 @@ const MassageBooking = () => {
           service: newBookingForm.serviceId,
           serviceTitle: selectedService?.title || '',
           appointmentDate: newBookingForm.appointmentDate,
-          appointmentDay: dayNames[appointmentDate.getDay()],
+          appointmentDay: dayNames[getBelgiumDayOfWeek(appointmentDate)],
           appointmentTime: newBookingForm.appointmentTime,
           firstName: newBookingForm.firstName,
           lastName: newBookingForm.lastName,
@@ -390,12 +392,12 @@ const MassageBooking = () => {
   }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Brussels',
       month: 'short',
       day: 'numeric',
       year: 'numeric'
-    })
+    }).format(new Date(dateString))
   }
 
   const getStatusConfig = (status: string) => {
@@ -724,17 +726,22 @@ const MassageBooking = () => {
               ) : (() => {
                 const now = new Date()
                 // Recent = current month + previous month; Archived = 3rd month and older
-                const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-                const recentCutoff = `${prevMonth.getFullYear()}-${String(prevMonth.getMonth()).padStart(2, '0')}`
+                // Use Belgium timezone for month boundaries
+                const belgiumNowStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(now)
+                const [bty, btm] = belgiumNowStr.split('-').map(Number)
+                const prevMonthM = btm === 1 ? 12 : btm - 1
+                const prevMonthY = btm === 1 ? bty - 1 : bty
+                const recentCutoff = `${prevMonthY}-${String(prevMonthM - 1).padStart(2, '0')}`
 
-                // Group bookings by month
+                // Group bookings by Belgium calendar month
                 const monthGroups: Record<string, { label: string, bookings: typeof filteredBookings }> = {}
                 filteredBookings.forEach(booking => {
-                  const d = new Date(booking.appointmentDate)
-                  const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`
+                  const belgiumDateStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date(booking.appointmentDate))
+                  const [y, m] = belgiumDateStr.split('-')
+                  const key = `${y}-${String(Number(m) - 1).padStart(2, '0')}`
                   if (!monthGroups[key]) {
                     monthGroups[key] = {
-                      label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+                      label: new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'long', year: 'numeric' }).format(new Date(booking.appointmentDate)),
                       bookings: []
                     }
                   }
