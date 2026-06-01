@@ -2,7 +2,7 @@ const cron = require('node-cron');
 const nodemailer = require('nodemailer');
 const Enrollment = require('../models/Enrollment');
 const { sendCustomerSmsReminder, sendAdminSmsReminder, initializeTwilio } = require('./twilioSmsService');
-const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getEndOfDayBelgium, getBelgiumDateStr } = require('../utils/timezone');
+const { BELGIUM_TIMEZONE, getStartOfDayBelgium, getEndOfDayBelgium, getBelgiumDateStr, getTimeSlot } = require('../utils/timezone');
 
 // Create email transporter
 const transporter = nodemailer.createTransport({
@@ -24,6 +24,8 @@ const generateCustomerReminderTemplate = (enrollment) => {
     month: 'long',
     day: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   return `
     <!DOCTYPE html>
@@ -60,7 +62,7 @@ const generateCustomerReminderTemplate = (enrollment) => {
           <div class="highlight-box">
             <h3 style="margin-top: 0; color: #C9A032;">Your Appointment is Tomorrow!</h3>
             <p style="font-size: 24px; font-weight: bold; color: #333; margin: 15px 0;">${formattedDate}</p>
-            <p style="font-size: 20px; color: #666;">at ${enrollment.appointmentTime} <span style="font-size: 14px; color: #999;">(Belgian time)</span></p>
+            <p style="font-size: 20px; color: #666;">at ${timeSlot} <span style="font-size: 14px; color: #999;">(Belgian time, ${durationMinutes} min)</span></p>
           </div>
 
           <div class="section-title">Service Details</div>
@@ -101,6 +103,8 @@ const generateAdminReminderTemplate = (enrollment) => {
     month: 'long',
     day: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   return `
     <!DOCTYPE html>
@@ -134,14 +138,14 @@ const generateAdminReminderTemplate = (enrollment) => {
 
           <div class="time-highlight">
             <p style="font-size: 14px; color: #666; margin: 0;">Appointment Time</p>
-            <p style="font-size: 28px; font-weight: bold; color: #D32F2F; margin: 10px 0;">${enrollment.appointmentTime} <span style="font-size: 16px; color: #888; font-weight: normal;">(Belgian time)</span></p>
+            <p style="font-size: 28px; font-weight: bold; color: #D32F2F; margin: 10px 0;">${timeSlot} <span style="font-size: 16px; color: #888; font-weight: normal;">(Belgian time, ${durationMinutes} min)</span></p>
             <p style="font-size: 14px; color: #666; margin: 0;">${formattedDate}</p>
           </div>
 
           <div class="section-title">Customer Details</div>
           <div class="info-row">
             <span class="label">Name:</span>
-            <span class="value">${enrollment.fullName}</span>
+            <span class="value">${enrollment.fullName || `${enrollment.firstName} ${enrollment.lastName}`}</span>
           </div>
           <div class="info-row">
             <span class="label">Phone:</span>
@@ -203,7 +207,7 @@ const sendCustomerReminder = async (enrollment) => {
   }
 };
 
-// Send admin reminder email (15 min before)
+// Send admin reminder email (1 day before)
 const sendAdminReminder = async (enrollment) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
     console.log('Email credentials not configured, skipping admin reminder');
@@ -215,7 +219,7 @@ const sendAdminReminder = async (enrollment) => {
     const mailOptions = {
       from: `"ZenYourLife Booking System" <${process.env.EMAIL_USER}>`,
       to: adminEmail,
-      subject: `STARTING IN 15 MIN - ${enrollment.fullName} - ${enrollment.serviceTitle}`,
+      subject: `Appointment Tomorrow: ${enrollment.fullName || `${enrollment.firstName} ${enrollment.lastName}`} - ${enrollment.serviceTitle}`,
       html: generateAdminReminderTemplate(enrollment)
     };
 
@@ -254,7 +258,7 @@ const checkCustomerReminders = async () => {
       },
       reminderSentToCustomer: false,
       status: { $in: ['pending', 'confirmed'] }
-    });
+    }).populate('service');
 
     console.log(`[Reminder] Found ${emailEnrollments.length} appointments for tomorrow needing EMAIL reminders (email is mandatory for all)`);
 
@@ -319,7 +323,7 @@ const checkAdminReminders = async () => {
       },
       reminderSentToAdmin: false,
       status: { $in: ['pending', 'confirmed'] }
-    });
+    }).populate('service');
 
     console.log(`[Admin Reminder] Found ${enrollments.length} appointments for tomorrow needing admin reminders`);
 

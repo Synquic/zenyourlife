@@ -3,6 +3,7 @@ import { Calendar, Plus, Trash2, X, Loader2, CalendarOff, CalendarCheck, Menu, A
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
+import { formatBelgiumDate, getBelgiumTodayStr, getBelgiumDateStr } from '../utils/timezone'
 
 interface BlockedDate {
   _id: string
@@ -207,7 +208,7 @@ const BlockedDates = () => {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBelgiumDate(dateString, {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -216,7 +217,7 @@ const BlockedDates = () => {
   }
 
   const formatShortDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return formatBelgiumDate(dateString, {
       month: 'short',
       day: 'numeric',
       year: 'numeric'
@@ -225,15 +226,14 @@ const BlockedDates = () => {
 
   const activeBlockedDates = blockedDates.filter(bd => bd.isActive)
 
-  // Get upcoming blocked dates (next 30 days)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const thirtyDaysLater = new Date(today)
-  thirtyDaysLater.setDate(thirtyDaysLater.getDate() + 30)
+  // Upcoming blocked dates: next 30 Belgium calendar days (string comparison is timezone-safe)
+  const todayStr = getBelgiumTodayStr()
+  const [ty, tm, td] = todayStr.split('-').map(Number)
+  const thirtyDaysLaterStr = new Date(Date.UTC(ty, tm - 1, td + 30)).toISOString().slice(0, 10)
 
   const upcomingBlockedDates = activeBlockedDates.filter(bd => {
-    const date = new Date(bd.date)
-    return date >= today && date <= thirtyDaysLater
+    const dStr = getBelgiumDateStr(bd.date)
+    return dStr >= todayStr && dStr <= thirtyDaysLaterStr
   })
 
   // Count partial blocks (only specific time slots blocked)
@@ -373,7 +373,8 @@ const BlockedDates = () => {
               <div className="divide-y divide-slate-100">
                 {blockedDates.map((blockedDate) => {
                   const date = new Date(blockedDate.date)
-                  const isPast = date < today
+                  // Past = Belgium calendar day is before today's Belgium calendar day
+                  const isPast = getBelgiumDateStr(blockedDate.date) < todayStr
 
                   return (
                     <div
@@ -395,10 +396,10 @@ const BlockedDates = () => {
                               : 'bg-gradient-to-br from-purple-500 to-purple-600'
                           }`}>
                             <span className="text-[10px] uppercase tracking-wide opacity-90">
-                              {new Date(blockedDate.date).toLocaleDateString('en-US', { month: 'short' })}
+                              {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short' }).format(new Date(blockedDate.date))}
                             </span>
                             <span className="text-lg sm:text-xl font-bold -mt-0.5">
-                              {new Date(blockedDate.date).getDate()}
+                              {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', day: 'numeric' }).format(new Date(blockedDate.date))}
                             </span>
                           </div>
 
@@ -562,7 +563,7 @@ const BlockedDates = () => {
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date())}
                   className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DFB13B]/20 focus:border-[#DFB13B] transition-all"
                 />
               </div>
@@ -649,12 +650,7 @@ const BlockedDates = () => {
                 <div className={`mb-6 p-4 rounded-xl border ${blockType === 'full' ? 'bg-red-50 border-red-100' : 'bg-purple-50 border-purple-100'}`}>
                   <p className={`text-sm ${blockType === 'full' ? 'text-red-700' : 'text-purple-700'}`}>
                     <span className="font-medium">Blocking:</span>{' '}
-                    {new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(selectedDate + 'T12:00:00Z'))}
                   </p>
                   <p className={`text-xs mt-1 ${blockType === 'full' ? 'text-red-600' : 'text-purple-600'}`}>
                     {blockType === 'full'

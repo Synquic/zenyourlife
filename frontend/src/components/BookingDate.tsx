@@ -432,118 +432,62 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
                       <span className="ml-2 text-[11px] text-gray-400 font-normal">({t('booking.loading_availability')})</span>
                     )}
                   </h2>
-                  {selectedDate !== null && availableTimeSlots.length > 0 && (
-                    <p className="text-[11px] text-gray-400">
-                      {availableTimeSlots.length - bookedSlots.length - blockedTimeSlotsForDate.length} {t('booking.available')}
-                    </p>
-                  )}
+                  {selectedDate !== null && availableTimeSlots.length > 0 && (() => {
+                    const visibleSlots = availableTimeSlots.filter(time => {
+                      if (bookedSlots.includes(time)) return false;
+                      if (blockedTimeSlotsForDate.includes(time)) return false;
+                      if (selectedDate !== null && isTimeSlotTooSoon(dates[selectedDate].fullDate, time)) return false;
+                      return true;
+                    });
+                    return (
+                      <p className="text-[11px] text-gray-400">
+                        {visibleSlots.length} {t('booking.available')}
+                      </p>
+                    );
+                  })()}
                 </div>
               </div>
               {selectedDate !== null ? (
                 <>
-                  {availableTimeSlots.length > 0 ? (
-                    <>
+                  {(() => {
+                    const visibleSlots = availableTimeSlots.filter(time => {
+                      if (bookedSlots.includes(time)) return false;
+                      if (blockedTimeSlotsForDate.includes(time)) return false;
+                      if (selectedDate !== null && isTimeSlotTooSoon(dates[selectedDate].fullDate, time)) return false;
+                      return true;
+                    });
+                    return visibleSlots.length > 0 ? (
                       <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5 sm:gap-2">
-                        {availableTimeSlots.map((time: string, index: number) => {
-                          const isBooked = isSlotBooked(time);
-                          const isBlockedByAdmin = blockedTimeSlotsForDate.includes(time);
-                          const isTooSoon = selectedDate !== null && isTimeSlotTooSoon(dates[selectedDate].fullDate, time);
-                          const isUnavailable = isBooked || isBlockedByAdmin || isTooSoon;
+                        {visibleSlots.map((time: string) => {
+                          const originalIndex = availableTimeSlots.indexOf(time);
                           return (
                             <button
-                              key={index}
+                              key={time}
                               onClick={() => {
-                                if (!isUnavailable && selectedDate !== null) {
-                                  setSelectedTime(index);
-
-                                  // Calculate the appointment date
-                                  const appointmentDate = dates[selectedDate].fullDate;
-
-                                  // Log selected date and time information
-                                  console.log('═══════════════════════════════════════════════════════');
-                                  console.log('STEP 2: DATE & TIME SELECTION');
-                                  console.log('═══════════════════════════════════════════════════════');
-                                  console.log('Selected Date & Time:', {
-                                    day: dates[selectedDate].day,
-                                    date: dates[selectedDate].date,
-                                    fullDate: appointmentDate.toLocaleDateString('en-US', {
-                                      weekday: 'long',
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric'
-                                    }),
-                                    time: time,
-                                    isoString: appointmentDate.toISOString()
-                                  });
-                                  console.log('\nAccumulated Information:');
-                                  console.log({
-                                    service: selectedService?.title,
-                                    price: `€${selectedService?.price}`,
-                                    duration: `${selectedService?.duration} minutes`,
-                                    appointmentDate: appointmentDate.toLocaleDateString(),
-                                    appointmentTime: time
-                                  });
-                                  console.log('═══════════════════════════════════════════════════════\n');
-
-                                  // Auto-proceed to booking form
+                                if (selectedDate !== null) {
+                                  setSelectedTime(originalIndex);
                                   setShowBookingFormModal(true);
                                 }
                               }}
-                              disabled={isUnavailable}
                               className={`py-2 sm:py-2.5 rounded-lg text-sm font-medium transition-all ${
-                                isTooSoon
-                                  ? "bg-amber-50 text-amber-300 cursor-not-allowed"
-                                  : isBlockedByAdmin
-                                  ? "bg-gray-50 text-gray-300 cursor-not-allowed line-through"
-                                  : isBooked
-                                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                                  : selectedTime === index
+                                selectedTime === originalIndex
                                   ? "bg-gradient-to-b from-[#d4a017] to-[#8b6914] text-white shadow-md ring-2 ring-[#d4a017]/30 ring-offset-1"
                                   : "bg-gray-50 text-gray-700 hover:bg-[#fdf6e3] hover:text-[#8b6914]"
                               }`}
-                              title={isTooSoon ? t('booking.too_soon') : isBlockedByAdmin ? t('booking.time_blocked') : isBooked ? t('booking.time_booked') : t('booking.available')}
                             >
                               {time}
                             </button>
                           );
                         })}
                       </div>
-                      {(() => {
-                        const tooSoonCount = selectedDate !== null
-                          ? availableTimeSlots.filter(time => isTimeSlotTooSoon(dates[selectedDate].fullDate, time)).length
-                          : 0;
-                        const hasInfo = bookedSlots.length > 0 || blockedTimeSlotsForDate.length > 0 || tooSoonCount > 0;
-
-                        return hasInfo && (
-                          <div className="mt-3 flex flex-wrap gap-3 text-[11px]">
-                            {tooSoonCount > 0 && (
-                              <span className="flex items-center gap-1 text-amber-500 bg-amber-50 px-2 py-0.5 rounded">
-                                <Clock className="w-3 h-3" />
-                                {t('booking.slots_too_soon', { count: tooSoonCount })}
-                              </span>
-                            )}
-                            {bookedSlots.length > 0 && (
-                              <span className="flex items-center gap-1 text-gray-400 bg-gray-50 px-2 py-0.5 rounded">
-                                <AlertCircle className="w-3 h-3" />
-                                {t('booking.slots_booked', { count: bookedSlots.length })}
-                              </span>
-                            )}
-                            {blockedTimeSlotsForDate.length > 0 && (
-                              <span className="flex items-center gap-1 text-gray-400 bg-gray-50 px-2 py-0.5 rounded">
-                                {t('booking.slots_unavailable', { count: blockedTimeSlotsForDate.length })}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })()}
-                    </>
-                  ) : (
-                    <div className="text-center py-8 bg-gray-50 rounded-xl">
-                      <Calendar className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-                      <p className="text-sm text-gray-400 font-medium">{t('booking.no_slots_available')}</p>
-                      <p className="text-xs text-gray-300 mt-1">{t('booking.select_another_date')}</p>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="text-center py-8 bg-gray-50 rounded-xl">
+                        <Calendar className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+                        <p className="text-sm text-gray-400 font-medium">{t('booking.no_slots_available')}</p>
+                        <p className="text-xs text-gray-300 mt-1">{t('booking.select_another_date')}</p>
+                      </div>
+                    );
+                  })()}
                 </>
               ) : (
                 <div className="text-center py-8 bg-gray-50 rounded-xl">
@@ -620,23 +564,19 @@ const BookingDate = ({ onClose: _onClose, onSuccess, selectedService = null }: B
           calendarCells.push({ day: null, dateIndex: null, fullDate: null });
         }
 
-        // Day cells
+        // Day cells — match by Belgium calendar date string (YYYY-MM-DD), not JS timestamps.
+        // String comparison is immune to the user's browser timezone.
         for (let day = 1; day <= daysInMonth; day++) {
           const cellDate = new Date(viewYear, viewMonthIndex, day);
-          cellDate.setHours(0, 0, 0, 0);
+          const cellDateStr = `${viewYear}-${String(viewMonthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-          // Find matching index in the dates array
-          let matchIndex: number | null = null;
-          for (let i = 0; i < dates.length; i++) {
-            const d = new Date(dates[i].fullDate);
-            d.setHours(0, 0, 0, 0);
-            if (d.getTime() === cellDate.getTime()) {
-              matchIndex = i;
-              break;
-            }
-          }
+          const matchIndex = dates.findIndex(d => d.dateStr === cellDateStr);
 
-          calendarCells.push({ day, dateIndex: matchIndex, fullDate: cellDate });
+          calendarCells.push({
+            day,
+            dateIndex: matchIndex !== -1 ? matchIndex : null,
+            fullDate: cellDate
+          });
         }
 
         // Can navigate to previous/next month?

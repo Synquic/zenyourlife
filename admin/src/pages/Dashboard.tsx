@@ -4,6 +4,7 @@ import { Sparkles, Calendar, Users, TrendingUp, Clock, CheckCircle, Loader2, Arr
 import Sidebar from '../components/Sidebar'
 
 import { API_BASE_URL } from '../config/api'
+import { formatBelgiumDate, getBelgiumMonth } from '../utils/timezone'
 
 type FilterPeriod = 'all' | 'day' | 'week' | 'month' | 'year'
 
@@ -140,7 +141,7 @@ const Dashboard = () => {
   const recentMassageBookings = filteredAppointments.slice(0, 6).map(apt => ({
     id: apt._id,
     name: `${apt.firstName} ${apt.lastName}`,
-    date: new Date(apt.appointmentDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    date: formatBelgiumDate(apt.appointmentDate, { month: 'short', day: 'numeric' }),
     service: apt.serviceTitle,
     status: apt.status,
     time: apt.appointmentTime
@@ -148,13 +149,13 @@ const Dashboard = () => {
 
   const getChartData = () => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const currentMonth = new Date().getMonth()
+    const currentMonth = getBelgiumMonth(new Date())
     const last6Months = []
 
     for (let i = 5; i >= 0; i--) {
       const monthIndex = (currentMonth - i + 12) % 12
       const monthName = months[monthIndex]
-      const massageCount = filteredAppointments.filter(apt => new Date(apt.appointmentDate).getMonth() === monthIndex).length
+      const massageCount = filteredAppointments.filter(apt => getBelgiumMonth(apt.appointmentDate) === monthIndex).length
       last6Months.push({ month: monthName, massage: massageCount })
     }
     return last6Months
@@ -173,7 +174,7 @@ const Dashboard = () => {
     }
   }
 
-  const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+  const currentDate = formatBelgiumDate(new Date(), { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50">
@@ -421,7 +422,7 @@ const Dashboard = () => {
                     <div className="p-4 sm:p-5">
                     <div className="flex items-end justify-between h-32 sm:h-48 px-1 sm:px-4 pt-4">
                       {chartData.map((data, index) => {
-                        const currentMonthName = new Date().toLocaleString('en-US', { month: 'short' })
+                        const currentMonthName = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Brussels', month: 'short' }).format(new Date())
                         const isCurrentMonth = data.month === currentMonthName
                         const massageHeight = maxChartValue > 0 ? (data.massage / maxChartValue) * 100 : 0
                         return (

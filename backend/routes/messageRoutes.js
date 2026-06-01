@@ -56,7 +56,7 @@ router.post('/send', async (req, res) => {
       // Send SMS via Twilio
       const formattedNumber = formatPhoneNumber(to, country || 'BE');
 
-      const smsMessage = `Zen Your Life\n\nDear ${customerName || 'Customer'},\n\n${message}\n\n- Zen Your Life Team`;
+      const smsMessage = `Dear ${customerName || 'Customer'},\n\n${message}\n\nKind Regards,\nZen Your Life Team`;
 
       const sent = await sendSms(formattedNumber, smsMessage);
 

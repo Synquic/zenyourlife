@@ -1,5 +1,5 @@
 const twilio = require('twilio');
-const { getBelgiumDateStr } = require('../utils/timezone');
+const { getBelgiumDateStr, getTimeSlot } = require('../utils/timezone');
 
 // Initialize Twilio client
 let twilioClient = null;
@@ -69,6 +69,8 @@ const generateCustomerSmsReminder = (enrollment) => {
     month: 'long',
     year: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   return `Dear ${enrollment.firstName},
 
@@ -76,13 +78,15 @@ This is a friendly reminder for your upcoming appointment at Zen Your Life.
 
 Service: ${enrollment.serviceTitle}
 Date: ${formattedDate}
-Time: ${enrollment.appointmentTime} (Belgian time)
+Time: ${timeSlot} (Belgian time, ${durationMinutes} min)
 Location: Schapenbaan 45, 1731 Relegem
 
 Please arrive 5 minutes early. To reschedule or cancel, kindly contact us in advance.
 
 We look forward to seeing you!
-- Zen Your Life Team`;
+
+Kind Regards,
+Zen Your Life Team`;
 };
 
 // Generate admin reminder SMS message
@@ -96,13 +100,15 @@ const generateAdminSmsReminder = (enrollment) => {
     month: 'long',
     year: 'numeric'
   });
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
 
   let message = `APPOINTMENT TOMORROW
 
-Client: ${enrollment.fullName}
+Client: ${enrollment.fullName || `${enrollment.firstName} ${enrollment.lastName}`}
 Service: ${enrollment.serviceTitle}
 Date: ${formattedDate}
-Time: ${enrollment.appointmentTime} (Belgian time)
+Time: ${timeSlot} (Belgian time, ${durationMinutes} min)
 Phone: ${enrollment.phoneNumber}`;
 
   if (enrollment.specialRequests) {

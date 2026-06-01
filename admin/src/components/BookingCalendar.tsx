@@ -80,6 +80,8 @@ const BookingCalendar = () => {
     fetchData()
   }, [])
 
+  const BELGIUM_TZ = 'Europe/Brussels'
+
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate()
   }
@@ -88,15 +90,14 @@ const BookingCalendar = () => {
     return new Date(year, month, 1).getDay()
   }
 
+  // Always returns the Belgium calendar day name for a date
   const getDayName = (date: Date) => {
-    return date.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+    return new Intl.DateTimeFormat('en-US', { timeZone: BELGIUM_TZ, weekday: 'long' }).format(date).toLowerCase()
   }
 
+  // Always returns YYYY-MM-DD in Belgium calendar — immune to browser timezone
   const formatDateStr = (date: Date) => {
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    return new Intl.DateTimeFormat('en-CA', { timeZone: BELGIUM_TZ }).format(date)
   }
 
   const getDayStatus = (date: Date): DayStatus => {
@@ -172,7 +173,9 @@ const BookingCalendar = () => {
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day)
+      // UTC noon anchor: guaranteed to be the same calendar day in Belgium timezone
+      // regardless of where the admin's browser is located
+      const date = new Date(Date.UTC(year, month, day, 12, 0, 0))
       days.push(getDayStatus(date))
     }
 
@@ -200,6 +203,7 @@ const BookingCalendar = () => {
   const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
   const weekDaysShort = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
   const today = new Date()
+  const todayBelgiumStr = new Intl.DateTimeFormat('en-CA', { timeZone: BELGIUM_TZ }).format(today)
 
   // Calculate stats
   const currentMonthDays = calendarDays.filter(d => d !== null) as DayStatus[]
@@ -243,7 +247,7 @@ const BookingCalendar = () => {
               </div>
               <div>
                 <h2 className="text-sm sm:text-xl font-bold text-slate-900">
-                  {currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                  {new Intl.DateTimeFormat('en-US', { timeZone: BELGIUM_TZ, month: 'short', year: 'numeric' }).format(currentDate)}
                 </h2>
               </div>
             </div>
@@ -305,9 +309,12 @@ const BookingCalendar = () => {
               )
             }
 
-            const isToday = formatDateStr(today) === dayStatus.dateStr
-            const isPast = dayStatus.date < new Date(today.getFullYear(), today.getMonth(), today.getDate())
-            const isWeekend = dayStatus.date.getDay() === 0 || dayStatus.date.getDay() === 6
+            const isToday = todayBelgiumStr === dayStatus.dateStr
+            const isPast = dayStatus.dateStr < todayBelgiumStr
+            // Derive weekend from dayStatus.dateStr which is already Belgium-calendar-correct
+            const [_y, _m, _d] = dayStatus.dateStr.split('-').map(Number)
+            const dayOfWeek = new Date(Date.UTC(_y, _m - 1, _d, 12)).getUTCDay()
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
 
             return (
               <button
@@ -342,7 +349,7 @@ const BookingCalendar = () => {
                       : 'text-slate-800'
                   }`}
                 >
-                  {dayStatus.date.getDate()}
+                  {Number(dayStatus.dateStr.split('-')[2])}
                 </div>
 
                 {/* Status Text */}
@@ -436,14 +443,10 @@ const BookingCalendar = () => {
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="text-white/70 text-sm font-medium">
-                      {selectedDay.date.toLocaleDateString('en-US', { weekday: 'long' })}
+                      {new Intl.DateTimeFormat('en-US', { timeZone: BELGIUM_TZ, weekday: 'long' }).format(selectedDay.date)}
                     </p>
                     <h3 className="text-2xl font-bold text-white mt-1">
-                      {selectedDay.date.toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
+                      {new Intl.DateTimeFormat('en-US', { timeZone: BELGIUM_TZ, month: 'long', day: 'numeric', year: 'numeric' }).format(selectedDay.date)}
                     </h3>
                   </div>
                   <button

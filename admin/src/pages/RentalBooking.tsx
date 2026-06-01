@@ -140,7 +140,9 @@ const RentalBooking = () => {
             parking: selectedProperty.parking
           } : null,
           booking: {
-            fullDate: new Date(newBookingForm.checkInDate).toISOString(),
+            // Send Belgium calendar date as YYYY-MM-DD — backend stores it at Belgium midnight.
+            // Avoids browser-local `.toISOString()` drift (e.g. UTC-5 turning "2026-04-20" into a UTC "2026-04-20T05:00:00Z").
+            fullDate: newBookingForm.checkInDate,
             checkInTime: newBookingForm.checkInTime,
             checkOutTime: newBookingForm.checkOutTime
           }
@@ -231,12 +233,12 @@ const RentalBooking = () => {
   }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Brussels',
       month: 'short',
       day: 'numeric',
       year: 'numeric'
-    })
+    }).format(new Date(dateString))
   }
 
   const getStatusConfig = (status: string) => {

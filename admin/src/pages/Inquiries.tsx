@@ -161,14 +161,14 @@ const Inquiries = () => {
   }
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Brussels',
       year: 'numeric',
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    })
+    }).format(new Date(dateString))
   }
 
   const getTimeAgo = (dateString: string) => {

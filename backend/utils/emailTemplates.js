@@ -1,7 +1,10 @@
 const BELGIUM_TIMEZONE = 'Europe/Brussels';
+const { getTimeSlot } = require('./timezone');
 
 // Email template for enrollment confirmation
 exports.enrollmentConfirmationEmail = (enrollment) => {
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
   return `
     <!DOCTYPE html>
     <html>
@@ -90,7 +93,7 @@ exports.enrollmentConfirmationEmail = (enrollment) => {
             <p style="margin: 5px 0;"><span class="info-label">Enrollment ID:</span> <span class="info-value">#${enrollment.enrollmentId}</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Service:</span> <span class="info-value">${enrollment.serviceTitle}</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Date:</span> <span class="info-value">${new Date(enrollment.appointmentDate).toLocaleDateString('en-US', { timeZone: BELGIUM_TIMEZONE, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
-            <p style="margin: 5px 0;"><span class="info-label">Time:</span> <span class="info-value">${enrollment.appointmentTime}</span></p>
+            <p style="margin: 5px 0;"><span class="info-label">Time:</span> <span class="info-value">${timeSlot} (Belgian time, ${durationMinutes} min)</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Duration:</span> <span class="info-value">${enrollment.service.duration} minutes</span></p>
             <p style="margin: 5px 0;"><span class="info-label">Price:</span> <span class="info-value">€${enrollment.service.price}</span></p>
           </div>
@@ -133,6 +136,8 @@ exports.enrollmentConfirmationEmail = (enrollment) => {
 
 // Email template for admin notification
 exports.adminNotificationEmail = (enrollment) => {
+  const durationMinutes = enrollment.service?.duration || 60;
+  const timeSlot = getTimeSlot(enrollment.appointmentTime, durationMinutes);
   return `
     <!DOCTYPE html>
     <html>
@@ -231,7 +236,7 @@ exports.adminNotificationEmail = (enrollment) => {
 
         <div class="info-row">
           <div class="label">Time:</div>
-          <div class="value">${enrollment.appointmentTime}</div>
+          <div class="value">${timeSlot} (Belgian time, ${durationMinutes} min)</div>
         </div>
 
         <div class="info-row">

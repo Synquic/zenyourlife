@@ -101,6 +101,47 @@ const formatBelgiumDate = (date, options = {}) => {
   });
 };
 
+/**
+ * Compute end time by adding duration to an HH:MM start time.
+ * @param {string} startTime - HH:MM (24h)
+ * @param {number} durationMinutes
+ * @returns {string} HH:MM (24h)
+ */
+const addMinutesToTime = (startTime, durationMinutes) => {
+  const [h, m] = String(startTime).split(':').map(Number);
+  const total = h * 60 + m + (Number(durationMinutes) || 0);
+  const eh = Math.floor(total / 60) % 24;
+  const em = total % 60;
+  return `${String(eh).padStart(2, '0')}:${String(em).padStart(2, '0')}`;
+};
+
+/**
+ * Format an appointment slot as "HH:MM - HH:MM".
+ * @param {string} startTime - HH:MM (24h)
+ * @param {number} durationMinutes
+ * @returns {string}
+ */
+const getTimeSlot = (startTime, durationMinutes) => {
+  return `${startTime} - ${addMinutesToTime(startTime, durationMinutes)}`;
+};
+
+/**
+ * Format appointment date as full long date (Belgium calendar).
+ * @param {Date|string} dateInput
+ * @returns {string} e.g. "Tuesday, 28 April 2026"
+ */
+const formatAppointmentDate = (dateInput) => {
+  const belgiumDateStr = getBelgiumDateStr(dateInput);
+  const [yr, mo, dy] = belgiumDateStr.split('-').map(Number);
+  return new Date(Date.UTC(yr, mo - 1, dy)).toLocaleDateString('en-GB', {
+    timeZone: 'UTC',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+};
+
 module.exports = {
   BELGIUM_TIMEZONE,
   getBelgiumNow,
@@ -109,5 +150,8 @@ module.exports = {
   getBelgiumDateStr,
   getStartOfDayBelgium,
   getEndOfDayBelgium,
-  formatBelgiumDate
+  formatBelgiumDate,
+  addMinutesToTime,
+  getTimeSlot,
+  formatAppointmentDate
 };

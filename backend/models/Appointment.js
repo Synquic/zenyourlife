@@ -72,9 +72,21 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],
     default: 'confirmed'
+  },
+
+  // Token used to authorize customer self-cancellation via email link
+  cancellationToken: {
+    type: String,
+    select: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {
+    transform: (_doc, ret) => {
+      delete ret.cancellationToken;
+      return ret;
+    }
+  }
 });
 
 // Index for faster queries
